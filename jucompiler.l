@@ -4,16 +4,20 @@
 	int linha_erro = 0;
 	int coluna_erro = 0;
 	int flag = 0;
+	char strlit[200];
 %}
 
-letras					([A-Za-z"_""$"])+
-nomes	 				([A-Za-z"_""$"])+[0-9]*
+letras					[A-Za-z_$]
+alfanum					[0-9A-Za-z_$]
+space 					(" "|"\t")
 reserved 				"++"|"--"|"null"
 
-intlit    				([1-9]+["_"0-9]*[0-9]+)
+intlit    				[0-9]|[1-9]+["_"0-9]*[0-9]+
    
 exponte                 (e|E)("+"|"-")?["_"0-9]+
 reallit					(["_"0-9]+"."["_"0-9]*{exponte}*)|(["_"0-9]+{exponte})|("."["_"0-9]*{exponte}*)
+
+escape					\\f|\\n|\\r|\\t|\\\\|\\
 
 %X COMEN_LINHA COMEN ASPAS
 
@@ -28,12 +32,17 @@ reallit					(["_"0-9]+"."["_"0-9]*{exponte}*)|(["_"0-9]+{exponte})|("."["_"0-9]*
 <COMEN>"\\n"			{num_colunas += yyleng;}
 <COMEN>\n				{num_colunas = 1;num_linhas++;}
 <COMEN>"*/" 			{BEGIN 0;num_colunas += yyleng;}
-<COMEN><<EOF>> 			{BEGIN 0;printf("Line %d, column %d: unterminated comment\n", linha_erro, coluna_erro); num_colunas = 1;}
+<COMEN><<EOF>> 			{BEGIN 0;printf("Line %d, column %d: unterminated comment\n", linha_erro, coluna_erro);}
 
-\"						{BEGIN ASPAS;linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
-<ASPAS>\n 				{BEGIN 0;printf("Line %d, column %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas = 1;num_linhas++;}
-<ASPAS>\"				{BEGIN 0;printf("STRLIT(\"%s\")\n",yytext);num_colunas += yyleng;}
 
+\"						{BEGIN ASPAS;strcpy(strlit, "");linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
+<ASPAS>\n 				{BEGIN 0;printf("Line %d, column %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas += yyleng;num_linhas++;}
+<ASPAS>{alfanum}		{strcat(strlit, yytext);num_colunas += yyleng;}
+<ASPAS>{escape}			{strcat(strlit, yytext);num_colunas += yyleng;}
+<ASPAS>{space}			{strcat(strlit, yytext);num_colunas += yyleng;}
+<ASPAS>\"				{BEGIN 0;if(flag==0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;}
+<ASPAS><<EOF>> 			{BEGIN 0; printf("Line %d, column %d: unterminated string literal\n", linha_erro, coluna_erro);}
+<ASPAS>[^\\]			{num_colunas += yyleng;}
 
 
 
@@ -80,21 +89,22 @@ Integer.parseInt 		{if(flag==0){printf("PARSEINT\n");}num_colunas+= yyleng;}
 public					{if(flag==0){printf("PUBLIC\n");}num_colunas+= yyleng;}
 return 					{if(flag==0){printf("RETURN\n");}num_colunas+= yyleng;}
 static					{if(flag==0){printf("STATIC\n");}num_colunas+= yyleng;}
-string					{if(flag==0){printf("STRING\n");}num_colunas+= yyleng;}
+String					{if(flag==0){printf("STRING\n");}num_colunas+= yyleng;}
 void					{if(flag==0){printf("VOID\n");}num_colunas+= yyleng;} 
 while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng;}
 package					{if(flag==0){printf("PACKAGE\n");}num_colunas+= yyleng;}
 func 					{if(flag==0){printf("FUNC\n");}num_colunas+= yyleng;}
-os.Args 				{if(flag==0){printf("CMDARGS\n");}num_colunas+= yyleng;}
 
+{space}					{num_colunas += yyleng;}
 {reserved}				{if(flag==0){printf("RESERVED(%s)\n", yytext);}num_colunas+= yyleng;}
-\n     					{num_colunas = 1; num_linhas++;}
 
-{nomes}					{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng;}
+{letras}{alfanum}*		{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng;}
 {reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;}
 {intlit}				{if(flag==0){printf("INTLIT(%s)\n",yytext);}num_colunas+= yyleng;}
 
-. 						{num_colunas+= yyleng;}
+\n      				{num_colunas = 1; num_linhas++;}
+.	 					{num_colunas+= yyleng;}
+
 
 %%
 int main(int argc, char *argv[]){
