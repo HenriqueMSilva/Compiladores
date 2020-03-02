@@ -13,6 +13,8 @@ clang-3.9 -o jucompiler lex.yy.c
 
 ./jucompiler -l < testes/INTLIT.juc | diff testes/INTLIT.out -
 
+ ./jucompiler -l < Comp2020/meta1/IdentifiersAndKeywords2.juc | diff Comp2020/meta1/IdentifiersA
+ndKeywords2.out -
 
 ver str lit
 aspas 10/15
