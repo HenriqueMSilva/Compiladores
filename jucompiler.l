@@ -7,7 +7,7 @@
 	char strlit[200];
 %}
 
-escape					\\f|\\n|\\r|\\t|\\\\|\\|\\\"
+escape					\f|\n|\r|\t|\\\\|\\\"
 lineTerminator			\n|\r|(\r\n)
 
 inputCharacter			[^(\r|\n)]*
@@ -16,7 +16,7 @@ letras					[A-Za-z_$]
 alfanum					[0-9A-Za-z_$]
 space 					(" "|\t)
 
-reserved 				"++"|"--"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"char"|"const"|"continue"|"default"|"do"|"enum"|"extends"|"final"|"finally"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"instance"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"
+reserved 				"++"|"--"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"char"|"const"|"continue"|"default"|"do"|"enum"|"extends"|"final"|"finally"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"instance"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"Integer"|"System"
 
 
 intlit    				[0-9]|[1-9]+["_"0-9]*[0-9]+
@@ -42,13 +42,11 @@ reallit					(["_"0-9]+"."["_"0-9]*{exponte}*)|(["_"0-9]+{exponte})|("."["_"0-9]+
 
 
 \"						{BEGIN ASPAS;strcpy(strlit, "");linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
-<ASPAS>\n 				{BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas += yyleng;num_linhas++;}
-<ASPAS>{alfanum}		{strcat(strlit, yytext);num_colunas += yyleng;}
+<ASPAS>{lineTerminator} {BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas += yyleng;num_linhas++;}
 <ASPAS>{escape}			{strcat(strlit, yytext);num_colunas += yyleng;}
-<ASPAS>{space}			{strcat(strlit, yytext);num_colunas += yyleng;}
 <ASPAS>\"				{BEGIN 0;if(flag==0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;}
 <ASPAS><<EOF>> 			{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);}
-<ASPAS>[^\\]			{num_colunas += yyleng;}
+<ASPAS>.				{strcat(strlit, yytext);num_colunas += yyleng;}
 
 
 true|false				{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng;}
@@ -100,7 +98,6 @@ while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng;}
 {lineTerminator}		{num_colunas = 1;num_linhas++;}
 
 {reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;}
-{space}					{num_colunas += yyleng;}
 
 {letras}{alfanum}*		{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng;}
 {reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;}
