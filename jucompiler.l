@@ -7,9 +7,15 @@
 	char strlit[200];
 %}
 
+escape					\\f|\\n|\\r|\\t|\\\\|\\|\\\"
+lineTerminator			\n|\r|(\r\n)
+
+inputCharacter			[^(\r|\n)]*
+
 letras					[A-Za-z_$]
 alfanum					[0-9A-Za-z_$]
-space 					(" "|"\t")
+space 					(" "|\t|{lineTerminator})
+
 reserved 				"++"|"--"|"null"
 
 intlit    				[0-9]|[1-9]+["_"0-9]*[0-9]+
@@ -17,22 +23,20 @@ intlit    				[0-9]|[1-9]+["_"0-9]*[0-9]+
 exponte                 (e|E)("+"|"-")?["_"0-9]+
 reallit					(["_"0-9]+"."["_"0-9]*{exponte}*)|(["_"0-9]+{exponte})|("."["_"0-9]*{exponte}*)
 
-escape					\\f|\\n|\\r|\\t|\\\\|\\
 
 %X COMEN_LINHA COMEN ASPAS
 
 %%
-"//"					{BEGIN COMEN_LINHA;num_colunas += yyleng;}
-<COMEN_LINHA>.*			{num_colunas += yyleng;}
-<COMEN_LINHA>\n 		{BEGIN 0;num_colunas = 1;num_linhas++;}
+"//"						{BEGIN COMEN_LINHA;num_colunas += yyleng;}
+<COMEN_LINHA>.				{num_colunas += yyleng;}
+<COMEN_LINHA>\n 			{BEGIN 0;num_colunas = 1;num_linhas++;}
 
-
-"/*"					{BEGIN COMEN; linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
-<COMEN>.				{num_colunas += yyleng;}
-<COMEN>"\\n"			{num_colunas += yyleng;}
-<COMEN>\n				{num_colunas = 1;num_linhas++;}
-<COMEN>"*/" 			{BEGIN 0;num_colunas += yyleng;}
-<COMEN><<EOF>> 			{BEGIN 0;printf("Line %d, column %d: unterminated comment\n", linha_erro, coluna_erro);}
+"/*"						{BEGIN COMEN; linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
+<COMEN>"\\n"				{num_colunas += yyleng;}
+<COMEN>{lineTerminator}		{num_colunas = 1;num_linhas++;}
+<COMEN>.					{num_colunas += yyleng;}
+<COMEN>"*/" 				{BEGIN 0;num_colunas += yyleng;}
+<COMEN><<EOF>> 				{BEGIN 0;printf("Line %d, column %d: unterminated comment\n", linha_erro, coluna_erro);}
 
 
 \"						{BEGIN ASPAS;strcpy(strlit, "");linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
@@ -50,7 +54,6 @@ true|false				{if(flag==0){printf("BOOLLIT\n");}num_colunas+= yyleng;}
 "&&" 					{if(flag==0){printf("AND\n");}num_colunas+= yyleng;}
 "=" 					{if(flag==0){printf("ASSIGN\n");}num_colunas+= yyleng;}
 "*" 					{if(flag==0){printf("STAR\n");}num_colunas+= yyleng;}
-"_" 					{if(flag==0){printf("BLANKID\n");}num_colunas+= yyleng;}
 "," 					{if(flag==0){printf("COMMA\n");}num_colunas+= yyleng;}
 "/" 					{if(flag==0){printf("DIV\n");}num_colunas+= yyleng;}
 "=="					{if(flag==0){printf("EQ\n");}num_colunas+= yyleng;}
@@ -92,17 +95,14 @@ static					{if(flag==0){printf("STATIC\n");}num_colunas+= yyleng;}
 String					{if(flag==0){printf("STRING\n");}num_colunas+= yyleng;}
 void					{if(flag==0){printf("VOID\n");}num_colunas+= yyleng;} 
 while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng;}
-package					{if(flag==0){printf("PACKAGE\n");}num_colunas+= yyleng;}
-func 					{if(flag==0){printf("FUNC\n");}num_colunas+= yyleng;}
 
 {space}					{num_colunas += yyleng;}
-{reserved}				{if(flag==0){printf("RESERVED(%s)\n", yytext);}num_colunas+= yyleng;}
+{reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;}
 
 {letras}{alfanum}*		{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng;}
 {reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;}
 {intlit}				{if(flag==0){printf("INTLIT(%s)\n",yytext);}num_colunas+= yyleng;}
 
-\n      				{num_colunas = 1; num_linhas++;}
 .	 					{num_colunas+= yyleng;}
 
 
