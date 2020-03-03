@@ -10,6 +10,7 @@
 
 escape					\\f|\\n|\\r|\\t|\\\\|\\\"
 invalidescape 			[^(f|r|t|n|\\|\\\")]
+
 lineTerminator			\n|\r|(\r\n)
 
 inputCharacter			[^(\r|\n)]*
@@ -17,6 +18,7 @@ inputCharacter			[^(\r|\n)]*
 letras					[A-Za-z_$]
 alfanum					[0-9A-Za-z_$]
 space 					(" "|\t)
+
 
 reserved 				"++"|"--"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"char"|"const"|"continue"|"default"|"do"|"enum"|"extends"|"final"|"finally"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"instance"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"Integer"|"System"
 
@@ -30,17 +32,18 @@ reallit					(["_"0-9]+"."["_"0-9]*{exponte}*)|(["_"0-9]+{exponte})|("."["_"0-9]+
 %X COMEN_LINHA COMEN ASPAS
 
 %%
+
 "//"							{BEGIN COMEN_LINHA;num_colunas += yyleng;}
-<COMEN_LINHA>.					{num_colunas += yyleng;}
 <COMEN_LINHA>{lineTerminator}	{BEGIN 0;num_colunas = 1;num_linhas++;}
+<COMEN_LINHA>.					{num_colunas += yyleng;}
 
 
 "/*"							{BEGIN COMEN; linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
-<COMEN>"\\n"					{num_colunas += yyleng;}
 <COMEN>{lineTerminator}			{num_colunas = 1;num_linhas++;}
-<COMEN>.						{num_colunas += yyleng;}
-<COMEN>"*/" 					{BEGIN 0;num_colunas += yyleng;}
 <COMEN><<EOF>> 					{BEGIN 0;printf("Line %d, col %d: unterminated comment\n", linha_erro, coluna_erro);}
+<COMEN>"*/" 					{BEGIN 0;num_colunas += yyleng;}
+<COMEN>.						{num_colunas += yyleng;}
+
 
 
 \"						{BEGIN ASPAS;strcpy(strlit, "");error_sequence=0;linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
