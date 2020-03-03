@@ -47,9 +47,10 @@ reallit					(["_"0-9]+"."["_"0-9]*{exponte}*)|(["_"0-9]+{exponte})|("."["_"0-9]+
 
 
 \"						{BEGIN ASPAS;strcpy(strlit, "");error_sequence=0;linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
-<ASPAS>{lineTerminator} {BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas = 1;num_linhas++;}
+<ASPAS>"\\"\n 			{error_sequence=1;printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);num_colunas += yyleng;}
+<ASPAS>\\{invalidescape} {error_sequence=1;printf("Line %d, col %d: invalid escape sequence (%s)\n", num_linhas, num_colunas, yytext);num_colunas += yyleng;}
 <ASPAS>{escape}			{if(error_sequence== 0){strcat(strlit, yytext);}num_colunas += yyleng;}
-<ASPAS>\\{invalidescape} {error_sequence=1;printf("Line %d, col %d: invalid escape sequence (%c%c)\n", num_linhas, num_colunas, yytext[0],yytext[1]);num_colunas += yyleng;}
+<ASPAS>{lineTerminator} {BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas = 1;num_linhas++;}
 <ASPAS>\"				{BEGIN 0;if(flag==0 && error_sequence== 0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;}
 <ASPAS><<EOF>> 			{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);}
 <ASPAS>[^\\]			{if(error_sequence== 0){strcat(strlit, yytext);}num_colunas += yyleng;}
