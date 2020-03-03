@@ -28,3 +28,32 @@ reserved word
 <COMEN><<EOF>> 			{BEGIN 0;printf("Line %d, column %d: unterminated comment\n", linha_erro, coluna_erro);}
 
 
+
+
+0.0e0 sim
+1.e   
+
+e-1 sim
+1e+01 sim
+1.e+01 sim
+"\\" imprime \\
+"qsd\ [enter] imprime erro de escape e de unterminated string
+"\[enter]"\\"
+""
+
+#length impime 
+--------------
+
+
+
+
+----------------
+
+"\ [este \ é do \n ou é \\n??]
+
+
+excluir escape sequences?
+--------------
+clone fork branch commit para esse branch merge request para site
+
+[1-9]("_"*[0-9]|[0-9])* | 0
