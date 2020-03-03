@@ -16,7 +16,7 @@ class Small #
 vari.able
 02
 1.e0_0
-"\	
+"\
 "\\"
 "hey\
 
