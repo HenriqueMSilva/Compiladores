@@ -10,24 +10,24 @@
 
 %}
 
-escape							\f|\n|\r|\t|\\|\"
-escape_sem_aspa					\f|\n|\r|\t|\\
 
+escape					\f|\n|\r|\t|\\\\|\\\"
 lineTerminator			\n|\r|(\r\n)
 
 inputCharacter			[^(\r|\n)]*
 
 letras					[A-Za-z_$]
 alfanum					[0-9A-Za-z_$]
-space 					(" "|\t|{lineTerminator})
+space 					(" "|\t)
 
-reserved 				"++"|"--"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"char"|"const"|"continue"|"default"|"do"|"enum"|"extends"|"final"|"finally"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"instance"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"System"|"Integer"
+
+reserved 				"++"|"--"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"char"|"const"|"continue"|"default"|"do"|"enum"|"extends"|"final"|"finally"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"instance"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"Integer"|"System"
 
 
 intlit    				[0-9]|[1-9]+["_"0-9]*[0-9]+
    
 exponte                 (e|E)("+"|"-")?["_"0-9]+
-reallit					(["_"0-9]+"."["_"0-9]*{exponte}*)|(["_"0-9]+{exponte})|("."["_"0-9]*{exponte}*)
+reallit					(["_"0-9]+"."["_"0-9]*{exponte}*)|(["_"0-9]+{exponte})|("."["_"0-9]+{exponte}*)
 
 
 %X COMEN_LINHA COMEN ASPAS
@@ -38,6 +38,7 @@ reallit					(["_"0-9]+"."["_"0-9]*{exponte}*)|(["_"0-9]+{exponte})|("."["_"0-9]*
 <COMEN_LINHA>{lineTerminator}	{BEGIN 0;num_colunas = 1;num_linhas++;}
 <COMEN_LINHA>.					{num_colunas += yyleng;}
 
+
 "/*"							{BEGIN COMEN; linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
 <COMEN>{lineTerminator}			{num_colunas = 1;num_linhas++;}
 <COMEN><<EOF>> 					{BEGIN 0;printf("Line %d, col %d: unterminated comment\n", linha_erro, coluna_erro);}
@@ -45,18 +46,16 @@ reallit					(["_"0-9]+"."["_"0-9]*{exponte}*)|(["_"0-9]+{exponte})|("."["_"0-9]*
 <COMEN>.						{num_colunas += yyleng;}
 
 
-\"								{BEGIN ASPAS;strcpy(strlit, "");linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
-<ASPAS>{lineTerminator} 		{BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas += yyleng;num_linhas++;}
-<ASPAS>{escape_sem_aspa}		{strcat(strlit, yytext);num_colunas += yyleng;}
-<ASPAS>{space}					{strcat(strlit, yytext);num_colunas += yyleng;}
 
-<ASPAS>{alfanum}				{strcat(strlit, yytext);num_colunas += yyleng;}
-<ASPAS>\"						{BEGIN 0;if(flag==0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;}
-<ASPAS><<EOF>> 					{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);}
-<ASPAS>[^\\]					{num_colunas += yyleng;}
+\"						{BEGIN ASPAS;strcpy(strlit, "");linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
+<ASPAS>{lineTerminator} {BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas += yyleng;num_linhas++;}
+<ASPAS>{escape}			{strcat(strlit, yytext);num_colunas += yyleng;}
+<ASPAS>\"				{BEGIN 0;if(flag==0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;}
+<ASPAS><<EOF>> 			{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);}
+<ASPAS>.				{strcat(strlit, yytext);num_colunas += yyleng;}
 
 
-true|false				{if(flag==0){printf("BOOLLIT(%s)\n", yytext);}num_colunas+= yyleng;}
+true|false				{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng;}
 "&&" 					{if(flag==0){printf("AND\n");}num_colunas+= yyleng;}
 "=" 					{if(flag==0){printf("ASSIGN\n");}num_colunas+= yyleng;}
 "*" 					{if(flag==0){printf("STAR\n");}num_colunas+= yyleng;}
@@ -86,7 +85,7 @@ true|false				{if(flag==0){printf("BOOLLIT(%s)\n", yytext);}num_colunas+= yyleng
 "^"     				{if(flag==0){printf("XOR\n");}num_colunas+= yyleng;}
 boolean					{if(flag==0){printf("BOOL\n");}num_colunas+= yyleng;}
 class					{if(flag==0){printf("CLASS\n");}num_colunas+= yyleng;}
-".length"				{if(flag==0){printf("DOTLENGTH\n");}num_colunas+= yyleng;}
+.length					{if(flag==0){printf("DOTLENGTH\n");}num_colunas+= yyleng;}
 double					{if(flag==0){printf("DOUBLE\n");}num_colunas+= yyleng;}
 else 					{if(flag==0){printf("ELSE\n");}num_colunas+= yyleng;}
 if 						{if(flag==0){printf("IF\n");}num_colunas+= yyleng;}
@@ -100,14 +99,17 @@ String					{if(flag==0){printf("STRING\n");}num_colunas+= yyleng;}
 void					{if(flag==0){printf("VOID\n");}num_colunas+= yyleng;} 
 while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng;}
 
-{reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;}
+
 {space}					{num_colunas += yyleng;}
+{lineTerminator}		{num_colunas = 1;num_linhas++;}
+
+{reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;}
 
 {letras}{alfanum}*		{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng;}
 {reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;}
 {intlit}				{if(flag==0){printf("INTLIT(%s)\n",yytext);}num_colunas+= yyleng;}
 
-.	 					{num_colunas+= yyleng;}
+.	 					{printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng;}
 
 
 %%
