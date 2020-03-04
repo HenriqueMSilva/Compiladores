@@ -13,21 +13,10 @@ clang-3.9 -o jucompiler lex.yy.c
 
 ./jucompiler -l < testes/INTLIT.juc | diff testes/INTLIT.out -
 
- ./jucompiler -l < Comp2020/meta1/IdentifiersAndKeywords2.juc | diff Comp2020/meta1/IdentifiersAndKeywords2.out -
+./jucompiler -l < Comp2020/meta1/IdentifiersAndKeywords2.juc | diff Comp2020/meta1/IdentifiersAndKeywords2.out -
 
 ver str lit
 aspas 10/15
-cometarios 
-reserved word
-
-"/*"					{BEGIN COMEN; linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
-<COMEN>.				{num_colunas += yyleng;}
-<COMEN>"\\n"			{num_colunas += yyleng;}
-<COMEN>\n				{num_colunas = 1;num_linhas++;}
-<COMEN>"*/" 			{BEGIN 0;num_colunas += yyleng;}
-<COMEN><<EOF>> 			{BEGIN 0;printf("Line %d, column %d: unterminated comment\n", linha_erro, coluna_erro);}
-
-
 
 
 0.0e0 sim
@@ -57,3 +46,25 @@ excluir escape sequences?
 clone fork branch commit para esse branch merge request para site
 
 [1-9]("_"*[0-9]|[0-9])* | 0
+
+
+1)
+\" e \\ visiveis 
+\n e \t invisiveis
+msa sao todos escape?
+sim
+
+
+2)como é que o lex funciona com escape
+ele le 1 caracter ascci de cada x, ou seja vai ver caracters de escape, mas as regras estao defenidas com +1 caracter (existe um passo de sintesse na compilacao)
+
+
+___
+\\n					escrever 1 \ seguida de 1 n
+\n					 ENTER
+"\n"					 ENTER
+
+___
+escrevo barra  -> vai ser escape->	 1) se depois vier um operador(excluindo "): significa que queremos apanhar o caracter do operador
+									2) se vier um caracter nao operador: significa que estamos a tentar apanhar um caracter de escape
+nota: \" é um caracter de escape 

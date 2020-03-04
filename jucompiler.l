@@ -8,30 +8,32 @@
 	int error_sequence = 0;
 %}
 
-escape					\\f|\\n|\\r|\\t|\\\\|\\\"
-invalidescape 			[^(f|r|t|n|\\|\\\")]
+valid_escape			\f|\t|\\{2}|\\\"
+invalid_escape			[^(f|r|t|n|\\|\")]
+
 
 lineTerminator			\n|\r|(\r\n)
 
-inputCharacter			[^(\r|\n)]*
 
-letras					[A-Za-z_$]
-alfanum					[0-9A-Za-z_$]
+letras					[A-Za-z_\$]
+alfanum					[0-9A-Za-z_\$]
 space 					(" "|\t)
 
 
 reserved 				"++"|"--"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"char"|"const"|"continue"|"default"|"do"|"enum"|"extends"|"final"|"finally"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"Integer"|"System"
 
+und_real				 [0-9]|[0-9]["_"0-9]*[0-9]
 
-intlit    				[0-9]|[1-9]+["_"0-9]*[0-9]+
+intlit    				[0-9]|[1-9]["_"0-9]*[0-9]
    
-exponte                 (e|E)("+"|"-")?["_"0-9]+
-reallit					(["_"0-9]+"."["_"0-9]*{exponte}*)|(["_"0-9]+{exponte})|("."["_"0-9]+{exponte}*)
+exponte                 (e|E)("+"|"-")?{und_real}+
+reallit					({und_real}+"."{und_real}*{exponte}?)|({und_real}+{exponte})|("."{und_real}+{exponte}?)
 
 
 %X COMEN_LINHA COMEN ASPAS
 
 %%
+
 
 "//"							{BEGIN COMEN_LINHA;num_colunas += yyleng;}
 <COMEN_LINHA>{lineTerminator}	{BEGIN 0;num_colunas = 1;num_linhas++;}
@@ -46,14 +48,15 @@ reallit					(["_"0-9]+"."["_"0-9]*{exponte}*)|(["_"0-9]+{exponte})|("."["_"0-9]+
 
 
 
-\"						{BEGIN ASPAS;strcpy(strlit, "");error_sequence=0;linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
-<ASPAS>("\\"){lineTerminator}	{BEGIN 0;printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas += yyleng;num_linhas++;}
-<ASPAS>\\{invalidescape} {error_sequence=1;printf("Line %d, col %d: invalid escape sequence (%s)\n", num_linhas, num_colunas, yytext);num_colunas += yyleng;}
-<ASPAS>{escape}			{if(error_sequence== 0){strcat(strlit, yytext);}num_colunas += yyleng;}
-<ASPAS>{lineTerminator} {BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas = 1;num_linhas++;}
-<ASPAS>\"				{BEGIN 0;if(flag==0 && error_sequence== 0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;}
-<ASPAS><<EOF>> 			{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);}
-<ASPAS>[^\\]			{if(error_sequence== 0){strcat(strlit, yytext);}num_colunas += yyleng;}
+\"									{BEGIN ASPAS;strcpy(strlit, "");error_sequence=0;linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
+<ASPAS>{valid_escape}				{if(error_sequence== 0){strcat(strlit, yytext);}num_colunas += yyleng;}
+<ASPAS>{lineTerminator} 			{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas = 1;num_linhas++;}
+<ASPAS>\"							{BEGIN 0; if(flag == 0 && error_sequence== 0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;}
+<ASPAS><<EOF>> 						{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);}
+<ASPAS>\\{lineTerminator}			{BEGIN 0; error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro); num_linhas++ ; num_colunas = 1;}							
+<ASPAS>\\{invalid_escape}			{error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (%s)\n", num_linhas, num_colunas, yytext);num_colunas += yyleng;}							
+<ASPAS>.							{if(error_sequence == 0){strcat(strlit, yytext);}num_colunas += yyleng;}
+
 
 
 true|false				{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng;}
@@ -86,7 +89,7 @@ true|false				{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng;
 "^"     				{if(flag==0){printf("XOR\n");}num_colunas+= yyleng;}
 boolean					{if(flag==0){printf("BOOL\n");}num_colunas+= yyleng;}
 class					{if(flag==0){printf("CLASS\n");}num_colunas+= yyleng;}
-".length"					{if(flag==0){printf("DOTLENGTH\n");}num_colunas+= yyleng;}
+".length"				{if(flag==0){printf("DOTLENGTH\n");}num_colunas+= yyleng;}
 double					{if(flag==0){printf("DOUBLE\n");}num_colunas+= yyleng;}
 else 					{if(flag==0){printf("ELSE\n");}num_colunas+= yyleng;}
 if 						{if(flag==0){printf("IF\n");}num_colunas+= yyleng;}

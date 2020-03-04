@@ -1,0 +1,7 @@
+Line 15, col 29: invalid escape sequence (\b)
+Line 16, col 28: invalid escape sequence (\g)
+Line 22, col 32: invalid escape sequence (\h)
+Line 22, col 29: unterminated string literal
+Line 28, col 31: invalid escape sequence (\d)
+Line 33, col 31: invalid escape sequence (\e)
+Line 32, col 5: unterminated comment
