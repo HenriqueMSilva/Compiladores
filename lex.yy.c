@@ -1053,7 +1053,7 @@ case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
 #line 56 "jucompiler.l"
-{BEGIN 0; error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro); num_linhas++ ; num_colunas = 1;}							
+{BEGIN 0; printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro); num_linhas++ ; num_colunas = 1;}							
 	YY_BREAK
 case 13:
 /* rule 13 can match eol */
