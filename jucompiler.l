@@ -17,7 +17,7 @@ lineTerminator			\n|\r|(\r\n)
 
 letras					[A-Za-z_\$]
 alfanum					[0-9A-Za-z_\$]
-space 					(" "|\t)
+space 					(" "|\t|\f)
 
 
 reserved 				"++"|"--"|"null"|"abstract"|"assert"|"break"|"byte"|"case"|"catch"|"char"|"const"|"continue"|"default"|"do"|"enum"|"extends"|"final"|"finally"|"float"|"for"|"goto"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"package"|"private"|"protected"|"short"|"strictfp"|"super"|"switch"|"synchronized"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"Integer"|"System"
@@ -48,14 +48,14 @@ reallit					({und_real}+"."{und_real}*{exponte}?)|({und_real}+{exponte})|("."{un
 
 
 
-\"									{BEGIN ASPAS;strcpy(strlit, "");error_sequence=0;linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
-<ASPAS>{valid_escape}				{if(error_sequence== 0){strcat(strlit, yytext);}num_colunas += yyleng;}
-<ASPAS>{lineTerminator} 			{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas = 1;num_linhas++;}
-<ASPAS>\"							{BEGIN 0; if(flag == 0 && error_sequence== 0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;}
-<ASPAS><<EOF>> 						{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);}
-<ASPAS>\\{lineTerminator}			{BEGIN 0; error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro); num_linhas++ ; num_colunas = 1;}							
-<ASPAS>\\{invalid_escape}			{error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (%s)\n", num_linhas, num_colunas, yytext);num_colunas += yyleng;}							
-<ASPAS>.							{if(error_sequence == 0){strcat(strlit, yytext);}num_colunas += yyleng;}
+\"								{BEGIN ASPAS;strcpy(strlit, "");error_sequence=0;linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
+<ASPAS>{valid_escape}			{if(error_sequence== 0){strcat(strlit, yytext);}num_colunas += yyleng;}
+<ASPAS>{lineTerminator} 		{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas = 1;num_linhas++;}
+<ASPAS>\"						{BEGIN 0; if(flag == 0 && error_sequence== 0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;}
+<ASPAS><<EOF>> 					{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);}
+<ASPAS>\\{lineTerminator}		{BEGIN 0; error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro); num_linhas++ ; num_colunas = 1;}							
+<ASPAS>\\{invalid_escape}		{error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (%s)\n", num_linhas, num_colunas, yytext);num_colunas += yyleng;}							
+<ASPAS>.						{if(error_sequence == 0){strcat(strlit, yytext);}num_colunas += yyleng;}
 
 
 
@@ -114,7 +114,6 @@ while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng;}
 {lineTerminator}		{num_colunas = 1;num_linhas++;}
 
 .	 					{printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng;}
-
 
 %%
 int main(int argc, char *argv[]){

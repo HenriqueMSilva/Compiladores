@@ -535,7 +535,7 @@ static const flex_int16_t yy_def[362] =
 
 static const flex_int16_t yy_nxt[617] =
     {   0,
-       10,   11,   12,   10,   13,   11,   14,   15,   16,   17,
+       10,   11,   12,   11,   13,   11,   14,   15,   16,   17,
        18,   19,   20,   21,   22,   23,   24,   25,   26,   27,
        28,   29,   30,   31,   32,   16,   33,   34,   35,   10,
        36,   37,   16,   38,   39,   40,   41,   42,   43,   44,
@@ -1053,7 +1053,7 @@ case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
 #line 56 "jucompiler.l"
-{BEGIN 0; printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro); num_linhas++ ; num_colunas = 1;}							
+{BEGIN 0; error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro); num_linhas++ ; num_colunas = 1;}							
 	YY_BREAK
 case 13:
 /* rule 13 can match eol */
@@ -1319,7 +1319,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 119 "jucompiler.l"
+#line 118 "jucompiler.l"
 ECHO;
 	YY_BREAK
 #line 1326 "lex.yy.c"
@@ -2328,7 +2328,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 119 "jucompiler.l"
+#line 118 "jucompiler.l"
 
 int main(int argc, char *argv[]){
 	if(argc == 2){
