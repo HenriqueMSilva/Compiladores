@@ -9,7 +9,7 @@
 %}
 
 valid_escape			\f|\t|\\{2}|\\\"
-invalid_escape			[^(f|r|t|n|\\|\")]
+invalid_escape			[^frtn\\\"]
 
 
 lineTerminator			\n|\r|(\r\n)
