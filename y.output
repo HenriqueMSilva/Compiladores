@@ -1,8 +1,3 @@
-Nonterminals useless in grammar
-
-   MethodBody
-
-
 Terminals unused in grammar
 
    BOOLLIT
@@ -34,11 +29,6 @@ Terminals unused in grammar
    WHILE
 
 
-Rules useless in grammar
-
-   20 MethodBody: LBRACE RBRACE
-
-
 Grammar
 
     0 $accept: program $end
@@ -50,7 +40,7 @@ Grammar
     4        | FieldDecl metodos
     5        | SEMICOLON metodos
 
-    6 MethodDecl: PUBLIC STATIC MethodHeader
+    6 MethodDecl: PUBLIC STATIC MethodHeader MethodBody
 
     7 FieldDecl: PUBLIC STATIC Type ID FieldDeclNext SEMICOLON
 
@@ -71,6 +61,16 @@ Grammar
    18 FormalParamsNext: %empty
    19                 | COMMA Type ID FormalParamsNext
 
+   20 MethodBody: LBRACE Body RBRACE
+
+   21 Body: %empty
+   22     | VarDecl Body
+
+   23 VarDecl: Type ID VarDeclNext SEMICOLON
+
+   24 VarDeclNext: %empty
+   25            | COMMA ID
+
 
 Terminals, with rules where they appear
 
@@ -80,12 +80,12 @@ BOOLLIT (258)
 AND (259)
 ASSIGN (260)
 STAR (261)
-COMMA (262) 9 19
+COMMA (262) 9 19 25
 DIV (263)
 EQ (264)
 GE (265)
 GT (266)
-LBRACE (267) 1
+LBRACE (267) 1 20
 LE (268)
 LPAR (269) 13 14
 RPAR (270) 13 14
@@ -97,9 +97,9 @@ NE (275)
 NOT (276)
 OR (277)
 PLUS (278)
-RBRACE (279) 1
+RBRACE (279) 1 20
 RSQ (280) 17
-SEMICOLON (281) 5 7
+SEMICOLON (281) 5 7 23
 ARROW (282)
 LSHIFT (283)
 RSHIFT (284)
@@ -119,7 +119,7 @@ STATIC (297) 6 7
 STRING (298) 17
 VOID (299) 14
 WHILE (300)
-ID (301) 1 7 9 13 14 16 17 19
+ID (301) 1 7 9 13 14 16 17 19 23 25
 
 
 Nonterminals, with rules where they appear
@@ -137,13 +137,21 @@ FieldDecl (51)
 FieldDeclNext (52)
     on left: 8 9, on right: 7
 Type (53)
-    on left: 10 11 12, on right: 7 13 16 19
+    on left: 10 11 12, on right: 7 13 16 19 23
 MethodHeader (54)
     on left: 13 14, on right: 6
 FormalParams (55)
     on left: 15 16 17, on right: 13 14
 FormalParamsNext (56)
     on left: 18 19, on right: 16 19
+MethodBody (57)
+    on left: 20, on right: 6
+Body (58)
+    on left: 21 22, on right: 20 22
+VarDecl (59)
+    on left: 23, on right: 22
+VarDeclNext (60)
+    on left: 24 25, on right: 23
 
 
 State 0
@@ -213,7 +221,7 @@ State 6
 
 State 7
 
-    6 MethodDecl: PUBLIC . STATIC MethodHeader
+    6 MethodDecl: PUBLIC . STATIC MethodHeader MethodBody
     7 FieldDecl: PUBLIC . STATIC Type ID FieldDeclNext SEMICOLON
 
     STATIC  shift, and go to state 12
@@ -263,7 +271,7 @@ State 11
 
 State 12
 
-    6 MethodDecl: PUBLIC STATIC . MethodHeader
+    6 MethodDecl: PUBLIC STATIC . MethodHeader MethodBody
     7 FieldDecl: PUBLIC STATIC . Type ID FieldDeclNext SEMICOLON
 
     BOOL    shift, and go to state 16
@@ -334,16 +342,18 @@ State 20
 
 State 21
 
-    6 MethodDecl: PUBLIC STATIC MethodHeader .
+    6 MethodDecl: PUBLIC STATIC MethodHeader . MethodBody
 
-    $default  reduce using rule 6 (MethodDecl)
+    LBRACE  shift, and go to state 24
+
+    MethodBody  go to state 25
 
 
 State 22
 
    14 MethodHeader: VOID ID . LPAR FormalParams RPAR
 
-    LPAR  shift, and go to state 24
+    LPAR  shift, and go to state 26
 
 
 State 23
@@ -351,140 +361,230 @@ State 23
     7 FieldDecl: PUBLIC STATIC Type ID . FieldDeclNext SEMICOLON
    13 MethodHeader: Type ID . LPAR FormalParams RPAR
 
-    COMMA  shift, and go to state 25
-    LPAR   shift, and go to state 26
+    COMMA  shift, and go to state 27
+    LPAR   shift, and go to state 28
 
     $default  reduce using rule 8 (FieldDeclNext)
 
-    FieldDeclNext  go to state 27
+    FieldDeclNext  go to state 29
 
 
 State 24
+
+   20 MethodBody: LBRACE . Body RBRACE
+
+    BOOL    shift, and go to state 16
+    DOUBLE  shift, and go to state 17
+    INT     shift, and go to state 18
+
+    $default  reduce using rule 21 (Body)
+
+    Type     go to state 30
+    Body     go to state 31
+    VarDecl  go to state 32
+
+
+State 25
+
+    6 MethodDecl: PUBLIC STATIC MethodHeader MethodBody .
+
+    $default  reduce using rule 6 (MethodDecl)
+
+
+State 26
 
    14 MethodHeader: VOID ID LPAR . FormalParams RPAR
 
     BOOL    shift, and go to state 16
     DOUBLE  shift, and go to state 17
     INT     shift, and go to state 18
-    STRING  shift, and go to state 28
+    STRING  shift, and go to state 33
 
     $default  reduce using rule 15 (FormalParams)
 
-    Type          go to state 29
-    FormalParams  go to state 30
+    Type          go to state 34
+    FormalParams  go to state 35
 
 
-State 25
+State 27
 
     9 FieldDeclNext: COMMA . ID
 
-    ID  shift, and go to state 31
+    ID  shift, and go to state 36
 
 
-State 26
+State 28
 
    13 MethodHeader: Type ID LPAR . FormalParams RPAR
 
     BOOL    shift, and go to state 16
     DOUBLE  shift, and go to state 17
     INT     shift, and go to state 18
-    STRING  shift, and go to state 28
+    STRING  shift, and go to state 33
 
     $default  reduce using rule 15 (FormalParams)
 
-    Type          go to state 29
-    FormalParams  go to state 32
-
-
-State 27
-
-    7 FieldDecl: PUBLIC STATIC Type ID FieldDeclNext . SEMICOLON
-
-    SEMICOLON  shift, and go to state 33
-
-
-State 28
-
-   17 FormalParams: STRING . LSQ RSQ ID
-
-    LSQ  shift, and go to state 34
+    Type          go to state 34
+    FormalParams  go to state 37
 
 
 State 29
 
-   16 FormalParams: Type . ID FormalParamsNext
+    7 FieldDecl: PUBLIC STATIC Type ID FieldDeclNext . SEMICOLON
 
-    ID  shift, and go to state 35
+    SEMICOLON  shift, and go to state 38
 
 
 State 30
 
-   14 MethodHeader: VOID ID LPAR FormalParams . RPAR
+   23 VarDecl: Type . ID VarDeclNext SEMICOLON
 
-    RPAR  shift, and go to state 36
+    ID  shift, and go to state 39
 
 
 State 31
+
+   20 MethodBody: LBRACE Body . RBRACE
+
+    RBRACE  shift, and go to state 40
+
+
+State 32
+
+   22 Body: VarDecl . Body
+
+    BOOL    shift, and go to state 16
+    DOUBLE  shift, and go to state 17
+    INT     shift, and go to state 18
+
+    $default  reduce using rule 21 (Body)
+
+    Type     go to state 30
+    Body     go to state 41
+    VarDecl  go to state 32
+
+
+State 33
+
+   17 FormalParams: STRING . LSQ RSQ ID
+
+    LSQ  shift, and go to state 42
+
+
+State 34
+
+   16 FormalParams: Type . ID FormalParamsNext
+
+    ID  shift, and go to state 43
+
+
+State 35
+
+   14 MethodHeader: VOID ID LPAR FormalParams . RPAR
+
+    RPAR  shift, and go to state 44
+
+
+State 36
 
     9 FieldDeclNext: COMMA ID .
 
     $default  reduce using rule 9 (FieldDeclNext)
 
 
-State 32
+State 37
 
    13 MethodHeader: Type ID LPAR FormalParams . RPAR
 
-    RPAR  shift, and go to state 37
+    RPAR  shift, and go to state 45
 
 
-State 33
+State 38
 
     7 FieldDecl: PUBLIC STATIC Type ID FieldDeclNext SEMICOLON .
 
     $default  reduce using rule 7 (FieldDecl)
 
 
-State 34
+State 39
+
+   23 VarDecl: Type ID . VarDeclNext SEMICOLON
+
+    COMMA  shift, and go to state 46
+
+    $default  reduce using rule 24 (VarDeclNext)
+
+    VarDeclNext  go to state 47
+
+
+State 40
+
+   20 MethodBody: LBRACE Body RBRACE .
+
+    $default  reduce using rule 20 (MethodBody)
+
+
+State 41
+
+   22 Body: VarDecl Body .
+
+    $default  reduce using rule 22 (Body)
+
+
+State 42
 
    17 FormalParams: STRING LSQ . RSQ ID
 
-    RSQ  shift, and go to state 38
+    RSQ  shift, and go to state 48
 
 
-State 35
+State 43
 
    16 FormalParams: Type ID . FormalParamsNext
 
-    COMMA  shift, and go to state 39
+    COMMA  shift, and go to state 49
 
     $default  reduce using rule 18 (FormalParamsNext)
 
-    FormalParamsNext  go to state 40
+    FormalParamsNext  go to state 50
 
 
-State 36
+State 44
 
    14 MethodHeader: VOID ID LPAR FormalParams RPAR .
 
     $default  reduce using rule 14 (MethodHeader)
 
 
-State 37
+State 45
 
    13 MethodHeader: Type ID LPAR FormalParams RPAR .
 
     $default  reduce using rule 13 (MethodHeader)
 
 
-State 38
+State 46
+
+   25 VarDeclNext: COMMA . ID
+
+    ID  shift, and go to state 51
+
+
+State 47
+
+   23 VarDecl: Type ID VarDeclNext . SEMICOLON
+
+    SEMICOLON  shift, and go to state 52
+
+
+State 48
 
    17 FormalParams: STRING LSQ RSQ . ID
 
-    ID  shift, and go to state 41
+    ID  shift, and go to state 53
 
 
-State 39
+State 49
 
    19 FormalParamsNext: COMMA . Type ID FormalParamsNext
 
@@ -492,42 +592,56 @@ State 39
     DOUBLE  shift, and go to state 17
     INT     shift, and go to state 18
 
-    Type  go to state 42
+    Type  go to state 54
 
 
-State 40
+State 50
 
    16 FormalParams: Type ID FormalParamsNext .
 
     $default  reduce using rule 16 (FormalParams)
 
 
-State 41
+State 51
+
+   25 VarDeclNext: COMMA ID .
+
+    $default  reduce using rule 25 (VarDeclNext)
+
+
+State 52
+
+   23 VarDecl: Type ID VarDeclNext SEMICOLON .
+
+    $default  reduce using rule 23 (VarDecl)
+
+
+State 53
 
    17 FormalParams: STRING LSQ RSQ ID .
 
     $default  reduce using rule 17 (FormalParams)
 
 
-State 42
+State 54
 
    19 FormalParamsNext: COMMA Type . ID FormalParamsNext
 
-    ID  shift, and go to state 43
+    ID  shift, and go to state 55
 
 
-State 43
+State 55
 
    19 FormalParamsNext: COMMA Type ID . FormalParamsNext
 
-    COMMA  shift, and go to state 39
+    COMMA  shift, and go to state 49
 
     $default  reduce using rule 18 (FormalParamsNext)
 
-    FormalParamsNext  go to state 44
+    FormalParamsNext  go to state 56
 
 
-State 44
+State 56
 
    19 FormalParamsNext: COMMA Type ID FormalParamsNext .
 

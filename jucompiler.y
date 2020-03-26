@@ -10,18 +10,24 @@ void yyerror(char* s);
 %}
 
 %token BOOLLIT AND ASSIGN STAR COMMA DIV EQ GE GT LBRACE LE LPAR RPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGTH DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC RETURN STATIC STRING VOID WHILE
+
 %token<id>ID 
-%type<aux>program
-%type<aux>metodos
-%type<aux>MethodHeader
-%type<aux>MethodDecl
-%type<aux>FormalParams
-%type<aux>FormalParamsNext
-%type<aux>FieldDeclNext
+%type<id>program
+%type<id>metodos
+%type<id>MethodDecl
+%type<id>FieldDecl
+%type<id>FieldDeclNext
+%type<id>MethodHeader
+%type<id>FormalParams
+%type<id>FormalParamsNext
+%type<id>MethodBody
+%type<id>Body
+%type<id>VarDecl
+%type<id>VarDeclNext
+
 
 %union{
     char *id;
-    char *aux;
 }
 
 %%
@@ -34,10 +40,10 @@ metodos: /*empty*/                                          {$$= "";}
         | SEMICOLON metodos                                 
     ;
 
-MethodDecl: PUBLIC STATIC MethodHeader                      {$$= $3;}
+MethodDecl: PUBLIC STATIC MethodHeader MethodBody           {$$= $4;}
     ;
 
-FieldDecl:  PUBLIC STATIC Type ID FieldDeclNext SEMICOLON
+FieldDecl:  PUBLIC STATIC Type ID FieldDeclNext SEMICOLON   
     ;
 
 FieldDeclNext:  /*empty*/                                   {$$= "";}     
@@ -49,12 +55,12 @@ Type: BOOL
     | DOUBLE
     ;
 
-MethodHeader: Type ID LPAR FormalParams RPAR                {$$= $2;}
-            | VOID ID LPAR FormalParams RPAR                {$$= $2;}
+MethodHeader: Type ID LPAR FormalParams RPAR                {$$= $4;}
+            | VOID ID LPAR FormalParams RPAR                {$$= $4;}
     ;
 
-FormalParams:  /*empty*/                                    
-            | Type ID FormalParamsNext                      {$$= $2;}
+FormalParams:  /*empty*/                                    {$$= "";}
+            | Type ID FormalParamsNext                      {$$= $3;}
             | STRING LSQ RSQ ID                             {$$= $4;}
     ;
 
@@ -63,7 +69,41 @@ FormalParamsNext: /*empty*/                                 {$$= "";}
     ;
 
 
-MethodBody: LBRACE RBRACE
+MethodBody: LBRACE Body RBRACE                              {$$= $2;}
+    ;
+
+Body:  /*empty*/                                            {$$= "";} 
+    |  VarDecl  Body                                        {$$= $1;} 
+    ;
+
+VarDecl: Type ID  VarDeclNext SEMICOLON                     {$$= strcat($2,$3);}
+    ;
+
+VarDeclNext: /*empty*/                                      {$$= "";}
+           | COMMA ID                                       {$$= $2;}
+    ;
+
+
+
+
+Statement:  WHILE LPAR Expr RPAR StatementBrackets
+        |   IF LPAR Expr RPAR Statement StatementElse
+        |   RETURN StatementReturn SEMICOLON
+    ;
+
+StatementBrackets: LBRACE Statement RBRACE
+    ;
+
+StatementElse:  /*empty*/ 
+            |   ELSE Statement
+    ;
+
+StatementReturn: /*empty*/
+            |    Expr
+    ;
+
+Expr: INTLIT
+    ;
 
 %%
 

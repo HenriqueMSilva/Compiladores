@@ -142,12 +142,11 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 22 "jucompiler.y" /* yacc.c:1909  */
+#line 29 "jucompiler.y" /* yacc.c:1909  */
 
     char *id;
-    char *aux;
 
-#line 151 "y.tab.h" /* yacc.c:1909  */
+#line 150 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
