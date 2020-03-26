@@ -1,0 +1,214 @@
+Terminals unused in grammar
+
+   ELSE
+   IF
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: CLASS ID LBRACE metodos RBRACE
+
+    2 metodos: %empty
+    3        | MethodDecl metodos
+
+    4 MethodDecl: PUBLIC STATIC MethodHeader
+
+    5 Type: BOOL
+    6     | INT
+    7     | DOUBLE
+
+    8 MethodHeader: Type ID LPAR RPAR
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+LBRACE (258) 1
+LPAR (259) 8
+RPAR (260) 8
+RBRACE (261) 1
+BOOL (262) 5
+CLASS (263) 1
+DOUBLE (264) 7
+ELSE (265)
+IF (266)
+INT (267) 6
+PUBLIC (268) 4
+STATIC (269) 4
+ID (270) 1 8
+
+
+Nonterminals, with rules where they appear
+
+$accept (16)
+    on left: 0
+program (17)
+    on left: 1, on right: 0
+metodos (18)
+    on left: 2 3, on right: 1 3
+MethodDecl (19)
+    on left: 4, on right: 3
+Type (20)
+    on left: 5 6 7, on right: 8
+MethodHeader (21)
+    on left: 8, on right: 4
+
+
+State 0
+
+    0 $accept: . program $end
+
+    CLASS  shift, and go to state 1
+
+    program  go to state 2
+
+
+State 1
+
+    1 program: CLASS . ID LBRACE metodos RBRACE
+
+    ID  shift, and go to state 3
+
+
+State 2
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 4
+
+
+State 3
+
+    1 program: CLASS ID . LBRACE metodos RBRACE
+
+    LBRACE  shift, and go to state 5
+
+
+State 4
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 5
+
+    1 program: CLASS ID LBRACE . metodos RBRACE
+
+    PUBLIC  shift, and go to state 6
+
+    $default  reduce using rule 2 (metodos)
+
+    metodos     go to state 7
+    MethodDecl  go to state 8
+
+
+State 6
+
+    4 MethodDecl: PUBLIC . STATIC MethodHeader
+
+    STATIC  shift, and go to state 9
+
+
+State 7
+
+    1 program: CLASS ID LBRACE metodos . RBRACE
+
+    RBRACE  shift, and go to state 10
+
+
+State 8
+
+    3 metodos: MethodDecl . metodos
+
+    PUBLIC  shift, and go to state 6
+
+    $default  reduce using rule 2 (metodos)
+
+    metodos     go to state 11
+    MethodDecl  go to state 8
+
+
+State 9
+
+    4 MethodDecl: PUBLIC STATIC . MethodHeader
+
+    BOOL    shift, and go to state 12
+    DOUBLE  shift, and go to state 13
+    INT     shift, and go to state 14
+
+    Type          go to state 15
+    MethodHeader  go to state 16
+
+
+State 10
+
+    1 program: CLASS ID LBRACE metodos RBRACE .
+
+    $default  reduce using rule 1 (program)
+
+
+State 11
+
+    3 metodos: MethodDecl metodos .
+
+    $default  reduce using rule 3 (metodos)
+
+
+State 12
+
+    5 Type: BOOL .
+
+    $default  reduce using rule 5 (Type)
+
+
+State 13
+
+    7 Type: DOUBLE .
+
+    $default  reduce using rule 7 (Type)
+
+
+State 14
+
+    6 Type: INT .
+
+    $default  reduce using rule 6 (Type)
+
+
+State 15
+
+    8 MethodHeader: Type . ID LPAR RPAR
+
+    ID  shift, and go to state 17
+
+
+State 16
+
+    4 MethodDecl: PUBLIC STATIC MethodHeader .
+
+    $default  reduce using rule 4 (MethodDecl)
+
+
+State 17
+
+    8 MethodHeader: Type ID . LPAR RPAR
+
+    LPAR  shift, and go to state 18
+
+
+State 18
+
+    8 MethodHeader: Type ID LPAR . RPAR
+
+    RPAR  shift, and go to state 19
+
+
+State 19
+
+    8 MethodHeader: Type ID LPAR RPAR .
+
+    $default  reduce using rule 8 (MethodHeader)
