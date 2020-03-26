@@ -125,6 +125,8 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[1],"-e1") == 0){
 			flag = 1;
 			while(yylex()){}
+		}else if(strcmp(argv[1],"-t") == 0){
+			yyparse();
 		}
 	}else if(argc == 1){
 			flag = 1;

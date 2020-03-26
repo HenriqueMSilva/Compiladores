@@ -45,47 +45,109 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    LBRACE = 258,
-    LPAR = 259,
-    RPAR = 260,
-    RBRACE = 261,
-    BOOL = 262,
-    CLASS = 263,
-    DOUBLE = 264,
-    ELSE = 265,
-    IF = 266,
-    INT = 267,
-    PUBLIC = 268,
-    STATIC = 269,
-    ID = 270
+    BOOLLIT = 258,
+    AND = 259,
+    ASSIGN = 260,
+    STAR = 261,
+    COMMA = 262,
+    DIV = 263,
+    EQ = 264,
+    GE = 265,
+    GT = 266,
+    LBRACE = 267,
+    LE = 268,
+    LPAR = 269,
+    RPAR = 270,
+    LSQ = 271,
+    LT = 272,
+    MINUS = 273,
+    MOD = 274,
+    NE = 275,
+    NOT = 276,
+    OR = 277,
+    PLUS = 278,
+    RBRACE = 279,
+    RSQ = 280,
+    SEMICOLON = 281,
+    ARROW = 282,
+    LSHIFT = 283,
+    RSHIFT = 284,
+    XOR = 285,
+    BOOL = 286,
+    CLASS = 287,
+    DOTLENGTH = 288,
+    DOUBLE = 289,
+    ELSE = 290,
+    IF = 291,
+    INT = 292,
+    PRINT = 293,
+    PARSEINT = 294,
+    PUBLIC = 295,
+    RETURN = 296,
+    STATIC = 297,
+    STRING = 298,
+    VOID = 299,
+    WHILE = 300,
+    ID = 301
   };
 #endif
 /* Tokens.  */
-#define LBRACE 258
-#define LPAR 259
-#define RPAR 260
-#define RBRACE 261
-#define BOOL 262
-#define CLASS 263
-#define DOUBLE 264
-#define ELSE 265
-#define IF 266
-#define INT 267
-#define PUBLIC 268
-#define STATIC 269
-#define ID 270
+#define BOOLLIT 258
+#define AND 259
+#define ASSIGN 260
+#define STAR 261
+#define COMMA 262
+#define DIV 263
+#define EQ 264
+#define GE 265
+#define GT 266
+#define LBRACE 267
+#define LE 268
+#define LPAR 269
+#define RPAR 270
+#define LSQ 271
+#define LT 272
+#define MINUS 273
+#define MOD 274
+#define NE 275
+#define NOT 276
+#define OR 277
+#define PLUS 278
+#define RBRACE 279
+#define RSQ 280
+#define SEMICOLON 281
+#define ARROW 282
+#define LSHIFT 283
+#define RSHIFT 284
+#define XOR 285
+#define BOOL 286
+#define CLASS 287
+#define DOTLENGTH 288
+#define DOUBLE 289
+#define ELSE 290
+#define IF 291
+#define INT 292
+#define PRINT 293
+#define PARSEINT 294
+#define PUBLIC 295
+#define RETURN 296
+#define STATIC 297
+#define STRING 298
+#define VOID 299
+#define WHILE 300
+#define ID 301
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 18 "jucompiler.y" /* yacc.c:1909  */
+#line 22 "jucompiler.y" /* yacc.c:1909  */
 
     char *id;
     char *aux;
 
-#line 89 "y.tab.h" /* yacc.c:1909  */
+#line 151 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
