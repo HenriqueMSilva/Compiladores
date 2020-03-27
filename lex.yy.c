@@ -1300,7 +1300,7 @@ YY_RULE_SETUP
 case 61:
 YY_RULE_SETUP
 #line 112 "jucompiler.l"
-{if(flag==0){printf("INTLIT(%s)\n",yytext);}num_colunas+= yyleng;}
+{if(flag==0){printf("INTLIT(%s)\n",yytext);}num_colunas+= yyleng;yylval.id = strdup(yytext);return INTLIT;}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
@@ -2340,6 +2340,7 @@ int main(int argc, char *argv[]){
 			flag = 1;
 			while(yylex()){}
 		}else if(strcmp(argv[1],"-t") == 0){
+			flag = 2;
 			yyparse();
 		}
 	}else if(argc == 1){

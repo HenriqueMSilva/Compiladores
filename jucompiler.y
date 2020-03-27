@@ -9,8 +9,8 @@ void yyerror(char* s);
 
 %}
 
-%token BOOLLIT AND ASSIGN STAR COMMA DIV EQ GE GT LBRACE LE LPAR RPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGTH DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC RETURN STATIC STRING VOID WHILE INTLIT REALLIT 
-
+%token BOOLLIT AND ASSIGN STAR COMMA DIV EQ GE GT LBRACE LE LPAR RPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGTH DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC RETURN STATIC STRING VOID WHILE REALLIT 
+%token<id>INTLIT 
 %token<id>ID 
 %type<id>program
 %type<id>metodos
@@ -24,14 +24,29 @@ void yyerror(char* s);
 %type<id>Body
 %type<id>VarDecl
 %type<id>VarDeclNext
+%type<id>Statement
+%type<id>StatementZrOuMais
+%type<id>StatementExpOp
+%type<id>Expr
 
+
+%left OR
+%left AND
+%left EQ NE LT LE GT GE
+%left PLUS MINUS
+%left STAR DIV MOD
+%right NOT
+
+%nonassoc REDUCE
+%nonassoc ELSE
+%nonassoc OPERADORES
 
 %union{
     char *id;
 }
 
 %%
-program: CLASS ID LBRACE metodos RBRACE                     {printf("\n\n\n%s\n\n\n", $4);}
+program: CLASS ID LBRACE metodos RBRACE                     {printf("\n%s\n", $4);}
     ;
 
 metodos: /*empty*/                                          {}
@@ -74,7 +89,7 @@ MethodBody: LBRACE Body RBRACE                              {$$= $2;}
 
 Body:  /*empty*/                                            {} 
     |  VarDecl  Body                                        {} 
-    |  Statement Body                                       {} 
+    |  Statement Body                                       {$$ = $1;} 
     ;
 
 VarDecl: Type ID  VarDeclNext SEMICOLON                     {$$= strcat($2,$3);}
@@ -87,22 +102,18 @@ VarDeclNext: /*empty*/                                      {}
 
 
 
-Statement: LBRACE StatementZrOuMais RBRACE                  {}
+Statement: LBRACE StatementZrOuMais RBRACE                  {$$= $2;}
     ;
 
 StatementZrOuMais: /*empty*/                                {}
-            | Statement  StatementZrOuMais                  {}
+            | Statement  StatementZrOuMais                  {$$= $1;}
     ;
 
-
-Statement:  IF LPAR Expr RPAR Statement StatementElse       {}
+Statement:  IF LPAR Expr RPAR Statement %prec REDUCE        {$$= $5;}
+        |   IF LPAR Expr RPAR Statement ELSE Statement      {}
         |   WHILE LPAR Expr RPAR Statement                  {}
         |   RETURN StatementExpOp SEMICOLON                 {}
     ; 
-
-StatementElse:  /*empty*/                                   {}
-            |   ELSE Statement                              {}
-    ;
 
 StatementExpOp: /*empty*/                                   {}
             |    Expr                                       {}
@@ -110,7 +121,7 @@ StatementExpOp: /*empty*/                                   {}
 
 
 Statement:  StateMethodIAssignmentParseArgs SEMICOLON       {}
-        |   PRINT StatementExpOp SEMICOLON                  {}
+        |   PRINT StatementExpOp SEMICOLON                  {$$= $2;}
     ; 
 
 
@@ -131,83 +142,38 @@ CommaExprZrOuMais: /*empty*/                                 {}
         | COMMA Expr CommaExprZrOuMais                       {}
     ;
 
-Assigment: ID ASSIGN Expr                                    {}                
+Assigment: ID ASSIGN Expr                                    {}
     ;
      
+
 
 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR                {}
     ;
 
 
 
-Expr: Expr Operator1 Expr                                    {}
-    ;
 
-Operator1: PLUS                                              {}
-        | MINUS                                              {}
-        | STAR                                               {}
-        | DIV                                                {}
-        | MOD                                                {}
-    ;
-
-Expr: Expr Operator2 Expr                                    {}
-    ;
-
-Operator2: AND                                               {}
-        | OR                                                 {}
-        | XOR                                                {}
-        | LSHIFT                                             {}
-        | RSHIFT                                             {}
-    ;
-
-Expr: Expr Operator3 Expr                                   {}
-    ;
-
-Operator3: EQ                                               {}
-        | GE                                                {}
-        | GT                                                {}
-        | LE                                                {}
-        | LT                                                {}
-        | NE                                                {}
-    ;
-
-Expr: Operator4 Expr                                        {}
-    ;
-
-Operator4: MINUS                                             {}
-        | NOT                                                {}
-        | PLUS                                               {}
-    ;
-
-
-Expr: LPAR Expr RPAR                                        {}
-    ;
-
-
-Expr: ExprMethodIAssignmentParseArgs                         {}
-    ;
-ExprMethodIAssignmentParseArgs: MethodInvocation            {} 
-        | Assigment                                         {} 
-        | ParseArgs                                         {} 
-    ;
-
-
-
-Expr: ID DotLengthOp                                        {}
-    ;
-
-DotLengthOp: /*empty*/                                      {}
-        | DOTLENGTH                                         {}
-    ;
-
-Expr: IntlRealLBooll                                        {}
-    ;
-
-IntlRealLBooll: INTLIT                                      {}
-        | REALLIT                                            {}
-        | BOOLLIT                                            {}
-    ;
-
+Expr: Expr PLUS Expr         {printf("+");}
+    | Expr MINUS Expr                             {printf("-");}               
+    | Expr STAR Expr                            {printf("*");}
+    | Expr DIV Expr                                 {printf("/");}
+    | Expr MOD Expr                                     {printf("mod");}
+    | Expr AND Expr
+    | Expr OR Expr
+    | Expr XOR Expr
+    | Expr LSHIFT Expr
+    | Expr RSHIFT Expr
+    | Expr EQ Expr
+    | Expr GE Expr
+    | Expr GT Expr
+    | Expr LE Expr
+    | Expr LT Expr
+    | Expr NE Expr
+    | NOT Expr
+    | MINUS Expr
+    | PLUS Expr
+    | INTLIT                                                 {$$ =$1;}
+    ; 
 
 %%
 

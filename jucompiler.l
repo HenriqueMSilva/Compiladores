@@ -109,7 +109,7 @@ while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng;return WHILE;}
 
 {letras}{alfanum}*		{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return ID;}
 {reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;}
-{intlit}				{if(flag==0){printf("INTLIT(%s)\n",yytext);}num_colunas+= yyleng;}
+{intlit}				{if(flag==0){printf("INTLIT(%s)\n",yytext);}num_colunas+= yyleng;yylval.id = strdup(yytext);return INTLIT;}
 
 {space}					{num_colunas += yyleng;}
 {lineTerminator}		{num_colunas = 1;num_linhas++;}
@@ -126,6 +126,7 @@ int main(int argc, char *argv[]){
 			flag = 1;
 			while(yylex()){}
 		}else if(strcmp(argv[1],"-t") == 0){
+			flag = 2;
 			yyparse();
 		}
 	}else if(argc == 1){

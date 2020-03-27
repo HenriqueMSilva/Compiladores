@@ -34,7 +34,7 @@
 # define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -88,9 +88,11 @@ extern int yydebug;
     STRING = 298,
     VOID = 299,
     WHILE = 300,
-    INTLIT = 301,
-    REALLIT = 302,
-    ID = 303
+    REALLIT = 301,
+    INTLIT = 302,
+    ID = 303,
+    REDUCE = 304,
+    OPERADORES = 305
   };
 #endif
 /* Tokens.  */
@@ -137,20 +139,22 @@ extern int yydebug;
 #define STRING 298
 #define VOID 299
 #define WHILE 300
-#define INTLIT 301
-#define REALLIT 302
+#define REALLIT 301
+#define INTLIT 302
 #define ID 303
+#define REDUCE 304
+#define OPERADORES 305
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 29 "jucompiler.y" /* yacc.c:1909  */
+#line 44 "jucompiler.y" /* yacc.c:1909  */
 
     char *id;
 
-#line 154 "y.tab.h" /* yacc.c:1909  */
+#line 158 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
