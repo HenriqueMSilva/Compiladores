@@ -4,14 +4,15 @@
 #include <string.h>
 #include "y.tab.h"
 
+extern int linha_erro, coluna_erro, num_colunas, num_linhas;
 int yylex (void);
 void yyerror(char* s);
 
 %}
 
-%token BOOLLIT AND ASSIGN STAR COMMA DIV EQ GE GT LBRACE LE LPAR RPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGTH DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC RETURN STATIC STRING VOID WHILE REALLIT STRLIT
-%token<id>INTLIT 
-%token<id>ID 
+%token BOOLLIT AND ASSIGN STAR COMMA DIV EQ GE GT LBRACE LE LPAR RPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGTH DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC RETURN STATIC STRING VOID WHILE REALLIT
+
+%token<id>ID INTLIT STRLIT
 %type<id>program
 %type<id>metodos
 %type<id>MethodDecl
@@ -53,7 +54,7 @@ program: CLASS ID LBRACE metodos RBRACE                     {printf("\n%s\n", $4
 
 metodos: /*empty*/                                          {}
         | MethodDecl metodos                                {$$= $1;}
-        | FieldDecl  metodos                                {$$= $1;} 
+        | FieldDecl  metodos                                {} 
         | SEMICOLON metodos                                 {}
     ;
 
@@ -94,7 +95,7 @@ Body:  /*empty*/                                            {}
     |  Statement Body                                       {$$ = $1;} 
     ;
 
-VarDecl: Type ID  VarDeclNext SEMICOLON                     {$$= strcat($2,$3);}
+VarDecl: Type ID  VarDeclNext SEMICOLON                     {$$= $2;}
     ;
 
 VarDeclNext: /*empty*/                                      {}
@@ -106,13 +107,13 @@ VarDeclNext: /*empty*/                                      {}
 
 
 
-Statement:  IF LPAR Expr RPAR Statement %prec REDUCE        {$$= $5;}
+Statement:  IF LPAR Expr RPAR Statement %prec REDUCE        {}
         |   IF LPAR Expr RPAR Statement ELSE Statement      {}
         |   WHILE LPAR Expr RPAR Statement                  {}
         |   RETURN StatementExpOp SEMICOLON                 {}
-        |   LBRACE StatementZrOuMais RBRACE                 {$$= $2;}
+        |   LBRACE StatementZrOuMais RBRACE                 {}
         |   StateMethodIAssignmentParseArgs SEMICOLON       {}
-        |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$= $3;}
+        |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = $3;}
     ; 
 
 StatementZrOuMais: /*empty*/                                {}
@@ -182,7 +183,7 @@ Expr: Expr AND Expr                             {}
     | MethodInvocation                          {$$ = $1;} 
     | Assigment                                 {} 
     | ParseArgs                                 {} 
-    | ID DotLengthOp                            {}
+    | ID DotLengthOp                            {$$ =$1;}
     | REALLIT                                   {}
     | BOOLLIT                                   {}
     | INTLIT                                    {$$ =$1;}
@@ -195,5 +196,6 @@ DotLengthOp: /*empty*/                                      {}
 %%
 
 void yyerror(char *msg) {
-    printf("%s", msg);
+
+    printf("Line %d, col %d: syntax error: %s\n", linha_erro, coluna_erro, yylval.id);
 }

@@ -1,13 +1,14 @@
-class Factorial {
-    public static int factorial(int n) {
-        if (n == 0)
-            return 1;
-        return n * factorial(n-1);
-    }
+class Teste {
+  	public static int main(String[] args){
+  		
+	  	if (/* true) {
+	      System.out.print("20 no projeto \g de SD");
+	      System.out.print("20 no projeto de PPP");
+	      System.out.print("20 no projeto de POO");
+	      System.out.print("20 no projeto de TI");
+	      System.out.print("20 no projeto \q de MULTIMEDIA");
+	      System.out.print("20 no projeto de IRC");
 
-    public static void main(String[] args) {
-        int argument;
-        argument = Integer.parseInt(args[0]);
-        System.out.print(factorial(argument));
-    }
+	    }
+	}
 }

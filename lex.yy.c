@@ -1044,7 +1044,7 @@ YY_RULE_SETUP
 case 11:
 YY_RULE_SETUP
 #line 55 "jucompiler.l"
-{BEGIN 0; if(flag == 0 && error_sequence== 0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;}
+{BEGIN 0; if(flag == 0 && error_sequence== 0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;yylval.id = strdup(strlit);return STRLIT;}
 	YY_BREAK
 case YY_STATE_EOF(ASPAS):
 #line 56 "jucompiler.l"
@@ -1295,7 +1295,7 @@ YY_RULE_SETUP
 case 60:
 YY_RULE_SETUP
 #line 111 "jucompiler.l"
-{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;}
+{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;return REALLIT;}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
@@ -2339,6 +2339,10 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[1],"-e1") == 0){
 			flag = 1;
 			while(yylex()){}
+		}else if(strcmp(argv[1],"-e2") == 0){
+			flag = 1;
+			while(yylex()){}
+			yyparse();
 		}else if(strcmp(argv[1],"-t") == 0){
 			flag = 2;
 			yyparse();

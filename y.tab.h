@@ -89,9 +89,9 @@ extern int yydebug;
     VOID = 299,
     WHILE = 300,
     REALLIT = 301,
-    STRLIT = 302,
+    ID = 302,
     INTLIT = 303,
-    ID = 304,
+    STRLIT = 304,
     REDUCE = 305
   };
 #endif
@@ -140,9 +140,9 @@ extern int yydebug;
 #define VOID 299
 #define WHILE 300
 #define REALLIT 301
-#define STRLIT 302
+#define ID 302
 #define INTLIT 303
-#define ID 304
+#define STRLIT 304
 #define REDUCE 305
 
 /* Value type.  */
@@ -150,7 +150,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 46 "jucompiler.y" /* yacc.c:1909  */
+#line 47 "jucompiler.y" /* yacc.c:1909  */
 
     char *id;
 

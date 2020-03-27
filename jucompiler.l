@@ -52,7 +52,7 @@ reallit					({und_real}+"."{und_real}*{exponte}?)|({und_real}+{exponte})|("."{un
 \"								{BEGIN ASPAS;strcpy(strlit, "");error_sequence=0;linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
 <ASPAS>{valid_escape}			{if(error_sequence== 0){strcat(strlit, yytext);}num_colunas += yyleng;}
 <ASPAS>{lineTerminator} 		{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas = 1;num_linhas++;}
-<ASPAS>\"						{BEGIN 0; if(flag == 0 && error_sequence== 0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;}
+<ASPAS>\"						{BEGIN 0; if(flag == 0 && error_sequence== 0){printf("STRLIT(\"%s\")\n",strlit);}num_colunas += yyleng;yylval.id = strdup(strlit);return STRLIT;}
 <ASPAS><<EOF>> 					{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);}
 <ASPAS>\\{lineTerminator}		{BEGIN 0; error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro); num_linhas++ ; num_colunas = 1;}							
 <ASPAS>\\{invalid_escape}		{error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (%s)\n", num_linhas, num_colunas, yytext);num_colunas += yyleng;}							
@@ -108,7 +108,7 @@ while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng;return WHILE;}
 {reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;}
 
 {letras}{alfanum}*		{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return ID;}
-{reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;}
+{reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;return REALLIT;}
 {intlit}				{if(flag==0){printf("INTLIT(%s)\n",yytext);}num_colunas+= yyleng;yylval.id = strdup(yytext);return INTLIT;}
 
 {space}					{num_colunas += yyleng;}
@@ -125,6 +125,10 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[1],"-e1") == 0){
 			flag = 1;
 			while(yylex()){}
+		}else if(strcmp(argv[1],"-e2") == 0){
+			flag = 1;
+			while(yylex()){}
+			yyparse();
 		}else if(strcmp(argv[1],"-t") == 0){
 			flag = 2;
 			yyparse();
