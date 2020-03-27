@@ -47,7 +47,7 @@ FieldDecl:  PUBLIC STATIC Type ID FieldDeclNext SEMICOLON
     ;
 
 FieldDeclNext:  /*empty*/                                   {$$= "";}     
-             |  COMMA ID
+             |  COMMA ID FieldDeclNext
     ;
 
 Type: BOOL
@@ -74,36 +74,140 @@ MethodBody: LBRACE Body RBRACE                              {$$= $2;}
 
 Body:  /*empty*/                                            {$$= "";} 
     |  VarDecl  Body                                        {$$= $1;} 
+    |  Statement Body                                       {$$= $1;} 
     ;
 
 VarDecl: Type ID  VarDeclNext SEMICOLON                     {$$= strcat($2,$3);}
     ;
 
 VarDeclNext: /*empty*/                                      {$$= "";}
-           | COMMA ID                                       {$$= $2;}
+           | COMMA ID  VarDeclNext                          {$$= $2;}
     ;
 
 
 
 
-Statement:  WHILE LPAR Expr RPAR StatementBrackets
-        |   IF LPAR Expr RPAR Statement StatementElse
-        |   RETURN StatementReturn SEMICOLON
+Statement: LBRACE StatementZrOuMais RBRACE
     ;
 
-StatementBrackets: LBRACE Statement RBRACE
+StatementZrOuMais: /*empty*/                                {$$ = "";}
+            | Statement  StatementZrOuMais                  {$$ = "";}
     ;
 
-StatementElse:  /*empty*/ 
-            |   ELSE Statement
+
+Statement:  IF LPAR Expr RPAR Statement StatementElse       {$$ = "";}
+        |   WHILE LPAR Expr RPAR Statement                  {$$ = "";}
+        |   RETURN StatementExpOp SEMICOLON                 {$$ = "";}
+    ; 
+
+StatementElse:  /*empty*/                                   {$$ = "";}
+            |   ELSE Statement                              {$$ = "";}
     ;
 
-StatementReturn: /*empty*/
-            |    Expr
+StatementExpOp: /*empty*/                                   {$$ = "";}
+            |    Expr                                       {$$ = "";}
     ;
 
-Expr: INTLIT
+
+Statement:  StateMethodIAssignmentParseArgs SEMICOLON       {$$ = "";}
+        |   PRINT StatementExpOp SEMICOLON                  {$$ = "";}
+    ; 
+
+
+StateMethodIAssignmentParseArgs : /*empty*/                 {$$ = "";}             
+        | MethodInvocation                                  {$$ = "";} 
+        | Assigment                                         {$$ = "";} 
+        | ParseArgs                                         {$$ = "";} 
     ;
+
+
+MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {$$ = "";} 
+    ;
+
+ExpCommaExpOP: /*empty*/                                     {$$ = "";} 
+        | Expr CommaExprZrOuMais                             {$$ = "";} 
+    ;
+CommaExprZrOuMais: /*empty*/                                 {$$ = "";}
+        | COMMA Expr CommaExprZrOuMais                       {$$ = "";}
+    ;
+
+Assigment: ID ASSIGN Expr                                    {$$ = "";}                
+    ;
+     
+
+ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR                {$$ = "";}
+    ;
+
+
+
+Expr: Expr Operator1 Expr                                    {$$ = "";}
+    ;
+
+Operator1: PLUS                                              {$$ = "";}
+        | MINUS                                              {$$ = "";}
+        | STAR                                               {$$ = "";}
+        | DIV                                                {$$ = "";}
+        | MOD                                                {$$ = "";}
+    ;
+
+Expr: Expr Operator2 Expr                                    {$$ = "";}
+    ;
+
+Operator2: AND                                               {$$ = "";}
+        | OR                                                 {$$ = "";}
+        | XOR                                                {$$ = "";}
+        | LSHIFT                                             {$$ = "";}
+        | RSHIFT                                             {$$ = "";}
+    ;
+
+Expr: Expr Operator3 Expr                                   {$$ = "";}
+    ;
+
+Operator3: EQ                                               {$$ = "";}
+        | GE                                                {$$ = "";}
+        | GT                                                {$$ = "";}
+        | LE                                                {$$ = "";}
+        | LT                                                {$$ = "";}
+        | NE                                                {$$ = "";}
+    ;
+
+Expr: Operator4 Expr                                        {$$ = "";}
+    ;
+
+Operator4: MINUS                                             {$$ = "";}
+        | NOT                                                {$$ = "";}
+        | PLUS                                               {$$ = "";}
+    ;
+
+
+Expr: LPAR Expr RPAR                                        {$$ = "";}
+    ;
+
+
+Expr: ExprMethodIAssignmentParseArgs                         {$$ = "";}
+    ;
+ExprMethodIAssignmentParseArgs: MethodInvocation            {$$ = "";} 
+        | Assigment                                         {$$ = "";} 
+        | ParseArgs                                         {$$ = "";} 
+    ;
+
+
+
+Expr: ID DotLengthOp                                        {$$ = "";}
+    ;
+
+DotLengthOp: /*empty*/                                      {$$ = "";}
+        | DOTLENGTH                                         {$$ = "";}
+    ;
+
+Expr: IntlRealLBooll                                        {$$ = "";}
+    ;
+
+IntlRealLBooll: INTLINT                                      {$$ = "";}
+        | REALLIT                                            {$$ = "";}
+        | BOOLLIT                                            {$$ = "";}
+    ;
+
 
 %%
 
