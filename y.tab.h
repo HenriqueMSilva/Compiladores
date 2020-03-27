@@ -34,7 +34,7 @@
 # define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 1
+# define YYDEBUG 0
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -88,7 +88,9 @@ extern int yydebug;
     STRING = 298,
     VOID = 299,
     WHILE = 300,
-    ID = 301
+    INTLIT = 301,
+    REALLIT = 302,
+    ID = 303
   };
 #endif
 /* Tokens.  */
@@ -135,7 +137,9 @@ extern int yydebug;
 #define STRING 298
 #define VOID 299
 #define WHILE 300
-#define ID 301
+#define INTLIT 301
+#define REALLIT 302
+#define ID 303
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -146,7 +150,7 @@ union YYSTYPE
 
     char *id;
 
-#line 150 "y.tab.h" /* yacc.c:1909  */
+#line 154 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

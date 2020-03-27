@@ -9,7 +9,7 @@ void yyerror(char* s);
 
 %}
 
-%token BOOLLIT AND ASSIGN STAR COMMA DIV EQ GE GT LBRACE LE LPAR RPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGTH DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC RETURN STATIC STRING VOID WHILE
+%token BOOLLIT AND ASSIGN STAR COMMA DIV EQ GE GT LBRACE LE LPAR RPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGTH DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC RETURN STATIC STRING VOID WHILE INTLIT REALLIT 
 
 %token<id>ID 
 %type<id>program
@@ -34,20 +34,20 @@ void yyerror(char* s);
 program: CLASS ID LBRACE metodos RBRACE                     {printf("\n\n\n%s\n\n\n", $4);}
     ;
 
-metodos: /*empty*/                                          {$$= "";}
+metodos: /*empty*/                                          {}
         | MethodDecl metodos                                {$$= $1;}
-        | FieldDecl  metodos                                
-        | SEMICOLON metodos                                 
+        | FieldDecl  metodos                                {$$= $1;} 
+        | SEMICOLON metodos                                 {}
     ;
 
 MethodDecl: PUBLIC STATIC MethodHeader MethodBody           {$$= $4;}
     ;
 
-FieldDecl:  PUBLIC STATIC Type ID FieldDeclNext SEMICOLON   
+FieldDecl:  PUBLIC STATIC Type ID FieldDeclNext SEMICOLON   {}
     ;
 
-FieldDeclNext:  /*empty*/                                   {$$= "";}     
-             |  COMMA ID FieldDeclNext
+FieldDeclNext:  /*empty*/                                   {}     
+             |  COMMA ID FieldDeclNext                      {}
     ;
 
 Type: BOOL
@@ -59,12 +59,12 @@ MethodHeader: Type ID LPAR FormalParams RPAR                {$$= $4;}
             | VOID ID LPAR FormalParams RPAR                {$$= $4;}
     ;
 
-FormalParams:  /*empty*/                                    {$$= "";}
+FormalParams:  /*empty*/                                    {}
             | Type ID FormalParamsNext                      {$$= $3;}
             | STRING LSQ RSQ ID                             {$$= $4;}
     ;
 
-FormalParamsNext: /*empty*/                                 {$$= "";}
+FormalParamsNext: /*empty*/                                 {}
                 | COMMA Type ID FormalParamsNext            {$$= $3;}
     ;
 
@@ -72,140 +72,140 @@ FormalParamsNext: /*empty*/                                 {$$= "";}
 MethodBody: LBRACE Body RBRACE                              {$$= $2;}
     ;
 
-Body:  /*empty*/                                            {$$= "";} 
-    |  VarDecl  Body                                        {$$= $1;} 
-    |  Statement Body                                       {$$= $1;} 
+Body:  /*empty*/                                            {} 
+    |  VarDecl  Body                                        {} 
+    |  Statement Body                                       {} 
     ;
 
 VarDecl: Type ID  VarDeclNext SEMICOLON                     {$$= strcat($2,$3);}
     ;
 
-VarDeclNext: /*empty*/                                      {$$= "";}
+VarDeclNext: /*empty*/                                      {}
            | COMMA ID  VarDeclNext                          {$$= $2;}
     ;
 
 
 
 
-Statement: LBRACE StatementZrOuMais RBRACE
+Statement: LBRACE StatementZrOuMais RBRACE                  {}
     ;
 
-StatementZrOuMais: /*empty*/                                {$$ = "";}
-            | Statement  StatementZrOuMais                  {$$ = "";}
+StatementZrOuMais: /*empty*/                                {}
+            | Statement  StatementZrOuMais                  {}
     ;
 
 
-Statement:  IF LPAR Expr RPAR Statement StatementElse       {$$ = "";}
-        |   WHILE LPAR Expr RPAR Statement                  {$$ = "";}
-        |   RETURN StatementExpOp SEMICOLON                 {$$ = "";}
+Statement:  IF LPAR Expr RPAR Statement StatementElse       {}
+        |   WHILE LPAR Expr RPAR Statement                  {}
+        |   RETURN StatementExpOp SEMICOLON                 {}
     ; 
 
-StatementElse:  /*empty*/                                   {$$ = "";}
-            |   ELSE Statement                              {$$ = "";}
+StatementElse:  /*empty*/                                   {}
+            |   ELSE Statement                              {}
     ;
 
-StatementExpOp: /*empty*/                                   {$$ = "";}
-            |    Expr                                       {$$ = "";}
+StatementExpOp: /*empty*/                                   {}
+            |    Expr                                       {}
     ;
 
 
-Statement:  StateMethodIAssignmentParseArgs SEMICOLON       {$$ = "";}
-        |   PRINT StatementExpOp SEMICOLON                  {$$ = "";}
+Statement:  StateMethodIAssignmentParseArgs SEMICOLON       {}
+        |   PRINT StatementExpOp SEMICOLON                  {}
     ; 
 
 
-StateMethodIAssignmentParseArgs : /*empty*/                 {$$ = "";}             
-        | MethodInvocation                                  {$$ = "";} 
-        | Assigment                                         {$$ = "";} 
-        | ParseArgs                                         {$$ = "";} 
+StateMethodIAssignmentParseArgs : /*empty*/                 {}             
+        | MethodInvocation                                  {} 
+        | Assigment                                         {} 
+        | ParseArgs                                         {} 
     ;
 
 
-MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {$$ = "";} 
+MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {} 
     ;
 
-ExpCommaExpOP: /*empty*/                                     {$$ = "";} 
-        | Expr CommaExprZrOuMais                             {$$ = "";} 
+ExpCommaExpOP: /*empty*/                                     {} 
+        | Expr CommaExprZrOuMais                             {} 
     ;
-CommaExprZrOuMais: /*empty*/                                 {$$ = "";}
-        | COMMA Expr CommaExprZrOuMais                       {$$ = "";}
+CommaExprZrOuMais: /*empty*/                                 {}
+        | COMMA Expr CommaExprZrOuMais                       {}
     ;
 
-Assigment: ID ASSIGN Expr                                    {$$ = "";}                
+Assigment: ID ASSIGN Expr                                    {}                
     ;
      
 
-ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR                {$$ = "";}
+ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR                {}
     ;
 
 
 
-Expr: Expr Operator1 Expr                                    {$$ = "";}
+Expr: Expr Operator1 Expr                                    {}
     ;
 
-Operator1: PLUS                                              {$$ = "";}
-        | MINUS                                              {$$ = "";}
-        | STAR                                               {$$ = "";}
-        | DIV                                                {$$ = "";}
-        | MOD                                                {$$ = "";}
+Operator1: PLUS                                              {}
+        | MINUS                                              {}
+        | STAR                                               {}
+        | DIV                                                {}
+        | MOD                                                {}
     ;
 
-Expr: Expr Operator2 Expr                                    {$$ = "";}
+Expr: Expr Operator2 Expr                                    {}
     ;
 
-Operator2: AND                                               {$$ = "";}
-        | OR                                                 {$$ = "";}
-        | XOR                                                {$$ = "";}
-        | LSHIFT                                             {$$ = "";}
-        | RSHIFT                                             {$$ = "";}
+Operator2: AND                                               {}
+        | OR                                                 {}
+        | XOR                                                {}
+        | LSHIFT                                             {}
+        | RSHIFT                                             {}
     ;
 
-Expr: Expr Operator3 Expr                                   {$$ = "";}
+Expr: Expr Operator3 Expr                                   {}
     ;
 
-Operator3: EQ                                               {$$ = "";}
-        | GE                                                {$$ = "";}
-        | GT                                                {$$ = "";}
-        | LE                                                {$$ = "";}
-        | LT                                                {$$ = "";}
-        | NE                                                {$$ = "";}
+Operator3: EQ                                               {}
+        | GE                                                {}
+        | GT                                                {}
+        | LE                                                {}
+        | LT                                                {}
+        | NE                                                {}
     ;
 
-Expr: Operator4 Expr                                        {$$ = "";}
+Expr: Operator4 Expr                                        {}
     ;
 
-Operator4: MINUS                                             {$$ = "";}
-        | NOT                                                {$$ = "";}
-        | PLUS                                               {$$ = "";}
-    ;
-
-
-Expr: LPAR Expr RPAR                                        {$$ = "";}
+Operator4: MINUS                                             {}
+        | NOT                                                {}
+        | PLUS                                               {}
     ;
 
 
-Expr: ExprMethodIAssignmentParseArgs                         {$$ = "";}
-    ;
-ExprMethodIAssignmentParseArgs: MethodInvocation            {$$ = "";} 
-        | Assigment                                         {$$ = "";} 
-        | ParseArgs                                         {$$ = "";} 
+Expr: LPAR Expr RPAR                                        {}
     ;
 
 
-
-Expr: ID DotLengthOp                                        {$$ = "";}
+Expr: ExprMethodIAssignmentParseArgs                         {}
+    ;
+ExprMethodIAssignmentParseArgs: MethodInvocation            {} 
+        | Assigment                                         {} 
+        | ParseArgs                                         {} 
     ;
 
-DotLengthOp: /*empty*/                                      {$$ = "";}
-        | DOTLENGTH                                         {$$ = "";}
+
+
+Expr: ID DotLengthOp                                        {}
     ;
 
-Expr: IntlRealLBooll                                        {$$ = "";}
+DotLengthOp: /*empty*/                                      {}
+        | DOTLENGTH                                         {}
     ;
 
-IntlRealLBooll: INTLINT                                      {$$ = "";}
-        | REALLIT                                            {$$ = "";}
-        | BOOLLIT                                            {$$ = "";}
+Expr: IntlRealLBooll                                        {}
+    ;
+
+IntlRealLBooll: INTLIT                                      {}
+        | REALLIT                                            {}
+        | BOOLLIT                                            {}
     ;
 
 
