@@ -1071,17 +1071,17 @@ YY_RULE_SETUP
 case 15:
 YY_RULE_SETUP
 #line 64 "jucompiler.l"
-{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng;return BOOLLIT;}
+{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng; return BOOLLIT;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 65 "jucompiler.l"
-{if(flag==0){printf("AND\n");}num_colunas+= yyleng;return AND;}
+{if(flag==0){printf("AND\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return AND;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 66 "jucompiler.l"
-{if(flag==0){printf("ASSIGN\n");}num_colunas+= yyleng;return ASSIGN;}
+{if(flag==0){printf("ASSIGN\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return ASSIGN;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
@@ -1091,82 +1091,82 @@ YY_RULE_SETUP
 case 19:
 YY_RULE_SETUP
 #line 68 "jucompiler.l"
-{if(flag==0){printf("COMMA\n");}num_colunas+= yyleng;return COMMA;}
+{if(flag==0){printf("COMMA\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return COMMA;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 69 "jucompiler.l"
-{if(flag==0){printf("DIV\n");}num_colunas+= yyleng;return DIV;}
+{if(flag==0){printf("DIV\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return DIV;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 70 "jucompiler.l"
-{if(flag==0){printf("EQ\n");}num_colunas+= yyleng;return EQ;}
+{if(flag==0){printf("EQ\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return EQ;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 71 "jucompiler.l"
-{if(flag==0){printf("GE\n");}num_colunas+= yyleng;return GE;}
+{if(flag==0){printf("GE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return GE;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 72 "jucompiler.l"
-{if(flag==0){printf("GT\n");}num_colunas+= yyleng;return GT;}
+{if(flag==0){printf("GT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return GT;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 73 "jucompiler.l"
-{if(flag==0){printf("LBRACE\n");}num_colunas+= yyleng; return LBRACE;}
+{if(flag==0){printf("LBRACE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return LBRACE;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 74 "jucompiler.l"
-{if(flag==0){printf("LE\n");}num_colunas+= yyleng;return LE;}
+{if(flag==0){printf("LE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return LE;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 75 "jucompiler.l"
-{if(flag==0){printf("LPAR\n");}num_colunas+= yyleng; return LPAR;}	
+{if(flag==0){printf("LPAR\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return LPAR;}	
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 76 "jucompiler.l"
-{if(flag==0){printf("RPAR\n");}num_colunas+= yyleng; return RPAR;}
+{if(flag==0){printf("RPAR\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return RPAR;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 77 "jucompiler.l"
-{if(flag==0){printf("LSQ\n");}num_colunas+= yyleng;return LSQ;}
+{if(flag==0){printf("LSQ\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return LSQ;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 78 "jucompiler.l"
-{if(flag==0){printf("LT\n");}num_colunas+= yyleng;return LT;}
+{if(flag==0){printf("LT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return LT;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 79 "jucompiler.l"
-{if(flag==0){printf("MINUS\n");}num_colunas+= yyleng;return MINUS;}
+{if(flag==0){printf("MINUS\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return MINUS;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 80 "jucompiler.l"
-{if(flag==0){printf("MOD\n");}num_colunas+= yyleng;return MOD;}
+{if(flag==0){printf("MOD\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return MOD;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 81 "jucompiler.l"
-{if(flag==0){printf("NE\n");}num_colunas+= yyleng;return NE;}
+{if(flag==0){printf("NE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return NE;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 82 "jucompiler.l"
-{if(flag==0){printf("NOT\n");}num_colunas+= yyleng;return NOT;}
+{if(flag==0){printf("NOT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return NOT;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 83 "jucompiler.l"
-{if(flag==0){printf("OR\n");}num_colunas+= yyleng;return OR;}
+{if(flag==0){printf("OR\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return OR;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
@@ -1176,117 +1176,117 @@ YY_RULE_SETUP
 case 36:
 YY_RULE_SETUP
 #line 85 "jucompiler.l"
-{if(flag==0){printf("RBRACE\n");}num_colunas+= yyleng; return RBRACE;}
+{if(flag==0){printf("RBRACE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return RBRACE;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 86 "jucompiler.l"
-{if(flag==0){printf("RSQ\n");}num_colunas+= yyleng;return RSQ;}
+{if(flag==0){printf("RSQ\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return RSQ;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 87 "jucompiler.l"
-{if(flag==0){printf("SEMICOLON\n");}num_colunas+= yyleng;return SEMICOLON;}
+{if(flag==0){printf("SEMICOLON\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return SEMICOLON;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 88 "jucompiler.l"
-{if(flag==0){printf("ARROW\n");}num_colunas+= yyleng;return ARROW;}
+{if(flag==0){printf("ARROW\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return ARROW;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 89 "jucompiler.l"
-{if(flag==0){printf("LSHIFT\n");}num_colunas+= yyleng;return LSHIFT;}
+{if(flag==0){printf("LSHIFT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return LSHIFT;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 90 "jucompiler.l"
-{if(flag==0){printf("RSHIFT\n");}num_colunas+= yyleng;return RSHIFT;}
+{if(flag==0){printf("RSHIFT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return RSHIFT;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
 #line 91 "jucompiler.l"
-{if(flag==0){printf("XOR\n");}num_colunas+= yyleng;return XOR;}
+{if(flag==0){printf("XOR\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return XOR;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
 #line 92 "jucompiler.l"
-{if(flag==0){printf("BOOL\n");}num_colunas+= yyleng; return BOOL;}
+{if(flag==0){printf("BOOL\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return BOOL;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 93 "jucompiler.l"
-{if(flag==0){printf("CLASS\n");}num_colunas+= yyleng; return CLASS;}
+{if(flag==0){printf("CLASS\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return CLASS;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
 #line 94 "jucompiler.l"
-{if(flag==0){printf("DOTLENGTH\n");}num_colunas+= yyleng;return DOTLENGTH;}
+{if(flag==0){printf("DOTLENGTH\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return DOTLENGTH;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
 #line 95 "jucompiler.l"
-{if(flag==0){printf("DOUBLE\n");}num_colunas+= yyleng; return DOUBLE;}
+{if(flag==0){printf("DOUBLE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return DOUBLE;}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
 #line 96 "jucompiler.l"
-{if(flag==0){printf("ELSE\n");}num_colunas+= yyleng; return ELSE;}
+{if(flag==0){printf("ELSE\n");}num_colunas+= yyleng;yylval.id = strdup(yytext);  return ELSE;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
 #line 97 "jucompiler.l"
-{if(flag==0){printf("IF\n");}num_colunas+= yyleng; return IF;}
+{if(flag==0){printf("IF\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return IF;}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
 #line 98 "jucompiler.l"
-{if(flag==0){printf("INT\n");}num_colunas+= yyleng; return INT;}
+{if(flag==0){printf("INT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return INT;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
 #line 99 "jucompiler.l"
-{if(flag==0){printf("PRINT\n");}num_colunas+= yyleng;return PRINT;}
+{if(flag==0){printf("PRINT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return PRINT;}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
 #line 100 "jucompiler.l"
-{if(flag==0){printf("PARSEINT\n");}num_colunas+= yyleng;return PARSEINT;}
+{if(flag==0){printf("PARSEINT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return PARSEINT;} 
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
 #line 101 "jucompiler.l"
-{if(flag==0){printf("PUBLIC\n");}num_colunas+= yyleng; return PUBLIC;}
+{if(flag==0){printf("PUBLIC\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return PUBLIC;}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
 #line 102 "jucompiler.l"
-{if(flag==0){printf("RETURN\n");}num_colunas+= yyleng;return RETURN;}
+{if(flag==0){printf("RETURN\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return RETURN;}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
 #line 103 "jucompiler.l"
-{if(flag==0){printf("STATIC\n");}num_colunas+= yyleng; return STATIC;}
+{if(flag==0){printf("STATIC\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return STATIC;}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
 #line 104 "jucompiler.l"
-{if(flag==0){printf("STRING\n");}num_colunas+= yyleng;return STRING;}
+{if(flag==0){printf("STRING\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return STRING;}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
 #line 105 "jucompiler.l"
-{if(flag==0){printf("VOID\n");}num_colunas+= yyleng;return VOID;} 
+{if(flag==0){printf("VOID\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return VOID;} 
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
 #line 106 "jucompiler.l"
-{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng;return WHILE;}
+{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return WHILE;}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
 #line 109 "jucompiler.l"
-{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;}
+{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;  yylval.id = strdup(yytext);}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
@@ -1296,7 +1296,7 @@ YY_RULE_SETUP
 case 60:
 YY_RULE_SETUP
 #line 112 "jucompiler.l"
-{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;return REALLIT;}
+{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return REALLIT;}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
@@ -2347,10 +2347,6 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[1],"-t") == 0){
 			flag = 2;
 			erro_sintaxe = yyparse();
-			erro_sintaxe = yyparse();
-		
-			
-
 		}
 	}else if(argc == 1){
 			flag = 1;

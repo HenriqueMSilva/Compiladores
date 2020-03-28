@@ -215,5 +215,5 @@ Expr: LPAR error RPAR                                       {}
 
 void yyerror(char *msg) {
 
-    printf("Line %d, col %d: syntax error: %s\n", linha_erro, coluna_erro, yylval.id);
+    printf("Line %d, col %d: syntax error: %s\n", num_linhas, num_colunas, yylval.id);
 }
