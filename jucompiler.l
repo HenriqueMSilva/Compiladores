@@ -108,7 +108,7 @@ while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng;return WHILE;}
 {reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;}
 
 {letras}{alfanum}*		{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return ID;}
-{reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;return REALLIT;}
+{reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;yylval.id = strdup(yytext);return REALLIT;}
 {intlit}				{if(flag==0){printf("INTLIT(%s)\n",yytext);}num_colunas+= yyleng;yylval.id = strdup(yytext);return INTLIT;}
 
 {space}					{num_colunas += yyleng;}
@@ -127,7 +127,6 @@ int main(int argc, char *argv[]){
 			while(yylex()){}
 		}else if(strcmp(argv[1],"-e2") == 0){
 			flag = 1;
-			while(yylex()){}
 			yyparse();
 		}else if(strcmp(argv[1],"-t") == 0){
 			flag = 2;

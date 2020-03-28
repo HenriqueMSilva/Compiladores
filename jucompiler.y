@@ -49,7 +49,7 @@ void yyerror(char* s);
 }
 
 %%
-program: CLASS ID LBRACE metodos RBRACE                     {printf("\n%s\n", $4);}
+program: CLASS ID LBRACE metodos RBRACE                     {}
     ;
 
 metodos: /*empty*/                                          {}
@@ -195,7 +195,6 @@ DotLengthOp: /*empty*/                                      {}
 
 %%
 
-void yyerror(char *msg) {
-
-    printf("Line %d, col %d: syntax error: %s\n", linha_erro, coluna_erro, yylval.id);
+void yyerror (char *s) {
+    printf ("Line %d, col %d: %s: %s\n", num_linhas,num_colunas, s, yylval.id );
 }

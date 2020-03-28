@@ -1482,7 +1482,7 @@ yyreduce:
     {
         case 2:
 #line 52 "jucompiler.y" /* yacc.c:1646  */
-    {printf("\n%s\n", (yyvsp[-1].id));}
+    {}
 #line 1487 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -2168,7 +2168,7 @@ yyreturn:
 #line 196 "jucompiler.y" /* yacc.c:1906  */
 
 
-void yyerror(char *msg) {
-
-    printf("Line %d, col %d: syntax error: %s\n", linha_erro, coluna_erro, yylval.id);
+void yyerror (char *s) {
+    printf ("Line %d, col %d: %s: %s\n", num_linhas,num_colunas, s, yylval.id );
+    yyparse();
 }
