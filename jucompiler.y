@@ -4,7 +4,8 @@
 #include <string.h>
 #include "y.tab.h"
 
-extern int linha_erro, coluna_erro, num_colunas, num_linhas;
+extern int linha_erro, coluna_erro, num_colunas, num_linhas, error_sequence;
+extern char* yytext;
 int yylex (void);
 void yyerror(char* s);
 
@@ -214,7 +215,10 @@ Expr: LPAR error RPAR                                       {}
 
 %%
 
-
 void yyerror (char *s) {
-    printf ("Line %d, col %d: %s: %s\n", num_linhas,num_colunas, s, yylval.id );
+    if (yychar == STRLIT && error_sequence == 0){
+        printf ("Line %d, col %d: %s: %s\n", linha_erro,coluna_erro, s, yylval.id );
+    }else if(error_sequence != 1){
+        printf ("Line %d, col %d: %s: %s\n", num_linhas, num_colunas, s, yytext);
+    }
 }
