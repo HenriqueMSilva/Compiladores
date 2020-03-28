@@ -49,6 +49,7 @@ void yyerror(char* s);
 }
 
 %%
+
 program: CLASS ID LBRACE metodos RBRACE                     {}
     ;
 
@@ -193,7 +194,26 @@ DotLengthOp: /*empty*/                                      {}
         | DOTLENGTH                                         {}
     ;
 
+
+
+FieldDecl : error SEMICOLON                                 {}
+    ;
+
+Statement : error SEMICOLON                                 {}
+    ;
+
+ParseArgs: PARSEINT LPAR error RPAR                         {}
+    ; 
+
+MethodInvocation: ID LPAR error RPAR                        {}
+    ;
+
+Expr: LPAR error RPAR                                       {}
+    ;
+
+
 %%
+
 
 void yyerror (char *s) {
     printf ("Line %d, col %d: %s: %s\n", num_linhas,num_colunas, s, yylval.id );
