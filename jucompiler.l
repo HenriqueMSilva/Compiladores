@@ -5,6 +5,7 @@
 	int linha_erro = 0;
 	int coluna_erro = 0;
 	int flag = 0;
+	int erro_sintaxe = 0;
 	char strlit[200];
 	int error_sequence = 0;
 %}
@@ -63,7 +64,7 @@ reallit					({und_real}+"."{und_real}*{exponte}?)|({und_real}+{exponte})|("."{un
 true|false				{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng;return BOOLLIT;}
 "&&" 					{if(flag==0){printf("AND\n");}num_colunas+= yyleng;return AND;}
 "=" 					{if(flag==0){printf("ASSIGN\n");}num_colunas+= yyleng;return ASSIGN;}
-"*" 					{if(flag==0){printf("STAR\n");}num_colunas+= yyleng;return STAR;}
+"*" 					{if(flag==0){printf("STAR\n");}num_colunas+= yyleng;  yylval.id = strdup(yytext); return STAR;}
 "," 					{if(flag==0){printf("COMMA\n");}num_colunas+= yyleng;return COMMA;}
 "/" 					{if(flag==0){printf("DIV\n");}num_colunas+= yyleng;return DIV;}
 "=="					{if(flag==0){printf("EQ\n");}num_colunas+= yyleng;return EQ;}
@@ -80,7 +81,7 @@ true|false				{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng;
 "!=" 					{if(flag==0){printf("NE\n");}num_colunas+= yyleng;return NE;}
 "!" 					{if(flag==0){printf("NOT\n");}num_colunas+= yyleng;return NOT;}
 "||" 					{if(flag==0){printf("OR\n");}num_colunas+= yyleng;return OR;}
-"+" 					{if(flag==0){printf("PLUS\n");}num_colunas+= yyleng;return PLUS;}
+"+" 					{if(flag==0){printf("PLUS\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return PLUS;}
 "}" 					{if(flag==0){printf("RBRACE\n");}num_colunas+= yyleng; return RBRACE;}
 "]"     				{if(flag==0){printf("RSQ\n");}num_colunas+= yyleng;return RSQ;}
 ";" 					{if(flag==0){printf("SEMICOLON\n");}num_colunas+= yyleng;return SEMICOLON;}
@@ -105,7 +106,7 @@ void					{if(flag==0){printf("VOID\n");}num_colunas+= yyleng;return VOID;}
 while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng;return WHILE;}
 
 
-{reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;}
+{reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;  yylval.id = strdup(yytext);}
 
 {letras}{alfanum}*		{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return ID;}
 {reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng;return REALLIT;}
@@ -131,7 +132,7 @@ int main(int argc, char *argv[]){
 			yyparse();
 		}else if(strcmp(argv[1],"-t") == 0){
 			flag = 2;
-			yyparse();
+			erro_sintaxe = yyparse();
 		}
 	}else if(argc == 1){
 			flag = 1;
