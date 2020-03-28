@@ -1,6 +1,6 @@
-class Teste {
-  public static int main(String[] args){
-  	
-  	x = ((1+2))
+class assign_error {
+  public static void main(String[] args) {
+    x
+
   }
 }

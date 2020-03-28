@@ -4,7 +4,7 @@
 #include <string.h>
 #include "y.tab.h"
 
-extern int linha_erro, coluna_erro, num_colunas, num_linhas, error_sequence;
+extern int linha_erro, coluna_erro, num_colunas, num_linhas, error_sequence, last_token;
 extern char* yytext;
 int yylex (void);
 void yyerror(char* s);
@@ -20,8 +20,8 @@ void yyerror(char* s);
 %type<id>FieldDecl
 %type<id>FieldDeclNext
 %type<id>MethodHeader
-%type<id>FormalParams
-%type<id>FormalParamsNext
+%type<id>MethodParams
+%type<id>MethodParamsNext
 %type<id>MethodBody
 %type<id>Body
 %type<id>VarDecl
@@ -75,17 +75,17 @@ Type: BOOL
     | DOUBLE
     ;
 
-MethodHeader: Type ID LPAR FormalParams RPAR                {$$= $4;}
-            | VOID ID LPAR FormalParams RPAR                {$$= $4;}
+MethodHeader: Type ID LPAR MethodParams RPAR                {$$= $4;}
+            | VOID ID LPAR MethodParams RPAR                {$$= $4;}
     ;
 
-FormalParams:  /*empty*/                                    {}
-            | Type ID FormalParamsNext                      {$$= $3;}
+MethodParams:  /*empty*/                                    {}
+            | Type ID MethodParamsNext                      {$$= $3;}
             | STRING LSQ RSQ ID                             {$$= $4;}
     ;
 
-FormalParamsNext: /*empty*/                                 {}
-                | COMMA Type ID FormalParamsNext            {$$= $3;}
+MethodParamsNext: /*empty*/                                 {}
+                | COMMA Type ID MethodParamsNext            {$$= $3;}
     ;
 
 
@@ -114,8 +114,9 @@ Statement:  IF LPAR Expr RPAR Statement %prec REDUCE        {}
         |   WHILE LPAR Expr RPAR Statement                  {}
         |   RETURN StatementExpOp SEMICOLON                 {}
         |   LBRACE StatementZrOuMais RBRACE                 {}
-        |   StateMethodIAssignmentParseArgs SEMICOLON       {}
+        |   StateMethodIAssignmentParseArgs SEMICOLON       {printf("-> %s",yytext);}
         |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = $3;}
+        |   error SEMICOLON                                 {printf("-aqi");}
     ; 
 
 StatementZrOuMais: /*empty*/                                {}
@@ -132,7 +133,7 @@ StatementPrint: STRLIT                                      {}
 
 StateMethodIAssignmentParseArgs : /*empty*/                 {}             
         | MethodInvocation                                  {} 
-        | Assigment                                         {} 
+        | Assigment                                         {printf("--> %s",yytext);} 
         | ParseArgs                                         {} 
     ;
 
@@ -151,7 +152,7 @@ CommaExprZrOuMais: /*empty*/                                 {}
          | COMMA Expr CommaExprZrOuMais                      {}
     ;
 
-Assigment: ID ASSIGN Expr                                    {}
+Assigment: ID ASSIGN Expr                                    {printf("--> %s",yytext);}
     ;
      
 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR                {}
@@ -181,7 +182,8 @@ Expr: Expr AND Expr                             {}
     | NOT Expr                                  {}
     | MINUS Expr                                {}
     | PLUS Expr                                 {}
-    | LPAR Expr RPAR                            {}
+    | LPAR Expr RPAR                            {printf("---> %s",yytext);}
+    | LPAR error RPAR                                       {}
     | MethodInvocation                          {$$ = $1;} 
     | Assigment                                 {} 
     | ParseArgs                                 {} 
@@ -200,25 +202,27 @@ DotLengthOp: /*empty*/                                      {}
 FieldDecl : error SEMICOLON                                 {}
     ;
 
-Statement : error SEMICOLON                                 {}
-    ;
-
 ParseArgs: PARSEINT LPAR error RPAR                         {}
     ; 
 
 MethodInvocation: ID LPAR error RPAR                        {}
     ;
 
-Expr: LPAR error RPAR                                       {}
-    ;
-
 
 %%
 
-void yyerror (char *s) {
-    if (yychar == STRLIT && error_sequence == 0){
-        printf ("Line %d, col %d: %s: %s\n", linha_erro,coluna_erro, s, yylval.id );
-    }else if(error_sequence != 1){
-        printf ("Line %d, col %d: %s: %s\n", num_linhas, num_colunas, s, yytext);
+void yyerror(char *msg) {
+    /*last_token = -1 default
+        last_token = 0 STRLIT
+    */
+
+    /*Quando o erro foi de uma STRLIT*/
+    if( last_token == 0 && error_sequence == 0){
+        printf("Line %d, col %d: %s: %s\n", num_linhas, num_colunas - (int) strlen(yylval.id) , msg, yylval.id);
+        last_token = -1;
+
+    /*Outros casos*/
+    }else if (last_token == -1){
+        printf("Line %d, col %d: %s: %s\n", num_linhas, num_colunas , msg, yylval.id);
     }
 }
