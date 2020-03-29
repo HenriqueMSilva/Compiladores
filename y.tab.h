@@ -92,7 +92,8 @@ extern int yydebug;
     ID = 302,
     INTLIT = 303,
     STRLIT = 304,
-    REDUCE = 305
+    REDUCE = 305,
+    ASSIGNMENT = 306
   };
 #endif
 /* Tokens.  */
@@ -144,17 +145,18 @@ extern int yydebug;
 #define INTLIT 303
 #define STRLIT 304
 #define REDUCE 305
+#define ASSIGNMENT 306
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 48 "jucompiler.y" /* yacc.c:1909  */
+#line 34 "jucompiler.y" /* yacc.c:1909  */
 
     char *id;
 
-#line 158 "y.tab.h" /* yacc.c:1909  */
+#line 160 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

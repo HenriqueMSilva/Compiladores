@@ -1,5 +1,5 @@
 #!/bin/sh
 
 lex jucompiler.l
-yacc -y -d -t -v jucompiler.y
+yacc -y -d -t -v --debug jucompiler.y
 cc -o jucompiler y.tab.c lex.yy.c

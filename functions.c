@@ -4,17 +4,16 @@
 #include <string.h>
 #include <stdio.h>
 
-is_program* insert_program(is_metodos* metodos){
+is_program* insert_program(/*is_metodos* metodos*/){
 
 	is_program* ip=(is_program*)malloc(sizeof(is_program));
 
-	ip->vlist=ivl;
-	ip->slist=isl;
+	//ip->metodos=metodos;
 
 	return ip;
 }
 
-
+/*
 is_metodos* insert_metodos(is_fieldecl_list* ifl, is_methoddecl_list* iml, char type){
 
 }

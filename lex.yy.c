@@ -1,4 +1,3 @@
-
 #line 3 "lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
@@ -2366,8 +2365,6 @@ int yywrap()
 	yylval.id = strdup(yytext);
 return 1;
 }
-
-
 
 
 

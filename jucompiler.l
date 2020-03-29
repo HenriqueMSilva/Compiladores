@@ -13,6 +13,7 @@
 	char strlit[200];
 	int error_sequence = 0;
 	int last_token = -1;
+
 %}
 
 valid_escape			\f|\t|\\{2}|\\\"
