@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "y.tab.h"
-int yydebug =1;
+int yydebug = 0;
 
 extern int linha_erro, coluna_erro, num_colunas, num_linhas, error_sequence, last_token;
 extern char* yytext;
@@ -49,7 +49,6 @@ MethodDecl: PUBLIC STATIC MethodHeader MethodBody           {}
     ;
 
 FieldDecl:  PUBLIC STATIC Type ID FieldDeclNext SEMICOLON   {}
-        |   error SEMICOLON                                 {}
     ;
 
 FieldDeclNext:  /*empty*/                                   {}     
@@ -101,8 +100,7 @@ Statement:  IF LPAR Expr RPAR Statement %prec REDUCE        {}
         |   RETURN StatementExpOp SEMICOLON                 {}
         |   LBRACE StatementZrOuMais RBRACE                 {}
         |   StateMethodIAssignmentParseArgs SEMICOLON       {}
-        |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = $3;}
-
+        |   PRINT LPAR StatementPrint RPAR SEMICOLON        {}
     ; 
 
 StatementZrOuMais: /*empty*/                                {}
@@ -128,7 +126,6 @@ StateMethodIAssignmentParseArgs : /*empty*/                 {}
 
 
 MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {}
-                | ID LPAR error RPAR                         {}
     ;
 
 ExpCommaExpOP: /*empty*/                                     {} 
@@ -143,7 +140,6 @@ Assigment: ID ASSIGN Expr                                    {}
     ;
      
 ParseArgs:  PARSEINT LPAR ID LSQ Expr RSQ RPAR               {}
-        |   PARSEINT LPAR error RPAR                         {}
     ;
 
 
@@ -181,16 +177,13 @@ Expr: Expr AND Expr                             {}
     | INTLIT                                    {}
     ; 
 
-DotLengthOp: /*empty*/                                      {}
-        | DOTLENGTH                                         {}
-    ;
 
 
 
 FieldDecl : error SEMICOLON                                 {}
     ;
 
-Statement : error SEMICOLON                      {}
+Statement : error SEMICOLON                                 {}
     ;
 ParseArgs: PARSEINT LPAR error RPAR                         {}
     ; 
@@ -198,7 +191,7 @@ ParseArgs: PARSEINT LPAR error RPAR                         {}
 MethodInvocation: ID LPAR error RPAR                        {}
     ;
 
-Expr: LPAR error RPAR                           {}
+Expr: LPAR error RPAR                                       {}
     ;
 
 %%
