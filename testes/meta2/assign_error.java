@@ -1,8 +1,6 @@
 class assign_error {
   public static void main(String[] args) {
-    x = ((1+2)
-
-    )
-
+    f(i = j = a&&b = l);
   }
 }
+

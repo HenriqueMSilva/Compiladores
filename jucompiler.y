@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "y.tab.h"
+int yydebug =1;
 
 extern int linha_erro, coluna_erro, num_colunas, num_linhas, error_sequence, last_token;
 extern char* yytext;
@@ -14,23 +15,7 @@ void yyerror(char* s);
 %token BOOLLIT AND ASSIGN STAR COMMA DIV EQ GE GT LBRACE LE LPAR RPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGTH DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC RETURN STATIC STRING VOID WHILE REALLIT
 
 %token<id>ID INTLIT STRLIT
-%type<id>program
-%type<id>metodos
-%type<id>MethodDecl
-%type<id>FieldDecl
-%type<id>FieldDeclNext
-%type<id>MethodHeader
-%type<id>MethodParams
-%type<id>MethodParamsNext
-%type<id>MethodBody
-%type<id>Body
-%type<id>VarDecl
-%type<id>VarDeclNext
-%type<id>Statement
-%type<id>StatementZrOuMais
-%type<id>StatementExpOp
-%type<id>StateMethodIAssignmentParseArgs ParseArgs
-%type<id>StatementPrint MethodInvocation ExpCommaExpOP CommaExprZrOuMais Assigment Expr
+%type<id>Assigment Expr MethodInvocation StateMethodIAssignmentParseArgs ExpCommaExpOP
 
 %right ASSIGN
 %left OR
@@ -55,15 +40,16 @@ program: CLASS ID LBRACE metodos RBRACE                     {}
     ;
 
 metodos: /*empty*/                                          {}
-        | MethodDecl metodos                                {$$= $1;}
+        | MethodDecl metodos                                {}
         | FieldDecl  metodos                                {} 
         | SEMICOLON metodos                                 {}
     ;
 
-MethodDecl: PUBLIC STATIC MethodHeader MethodBody           {$$= $4;}
+MethodDecl: PUBLIC STATIC MethodHeader MethodBody           {}
     ;
 
 FieldDecl:  PUBLIC STATIC Type ID FieldDeclNext SEMICOLON   {}
+        |   error SEMICOLON                                 {}
     ;
 
 FieldDeclNext:  /*empty*/                                   {}     
@@ -75,33 +61,33 @@ Type: BOOL
     | DOUBLE
     ;
 
-MethodHeader: Type ID LPAR MethodParams RPAR                {$$= $4;}
-            | VOID ID LPAR MethodParams RPAR                {$$= $4;}
+MethodHeader: Type ID LPAR MethodParams RPAR                {}
+            | VOID ID LPAR MethodParams RPAR                {}
     ;
 
 MethodParams:  /*empty*/                                    {}
-            | Type ID MethodParamsNext                      {$$= $3;}
-            | STRING LSQ RSQ ID                             {$$= $4;}
+            | Type ID MethodParamsNext                      {}
+            | STRING LSQ RSQ ID                             {}
     ;
 
 MethodParamsNext: /*empty*/                                 {}
-                | COMMA Type ID MethodParamsNext            {$$= $3;}
+                | COMMA Type ID MethodParamsNext            {}
     ;
 
 
-MethodBody: LBRACE Body RBRACE                              {$$= $2;}
+MethodBody: LBRACE Body RBRACE                              {}
     ;
 
 Body:  /*empty*/                                            {} 
     |  VarDecl  Body                                        {} 
-    |  Statement Body                                       {$$ = $1;} 
+    |  Statement Body                                       {} 
     ;
 
-VarDecl: Type ID  VarDeclNext SEMICOLON                     {$$= $2;}
+VarDecl: Type ID  VarDeclNext SEMICOLON                     {}
     ;
 
 VarDeclNext: /*empty*/                                      {}
-           | COMMA ID  VarDeclNext                          {$$= $2;}
+           | COMMA ID  VarDeclNext                          {}
     ;
 
 
@@ -114,26 +100,26 @@ Statement:  IF LPAR Expr RPAR Statement %prec REDUCE        {}
         |   WHILE LPAR Expr RPAR Statement                  {}
         |   RETURN StatementExpOp SEMICOLON                 {}
         |   LBRACE StatementZrOuMais RBRACE                 {}
-        |   StateMethodIAssignmentParseArgs SEMICOLON       {printf("-> %s",yytext);}
-        |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = $3;}
-        |   error SEMICOLON                                 {printf("-aqi");}
+        |   StateMethodIAssignmentParseArgs SEMICOLON       {}
+        |   PRINT LPAR StatementPrint RPAR SEMICOLON        {}
+        |   error SEMICOLON                                 {}
     ; 
 
 StatementZrOuMais: /*empty*/                                {}
-            | Statement  StatementZrOuMais                  {$$= $1;}
+            | Statement  StatementZrOuMais                  {}
     ;
 
 StatementExpOp: /*empty*/                                   {}
-            |    Expr                                       {$$ = $1;}
+            |    Expr                                       {}
     ;
 
 StatementPrint: STRLIT                                      {}
-        |    Expr                                           {$$ = $1;}
+        |    Expr                                           {}
     ;
 
 StateMethodIAssignmentParseArgs : /*empty*/                 {}             
         | MethodInvocation                                  {} 
-        | Assigment                                         {printf("--> %s",yytext);} 
+        | Assigment                                         {} 
         | ParseArgs                                         {} 
     ;
 
@@ -141,21 +127,23 @@ StateMethodIAssignmentParseArgs : /*empty*/                 {}
 
 
 
-MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {$$ = $3;} 
+MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {}
+                | ID LPAR error RPAR                         {}
     ;
 
 ExpCommaExpOP: /*empty*/                                     {} 
-            | Expr CommaExprZrOuMais                         {$$ = $1;} 
+            | Expr CommaExprZrOuMais                         {} 
     ;
 
 CommaExprZrOuMais: /*empty*/                                 {}
          | COMMA Expr CommaExprZrOuMais                      {}
     ;
 
-Assigment: ID ASSIGN Expr                                    {printf("--> %s",yytext);}
+Assigment: ID ASSIGN Expr                                    {}
     ;
      
-ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR                {}
+ParseArgs:  PARSEINT LPAR ID LSQ Expr RSQ RPAR               {}
+        |   PARSEINT LPAR error RPAR                         {}
     ;
 
 
@@ -182,31 +170,18 @@ Expr: Expr AND Expr                             {}
     | NOT Expr                                  {}
     | MINUS Expr                                {}
     | PLUS Expr                                 {}
-    | LPAR Expr RPAR                            {printf("---> %s",yytext);}
-    | LPAR error RPAR                                       {}
-    | MethodInvocation                          {$$ = $1;} 
+    | LPAR Expr RPAR                            {}
+    | LPAR error RPAR                           {}
+    | MethodInvocation                          {}
     | Assigment                                 {} 
     | ParseArgs                                 {} 
-    | ID DotLengthOp                            {$$ =$1;}
+    | ID                                        {}
+    | ID DOTLENGTH                              {}
     | REALLIT                                   {}
     | BOOLLIT                                   {}
-    | INTLIT                                    {$$ =$1;}
+    | INTLIT                                    {}
     ; 
 
-DotLengthOp: /*empty*/                                      {}
-        | DOTLENGTH                                         {}
-    ;
-
-
-
-FieldDecl : error SEMICOLON                                 {}
-    ;
-
-ParseArgs: PARSEINT LPAR error RPAR                         {}
-    ; 
-
-MethodInvocation: ID LPAR error RPAR                        {}
-    ;
 
 
 %%
@@ -218,7 +193,7 @@ void yyerror(char *msg) {
 
     /*Quando o erro foi de uma STRLIT*/
     if( last_token == 0 && error_sequence == 0){
-        printf("Line %d, col %d: %s: %s\n", num_linhas, num_colunas - (int) strlen(yylval.id) , msg, yylval.id);
+        printf("Line %d, col %d: %s: %s\n", num_linhas, num_colunas - (int) strlen(yylval.id) + 1 , msg, yylval.id);
         last_token = -1;
 
     /*Outros casos*/
