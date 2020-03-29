@@ -114,9 +114,9 @@ Statement:  IF LPAR Expr RPAR Statement %prec REDUCE        {}
         |   WHILE LPAR Expr RPAR Statement                  {}
         |   RETURN StatementExpOp SEMICOLON                 {}
         |   LBRACE StatementZrOuMais RBRACE                 {}
-        |   StateMethodIAssignmentParseArgs SEMICOLON       {printf("-> %s",yytext);}
+        |   StateMethodIAssignmentParseArgs SEMICOLON       {}
         |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = $3;}
-        |   error SEMICOLON                                 {printf("-aqi");}
+        |   error SEMICOLON                                 {yyerrok;}
     ; 
 
 StatementZrOuMais: /*empty*/                                {}
@@ -133,7 +133,7 @@ StatementPrint: STRLIT                                      {}
 
 StateMethodIAssignmentParseArgs : /*empty*/                 {}             
         | MethodInvocation                                  {} 
-        | Assigment                                         {printf("--> %s",yytext);} 
+        | Assigment                                         {} 
         | ParseArgs                                         {} 
     ;
 
@@ -152,7 +152,7 @@ CommaExprZrOuMais: /*empty*/                                 {}
          | COMMA Expr CommaExprZrOuMais                      {}
     ;
 
-Assigment: ID ASSIGN Expr                                    {printf("--> %s",yytext);}
+Assigment: ID ASSIGN Expr                                    {}
     ;
      
 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR                {}
@@ -182,8 +182,8 @@ Expr: Expr AND Expr                             {}
     | NOT Expr                                  {}
     | MINUS Expr                                {}
     | PLUS Expr                                 {}
-    | LPAR Expr RPAR                            {printf("---> %s",yytext);}
-    | LPAR error RPAR                                       {}
+    | LPAR Expr RPAR                            {}
+    | LPAR error RPAR                           {yyerrok;}
     | MethodInvocation                          {$$ = $1;} 
     | Assigment                                 {} 
     | ParseArgs                                 {} 
@@ -199,13 +199,13 @@ DotLengthOp: /*empty*/                                      {}
 
 
 
-FieldDecl : error SEMICOLON                                 {}
+FieldDecl : error SEMICOLON                                 {yyerrok;}
     ;
 
-ParseArgs: PARSEINT LPAR error RPAR                         {}
+ParseArgs: PARSEINT LPAR error RPAR                         {yyerrok;}
     ; 
 
-MethodInvocation: ID LPAR error RPAR                        {}
+MethodInvocation: ID LPAR error RPAR                        {yyerrok;}
     ;
 
 

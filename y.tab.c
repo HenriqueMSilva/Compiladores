@@ -1664,7 +1664,7 @@ yyreduce:
 
   case 33:
 #line 117 "jucompiler.y" /* yacc.c:1646  */
-    {printf("-> %s",yytext);}
+    {}
 #line 1669 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1676,7 +1676,7 @@ yyreduce:
 
   case 35:
 #line 119 "jucompiler.y" /* yacc.c:1646  */
-    {printf("-aqi");}
+    {yyerrok;}
 #line 1681 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1730,7 +1730,7 @@ yyreduce:
 
   case 44:
 #line 136 "jucompiler.y" /* yacc.c:1646  */
-    {printf("--> %s",yytext);}
+    {}
 #line 1735 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1772,7 +1772,7 @@ yyreduce:
 
   case 51:
 #line 155 "jucompiler.y" /* yacc.c:1646  */
-    {printf("--> %s",yytext);}
+    {}
 #line 1777 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1898,13 +1898,13 @@ yyreduce:
 
   case 72:
 #line 185 "jucompiler.y" /* yacc.c:1646  */
-    {printf("---> %s",yytext);}
+    {}
 #line 1903 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
 #line 186 "jucompiler.y" /* yacc.c:1646  */
-    {}
+    {yyerrok;}
 #line 1909 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1964,19 +1964,19 @@ yyreduce:
 
   case 83:
 #line 202 "jucompiler.y" /* yacc.c:1646  */
-    {}
+    {yyerrok;}
 #line 1969 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 84:
 #line 205 "jucompiler.y" /* yacc.c:1646  */
-    {}
+    {yyerrok;}
 #line 1975 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 85:
 #line 208 "jucompiler.y" /* yacc.c:1646  */
-    {}
+    {yyerrok;}
 #line 1981 "y.tab.c" /* yacc.c:1646  */
     break;
 

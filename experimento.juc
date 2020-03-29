@@ -1,6 +1,7 @@
 class assign_error {
-  public static void main(String[] args) {
-    x
+	int;
+	int a;
+	public static int a;
+	int b
 
-  }
 }
