@@ -101,8 +101,8 @@ Statement:  IF LPAR Expr RPAR Statement %prec REDUCE        {}
         |   RETURN StatementExpOp SEMICOLON                 {}
         |   LBRACE StatementZrOuMais RBRACE                 {}
         |   StateMethodIAssignmentParseArgs SEMICOLON       {}
-        |   PRINT LPAR StatementPrint RPAR SEMICOLON        {}
-        |   error SEMICOLON                                 {}
+        |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = $3;}
+        |   error SEMICOLON                                 {yyerrok;}
     ; 
 
 StatementZrOuMais: /*empty*/                                {}
@@ -170,9 +170,9 @@ Expr: Expr AND Expr                             {}
     | NOT Expr                                  {}
     | MINUS Expr                                {}
     | PLUS Expr                                 {}
-    | LPAR Expr RPAR                            {}
-    | LPAR error RPAR                           {}
-    | MethodInvocation                          {}
+    | LPAR Expr RPAR                            {
+    | LPAR error RPAR                           {yyerrok;}
+    | MethodInvocation                          {$$ = $1;} 
     | Assigment                                 {} 
     | ParseArgs                                 {} 
     | ID                                        {}
@@ -182,6 +182,20 @@ Expr: Expr AND Expr                             {}
     | INTLIT                                    {}
     ; 
 
+DotLengthOp: /*empty*/                                      {}
+        | DOTLENGTH                                         {}
+    ;
+
+
+
+FieldDecl : error SEMICOLON                                 {yyerrok;}
+    ;
+
+ParseArgs: PARSEINT LPAR error RPAR                         {yyerrok;}
+    ; 
+
+MethodInvocation: ID LPAR error RPAR                        {yyerrok;}
+    ;
 
 
 %%
