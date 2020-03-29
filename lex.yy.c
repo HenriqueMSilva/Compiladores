@@ -1050,7 +1050,7 @@ YY_RULE_SETUP
 case 11:
 YY_RULE_SETUP
 #line 61 "jucompiler.l"
-{BEGIN 0; strcat(strlit, "\"");  if(flag == 0 && error_sequence== 0){ printf("STRLIT(%s)\n",strlit);} num_colunas += yyleng; yylval.id = strdup(strlit); last_token = 0; return STRLIT;}
+{BEGIN 0; strcat(strlit, "\"");  if(flag == 0 && error_sequence== 0){ printf("STRLIT(%s)\n",strlit);} num_colunas += yyleng; yylval.id = strdup(strlit); last_token = 0; if(error_sequence == 0){return STRLIT;} }
 	YY_BREAK
 case YY_STATE_EOF(ASPAS):
 #line 62 "jucompiler.l"
@@ -1322,7 +1322,7 @@ YY_RULE_SETUP
 case 64:
 YY_RULE_SETUP
 #line 124 "jucompiler.l"
-{printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng;  }
+{printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng; return yytext[0];  }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP

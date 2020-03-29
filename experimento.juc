@@ -1,7 +1,7 @@
-class assign_error {
-	int;
-	int a;
-	public static int a;
-	int b
-
+class Factorial {
+	public static int factorial(int n) {
+int a,b,c,d,123123123,e;
+		int u;
+		
+	}
 }

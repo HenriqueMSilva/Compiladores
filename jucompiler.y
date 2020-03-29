@@ -116,7 +116,7 @@ Statement:  IF LPAR Expr RPAR Statement %prec REDUCE        {}
         |   LBRACE StatementZrOuMais RBRACE                 {}
         |   StateMethodIAssignmentParseArgs SEMICOLON       {}
         |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = $3;}
-        |   error SEMICOLON                                 {yyerrok;}
+
     ; 
 
 StatementZrOuMais: /*empty*/                                {}
@@ -183,7 +183,6 @@ Expr: Expr AND Expr                             {}
     | MINUS Expr                                {}
     | PLUS Expr                                 {}
     | LPAR Expr RPAR                            {}
-    | LPAR error RPAR                           {yyerrok;}
     | MethodInvocation                          {$$ = $1;} 
     | Assigment                                 {} 
     | ParseArgs                                 {} 
@@ -199,30 +198,25 @@ DotLengthOp: /*empty*/                                      {}
 
 
 
-FieldDecl : error SEMICOLON                                 {yyerrok;}
+FieldDecl : error SEMICOLON                                 {}
     ;
 
-ParseArgs: PARSEINT LPAR error RPAR                         {yyerrok;}
+Statement : error SEMICOLON                      {}
+    ;
+ParseArgs: PARSEINT LPAR error RPAR                         {}
     ; 
 
-MethodInvocation: ID LPAR error RPAR                        {yyerrok;}
+MethodInvocation: ID LPAR error RPAR                        {}
     ;
 
+Expr: LPAR error RPAR                           {}
+    ;
 
 %%
 
 void yyerror(char *msg) {
-    /*last_token = -1 default
-        last_token = 0 STRLIT
-    */
 
-    /*Quando o erro foi de uma STRLIT*/
-    if( last_token == 0 && error_sequence == 0){
-        printf("Line %d, col %d: %s: %s\n", num_linhas, num_colunas - (int) strlen(yylval.id) , msg, yylval.id);
-        last_token = -1;
-
-    /*Outros casos*/
-    }else if (last_token == -1){
-        printf("Line %d, col %d: %s: %s\n", num_linhas, num_colunas , msg, yylval.id);
-    }
+    printf("Line %d, col %d: %s: %s\n", num_linhas, num_colunas - (int) strlen(yylval.id) , msg, yylval.id);
+ 
+    
 }
