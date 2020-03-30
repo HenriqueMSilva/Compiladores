@@ -696,7 +696,7 @@ char *yytext;
 // Henrique Miguel Silva 2017246594
 //Pedro Almeida 2017255094	
 
-
+	#include "structures.h"
 	#include "y.tab.h"
 	int num_linhas = 1;
 	int num_colunas = 1;
@@ -706,8 +706,8 @@ char *yytext;
 	int erro_sintaxe = 0;
 	char strlit[200];
 	int error_sequence = 0;
-	int last_token = -1;
 
+	extern is_program* myprogram;
 #line 712 "lex.yy.c"
 
 #line 714 "lex.yy.c"
@@ -1051,7 +1051,7 @@ YY_RULE_SETUP
 case 11:
 YY_RULE_SETUP
 #line 62 "jucompiler.l"
-{BEGIN 0; strcat(strlit, "\"");  if(flag == 0 && error_sequence== 0){ printf("STRLIT(%s)\n",strlit);} num_colunas += yyleng; yylval.id = strdup(strlit); last_token = 0; if(error_sequence == 0){return STRLIT;} }
+{BEGIN 0; strcat(strlit, "\"");  if(flag == 0 && error_sequence== 0){ printf("STRLIT(%s)\n",strlit);} num_colunas += yyleng; yylval.id = strdup(strlit); if(error_sequence == 0){return STRLIT;} }
 	YY_BREAK
 case YY_STATE_EOF(ASPAS):
 #line 63 "jucompiler.l"
@@ -1077,7 +1077,7 @@ YY_RULE_SETUP
 case 15:
 YY_RULE_SETUP
 #line 70 "jucompiler.l"
-{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng; return BOOLLIT;}
+{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return BOOLLIT;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
@@ -1292,7 +1292,7 @@ YY_RULE_SETUP
 case 58:
 YY_RULE_SETUP
 #line 115 "jucompiler.l"
-{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;  yylval.id = strdup(yytext);}
+{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext);return RESERVED;}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
@@ -1323,7 +1323,7 @@ YY_RULE_SETUP
 case 64:
 YY_RULE_SETUP
 #line 125 "jucompiler.l"
-{printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng; return yytext[0];  }
+{printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng;}
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
@@ -2338,6 +2338,85 @@ void yyfree (void * ptr )
 
 #line 127 "jucompiler.l"
 
+
+void print_tree(){
+	char  *auxiliar = "";
+	is_metodos* metodos= myprogram->metodos;
+	is_fielddecl_list* field;
+	is_methoddecl_list* method;
+	is_methodparams_list* params;
+	is_methodbody_list* body;
+	is_vardecl_list* vardecl;
+	is_statment_list* statment;
+
+	printf("Program\n");
+	printf("..Id(%s)\n",myprogram->classname);
+	while(metodos != NULL){
+		if(strcmp("Field",metodos->evocation) == 0){
+			field = metodos->ifl;
+			while(field != NULL){
+				printf("..FieldDecl\n");
+				if(strcmp("",field->type) != 0){
+					printf("....%s\n",field->type);
+					auxiliar = field->type; 
+				}else{
+					printf("....%s\n",auxiliar);
+				}
+				printf("....Id(%s)\n",field->name);
+				field = field->next;
+			}
+		}else{
+			printf("..MethodDecl\n");
+			method = metodos->imdl;
+			printf("....MethodHeader\n");
+			printf("......%s\n",method->imhl->type);
+			printf("......Id(%s)\n",method->imhl->name);
+			params = method->imhl->impl;
+			printf("......MethodParams\n");
+			while(params != NULL){
+				printf("........ParamDecl\n");
+				printf("..........%s\n",params->type);
+				printf("..........Id(%s)\n",params->name);
+				params = params->next;
+			}
+			printf("....MethodBody\n");
+			body = metodos->imdl->imbl;
+			while(body != NULL){
+				if(strcmp("VarDecl",body->type) == 0){
+					vardecl = body->ivdl;
+					while(vardecl != NULL){
+						printf("......VarDecl\n");
+						
+						if(strcmp("",vardecl->type) != 0){
+							printf("........%s\n",vardecl->type);
+							auxiliar = vardecl->type; 
+						}else{
+							printf("........%s\n",auxiliar);
+						}
+						
+
+						printf("........Id(%s)\n",vardecl->name);
+						vardecl = vardecl->next;
+					}
+				}else{
+					statment = body->statment;
+					printf("......%s\n",statment->name_function);
+					while(statment->expr != NULL){
+						printf("........%s\n",statment->expr->value);
+						statment->expr = statment->expr->next;
+					}
+					
+				}
+				body = body->next;
+			}
+		}
+		metodos= metodos->next;
+	}
+
+	
+}
+
+
 int main(int argc, char *argv[]){
 	if(argc == 2){
 		if(strcmp(argv[1],"-l") == 0){
@@ -2353,7 +2432,10 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[1],"-t") == 0){
 
 			flag = 2;
-			erro_sintaxe = yyparse();
+			yyparse();
+			if(erro_sintaxe == 0){
+				print_tree();
+			}
 		}
 	}else if(argc == 1){
 			flag = 1;
@@ -2367,8 +2449,6 @@ int yywrap()
 	yylval.id = strdup(yytext);
 return 1;
 }
-
-
 
 
 

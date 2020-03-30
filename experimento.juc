@@ -1,7 +1,13 @@
 class Factorial {
-	public static int factorial(int n) {
-int a,b,c,d,123123123,e;
-		int u;
-		
-	}
+public static boolean b;
+  public static int factorial(int a,int b, int c, int d) {
+  };;;;;;;;;;
+
+  public static void main(String[] args) {
+    int argument,teste;
+    int n;
+  };;;;
+  public static double ole(int n) {
+    
+  }
 }

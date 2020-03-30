@@ -2,7 +2,7 @@
 // Henrique Miguel Silva 2017246594
 //Pedro Almeida 2017255094	
 
-
+	#include "structures.h"
 	#include "y.tab.h"
 	int num_linhas = 1;
 	int num_colunas = 1;
@@ -12,8 +12,8 @@
 	int erro_sintaxe = 0;
 	char strlit[200];
 	int error_sequence = 0;
-	int last_token = -1;
 
+	extern is_program* myprogram;
 %}
 
 valid_escape			\f|\t|\\{2}|\\\"
@@ -59,7 +59,7 @@ reallit					({und_real}+"."{und_real}*{exponte}?)|({und_real}+{exponte})|("."{un
 \"								{BEGIN ASPAS;strcpy(strlit, "\"");error_sequence=0;linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
 <ASPAS>{valid_escape}			{if(error_sequence== 0){strcat(strlit, yytext);}num_colunas += yyleng;}
 <ASPAS>{lineTerminator} 		{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas = 1;num_linhas++;}
-<ASPAS>\"						{BEGIN 0; strcat(strlit, "\"");  if(flag == 0 && error_sequence== 0){ printf("STRLIT(%s)\n",strlit);} num_colunas += yyleng; yylval.id = strdup(strlit); last_token = 0; if(error_sequence == 0){return STRLIT;} }
+<ASPAS>\"						{BEGIN 0; strcat(strlit, "\"");  if(flag == 0 && error_sequence== 0){ printf("STRLIT(%s)\n",strlit);} num_colunas += yyleng; yylval.id = strdup(strlit); if(error_sequence == 0){return STRLIT;} }
 <ASPAS><<EOF>> 					{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);}
 <ASPAS>\\{lineTerminator}		{BEGIN 0; error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro); num_linhas++ ; num_colunas = 1;}							
 <ASPAS>\\{invalid_escape}		{error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (%s)\n", num_linhas, num_colunas, yytext);num_colunas += yyleng;}							
@@ -67,7 +67,7 @@ reallit					({und_real}+"."{und_real}*{exponte}?)|({und_real}+{exponte})|("."{un
 
 
 
-true|false				{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng; return BOOLLIT;}
+true|false				{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return BOOLLIT;}
 "&&" 					{if(flag==0){printf("AND\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return AND;}
 "=" 					{if(flag==0){printf("ASSIGN\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return ASSIGN;}
 "*" 					{if(flag==0){printf("STAR\n");}num_colunas+= yyleng;  yylval.id = strdup(yytext); return STAR;}
@@ -112,7 +112,7 @@ void					{if(flag==0){printf("VOID\n");}num_colunas+= yyleng; yylval.id = strdup
 while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return WHILE;}
 
 
-{reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;  yylval.id = strdup(yytext);}
+{reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext);return RESERVED;}
 
 {letras}{alfanum}*		{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return ID;}
 {reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return REALLIT;}
@@ -122,9 +122,88 @@ while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng; yylval.id = strd
 {space}					{num_colunas += yyleng;}
 {lineTerminator}		{num_colunas = 1;num_linhas++; }
 
-.	 					{printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng; return yytext[0];  }
+.	 					{printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng;}
 
 %%
+
+void print_tree(){
+	char  *auxiliar = "";
+	is_metodos* metodos= myprogram->metodos;
+	is_fielddecl_list* field;
+	is_methoddecl_list* method;
+	is_methodparams_list* params;
+	is_methodbody_list* body;
+	is_vardecl_list* vardecl;
+	is_statment_list* statment;
+
+	printf("Program\n");
+	printf("..Id(%s)\n",myprogram->classname);
+	while(metodos != NULL){
+		if(strcmp("Field",metodos->evocation) == 0){
+			field = metodos->ifl;
+			while(field != NULL){
+				printf("..FieldDecl\n");
+				if(strcmp("",field->type) != 0){
+					printf("....%s\n",field->type);
+					auxiliar = field->type; 
+				}else{
+					printf("....%s\n",auxiliar);
+				}
+				printf("....Id(%s)\n",field->name);
+				field = field->next;
+			}
+		}else{
+			printf("..MethodDecl\n");
+			method = metodos->imdl;
+			printf("....MethodHeader\n");
+			printf("......%s\n",method->imhl->type);
+			printf("......Id(%s)\n",method->imhl->name);
+			params = method->imhl->impl;
+			printf("......MethodParams\n");
+			while(params != NULL){
+				printf("........ParamDecl\n");
+				printf("..........%s\n",params->type);
+				printf("..........Id(%s)\n",params->name);
+				params = params->next;
+			}
+			printf("....MethodBody\n");
+			body = metodos->imdl->imbl;
+			while(body != NULL){
+				if(strcmp("VarDecl",body->type) == 0){
+					vardecl = body->ivdl;
+					while(vardecl != NULL){
+						printf("......VarDecl\n");
+						
+						if(strcmp("",vardecl->type) != 0){
+							printf("........%s\n",vardecl->type);
+							auxiliar = vardecl->type; 
+						}else{
+							printf("........%s\n",auxiliar);
+						}
+						
+
+						printf("........Id(%s)\n",vardecl->name);
+						vardecl = vardecl->next;
+					}
+				}else{
+					statment = body->statment;
+					printf("......%s\n",statment->name_function);
+					while(statment->expr != NULL){
+						printf("........%s\n",statment->expr->value);
+						statment->expr = statment->expr->next;
+					}
+					
+				}
+				body = body->next;
+			}
+		}
+		metodos= metodos->next;
+	}
+
+	
+}
+
+
 int main(int argc, char *argv[]){
 	if(argc == 2){
 		if(strcmp(argv[1],"-l") == 0){
@@ -140,7 +219,10 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[1],"-t") == 0){
 
 			flag = 2;
-			erro_sintaxe = yyparse();
+			yyparse();
+			if(erro_sintaxe == 0){
+				print_tree();
+			}
 		}
 	}else if(argc == 1){
 			flag = 1;
@@ -154,8 +236,6 @@ int yywrap()
 	yylval.id = strdup(yytext);
 return 1;
 }
-
-
 
 
 
