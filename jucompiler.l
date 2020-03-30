@@ -114,6 +114,7 @@ while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng; yylval.id = strd
 
 {reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext);return RESERVED;}
 
+
 {letras}{alfanum}*		{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return ID;}
 {reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return REALLIT;}
 {intlit}				{if(flag==0){printf("INTLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext);return INTLIT;}
@@ -122,7 +123,7 @@ while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng; yylval.id = strd
 {space}					{num_colunas += yyleng;}
 {lineTerminator}		{num_colunas = 1;num_linhas++; }
 
-.	 					{printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng;}
+.	 					{printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng;  return yytext[0];  }
 
 %%
 

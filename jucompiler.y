@@ -28,11 +28,15 @@ is_program* myprogram;
 %type<imbl>body MethodBody
 %type<ivdl>VarDecl VarDeclNext
 %type<state> Statement
-%type<iel>StatementPrint StatementExpOp Expr
+%type<iel>StatementPrint StatementExpOp Expr ExprA
 %type<id>Type
 
 
+
+%nonassoc REDUCEA
 %right ASSIGN
+
+
 %left OR
 %left AND
 %left XOR
@@ -43,8 +47,9 @@ is_program* myprogram;
 %right NOT
 %left LPAR RPAR LSQ RSQ LBRACE RBRACE
 
+
 %nonassoc REDUCE
-%nonassoc ELSE
+%right ELSE
 
 %union{
     char *id;
@@ -84,6 +89,7 @@ FieldDeclNext:  /*empty*/                                   {$$ = NULL;}
 Type: BOOL                                                  {$$="Bool";}
     | INT                                                   {$$="Int";}
     | DOUBLE                                                {$$="Double";}
+
     ;
 
 MethodHeader: Type ID LPAR MethodParams RPAR                {$$=insert_methodheader($1,$2,$4);}
@@ -116,12 +122,9 @@ VarDeclNext: /*empty*/                                      {$$ = NULL;}
 
 
 
-
-
-
-Statement:  IF LPAR Expr RPAR Statement %prec REDUCE        {}
-        |   IF LPAR Expr RPAR Statement ELSE Statement      {}
-        |   WHILE LPAR Expr RPAR Statement                  {}
+Statement:  IF LPAR  ExprA RPAR Statement    %prec REDUCE     {}
+        |   IF LPAR  ExprA RPAR Statement ELSE Statement      {}
+        |   WHILE LPAR   ExprA RPAR Statement                  {}
         |   RETURN StatementExpOp SEMICOLON                 {}
         |   LBRACE StatementZrOuMais RBRACE                 {}
         |   StateMethodIAssignmentParseArgs SEMICOLON       {}
@@ -133,16 +136,16 @@ StatementZrOuMais: /*empty*/                                {}
     ;
 
 StatementExpOp: /*empty*/                                   {$$ = NULL;}
-            |    Expr                                       {$$ = $1;}
+            |     ExprA                                     {$$ = $1;}
     ;
 
 StatementPrint: STRLIT                                      {$$ = insert_expr("StrLit",$1,NULL,NULL);}
-        |    Expr                                           {$$ = $1;}
+        |     ExprA                                         {$$ = $1;}
     ;
 
 StateMethodIAssignmentParseArgs : /*empty*/                 {}             
         | MethodInvocation                                  {} 
-        | Assigment                                         {} 
+        | ID ASSIGN ExprA     {}
         | ParseArgs                                         {} 
     ;
 
@@ -154,23 +157,28 @@ MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {}
     ;
 
 ExpCommaExpOP: /*empty*/                                     {} 
-            | Expr CommaExprZrOuMais                         {}
+            |  ExprA CommaExprZrOuMais                       {} 
     ;
 
 CommaExprZrOuMais: /*empty*/                                 {}
-         | COMMA Expr CommaExprZrOuMais                      {}
+         | COMMA  ExprA CommaExprZrOuMais                    {}
     ;
 
-Assigment: ID ASSIGN Expr                                    {}
-    ;
+
      
-ParseArgs:  PARSEINT LPAR ID LSQ Expr RSQ RPAR               {}
+ParseArgs:  PARSEINT LPAR ID LSQ  ExprA RSQ RPAR             {}
     ;
 
 
+/*
+Assigment:  ID ASSIGN ExprA {}
+    ;
+*/
 
 
-
+ExprA: Expr                             {}
+    |  ID ASSIGN ExprA                         {}
+    |  LPAR ID ASSIGN ExprA RPAR                         {}
 
 Expr: Expr AND Expr                             {$$ = insert_expr("Operacao","And",$1,$3);}
     | Expr OR Expr                              {$$ = insert_expr("Operacao","Or",$1,$3);}
@@ -193,7 +201,6 @@ Expr: Expr AND Expr                             {$$ = insert_expr("Operacao","An
     | PLUS Expr                                 {}
     | LPAR Expr RPAR                            {}
     | MethodInvocation                          {}
-    | Assigment                                 {}
     | ParseArgs                                 {} 
     | ID                                        {$$ = insert_expr("Id",$1,NULL,NULL);}
     | ID DOTLENGTH                              {}
