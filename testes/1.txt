@@ -1,7 +1,5 @@
-class Factorial {
-      int;
-      int a;
-      public static int a;
-      int b;    
-    
+class assign_error {
+  public static void main(String[] args) {
+    f(i = j = a&&b = l);
+  }
 }

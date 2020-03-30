@@ -67,7 +67,7 @@ reallit					({und_real}+"."{und_real}*{exponte}?)|({und_real}+{exponte})|("."{un
 
 
 
-true|false				{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng; return BOOLLIT;}
+true|false				{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return BOOLLIT;}
 "&&" 					{if(flag==0){printf("AND\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return AND;}
 "=" 					{if(flag==0){printf("ASSIGN\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return ASSIGN;}
 "*" 					{if(flag==0){printf("STAR\n");}num_colunas+= yyleng;  yylval.id = strdup(yytext); return STAR;}
@@ -112,7 +112,7 @@ void					{if(flag==0){printf("VOID\n");}num_colunas+= yyleng; yylval.id = strdup
 while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return WHILE;}
 
 
-{reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;  yylval.id = strdup(yytext);}
+{reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;  yylval.id = strdup(yytext); return RESERVED;}
 
 {letras}{alfanum}*		{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return ID;}
 {reallit}				{if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return REALLIT;}

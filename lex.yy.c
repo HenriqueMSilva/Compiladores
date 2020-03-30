@@ -1077,7 +1077,7 @@ YY_RULE_SETUP
 case 15:
 YY_RULE_SETUP
 #line 70 "jucompiler.l"
-{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng; return BOOLLIT;}
+{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return BOOLLIT;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
@@ -1292,7 +1292,7 @@ YY_RULE_SETUP
 case 58:
 YY_RULE_SETUP
 #line 115 "jucompiler.l"
-{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;  yylval.id = strdup(yytext);}
+{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng;  yylval.id = strdup(yytext); return RESERVED;}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP

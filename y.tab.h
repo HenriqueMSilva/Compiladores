@@ -89,10 +89,12 @@ extern int yydebug;
     VOID = 299,
     WHILE = 300,
     REALLIT = 301,
-    ID = 302,
-    INTLIT = 303,
-    STRLIT = 304,
-    REDUCE = 305
+    RESERVED = 302,
+    ID = 303,
+    INTLIT = 304,
+    STRLIT = 305,
+    REDUCEA = 306,
+    REDUCE = 307
   };
 #endif
 /* Tokens.  */
@@ -140,21 +142,23 @@ extern int yydebug;
 #define VOID 299
 #define WHILE 300
 #define REALLIT 301
-#define ID 302
-#define INTLIT 303
-#define STRLIT 304
-#define REDUCE 305
+#define RESERVED 302
+#define ID 303
+#define INTLIT 304
+#define STRLIT 305
+#define REDUCEA 306
+#define REDUCE 307
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 33 "jucompiler.y" /* yacc.c:1909  */
+#line 37 "jucompiler.y" /* yacc.c:1909  */
 
     char *id;
 
-#line 158 "y.tab.h" /* yacc.c:1909  */
+#line 162 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

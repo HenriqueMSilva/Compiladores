@@ -1,5 +1,5 @@
 class assign_error {
 
-  public static boolean main(String[] args) {
-
+	public static void c(float w){};;;; // float is not known to Ja as a type!
+	
 }
