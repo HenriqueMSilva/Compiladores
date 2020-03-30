@@ -151,6 +151,7 @@ Assigment:  ID ASSIGN ExprA {}
 
 ExprA: Expr                             {}
     |  ID ASSIGN ExprA                         {}
+    |  LPAR ID ASSIGN ExprA RPAR                         {}
 
 Expr: Expr AND Expr                             {}
     | Expr OR Expr                              {}

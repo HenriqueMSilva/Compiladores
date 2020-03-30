@@ -1323,7 +1323,7 @@ YY_RULE_SETUP
 case 64:
 YY_RULE_SETUP
 #line 125 "jucompiler.l"
-{printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng; return yytext[0];  }
+{printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng;  return yytext[0];  }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
