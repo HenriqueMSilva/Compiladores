@@ -15,9 +15,9 @@ is_program* myprogram;
 
 %}
 
-%token BOOLLIT AND ASSIGN STAR COMMA DIV EQ GE GT LBRACE LE LPAR RPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGTH DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC RETURN STATIC STRING VOID WHILE REALLIT RESERVED
+%token AND ASSIGN STAR COMMA DIV EQ GE GT LBRACE LE LPAR RPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGTH DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC RETURN STATIC STRING VOID WHILE RESERVED
 
-%token<id>ID INTLIT STRLIT
+%token<id>ID INTLIT STRLIT REALLIT BOOLLIT
 
 %type<ip>program
 %type<im>metodos
@@ -27,16 +27,13 @@ is_program* myprogram;
 %type<impl>MethodParams MethodParamsNext
 %type<imbl>body MethodBody
 %type<ivdl>VarDecl VarDeclNext
-%type<state> Statement
-%type<iel>StatementPrint StatementExpOp Expr ExprA
+%type<state> Statement StatementZrOuMais
+%type<iel>StatementPrint StatementExpOp Expr ExprA MethodInvocation ParseArgs ExpCommaExpOP CommaExprZrOuMais
 %type<id>Type
 
 
 
-%nonassoc REDUCEA
 %right ASSIGN
-
-
 %left OR
 %left AND
 %left XOR
@@ -122,13 +119,16 @@ VarDeclNext: /*empty*/                                      {$$ = NULL;}
 
 
 
-Statement:  IF LPAR  ExprA RPAR Statement    %prec REDUCE     {}
-        |   IF LPAR  ExprA RPAR Statement ELSE Statement      {}
-        |   WHILE LPAR   ExprA RPAR Statement                  {}
-        |   RETURN StatementExpOp SEMICOLON                 {}
+Statement:  IF LPAR  ExprA RPAR Statement    %prec REDUCE   {$$ = insert_multiple_statement("If", $3, $5, NULL);}
+        |   IF LPAR  ExprA RPAR Statement ELSE Statement    {$$ = insert_multiple_statement("IfElse", $3, $5, $7);}
+        |   WHILE LPAR   ExprA RPAR Statement               {}
+        |   RETURN StatementExpOp SEMICOLON                 {$$ = insert_statment("Return",NULL,$2);}
         |   LBRACE StatementZrOuMais RBRACE                 {}
-        |   StateMethodIAssignmentParseArgs SEMICOLON       {}
         |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = insert_statment("Print",NULL,$3);}
+        |   MethodInvocation SEMICOLON                      {$$ = insert_statment("Call",NULL,$1);}
+        |   ID ASSIGN ExprA  SEMICOLON                      {$$ = insert_statment("AssignStatment",NULL,insert_expr("Assign",$1,$3,NULL));}
+        |   ParseArgs SEMICOLON                             {$$ = insert_statment("ParseArgs",NULL,$1);}
+        |   SEMICOLON                                       {$$ = NULL;}
     ; 
 
 StatementZrOuMais: /*empty*/                                {}
@@ -143,70 +143,59 @@ StatementPrint: STRLIT                                      {$$ = insert_expr("S
         |     ExprA                                         {$$ = $1;}
     ;
 
-StateMethodIAssignmentParseArgs : /*empty*/                 {}             
-        | MethodInvocation                                  {} 
-        | ID ASSIGN ExprA     {}
-        | ParseArgs                                         {} 
+
+
+
+MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {$$ = insert_expr("Call",$1,$3,NULL);}
+    ;
+
+ExpCommaExpOP: /*empty*/                                     {$$ = NULL;} 
+            |  ExprA CommaExprZrOuMais                       {$$ = insert_expr("CallMore","",$1,$2);} 
+    ;
+
+CommaExprZrOuMais: /*empty*/                                 {$$ = NULL;}
+         | COMMA  ExprA CommaExprZrOuMais                    {$$ = insert_expr("CallMore","",$2,$3);}
+    ;
+
+
+ParseArgs:  PARSEINT LPAR ID LSQ  ExprA RSQ RPAR  {$$ = insert_expr("ParseArgs",$3,$5,NULL);}
     ;
 
 
 
-
-
-MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {}
+ExprA: Expr                                     {$$ = $1;}
+    |  ID ASSIGN ExprA                          {$$ = insert_expr("Assign",$1,$3,NULL);}
+    |  LPAR ID ASSIGN ExprA RPAR                {$$ = insert_expr("Assign",$2,$4,NULL);}
     ;
 
-ExpCommaExpOP: /*empty*/                                     {} 
-            |  ExprA CommaExprZrOuMais                       {} 
-    ;
-
-CommaExprZrOuMais: /*empty*/                                 {}
-         | COMMA  ExprA CommaExprZrOuMais                    {}
-    ;
-
-
-     
-ParseArgs:  PARSEINT LPAR ID LSQ  ExprA RSQ RPAR             {}
-    ;
-
-
-/*
-Assigment:  ID ASSIGN ExprA {}
-    ;
-*/
-
-
-ExprA: Expr                             {}
-    |  ID ASSIGN ExprA                         {}
-    |  LPAR ID ASSIGN ExprA RPAR                         {}
 
 Expr: Expr AND Expr                             {$$ = insert_expr("Operacao","And",$1,$3);}
     | Expr OR Expr                              {$$ = insert_expr("Operacao","Or",$1,$3);}
-    | Expr EQ Expr                              {}
-    | Expr GE Expr                              {}
-    | Expr GT Expr                              {}
-    | Expr LE Expr                              {}
-    | Expr LT Expr                              {}
-    | Expr NE Expr                              {}
-    | Expr PLUS Expr                            {}
-    | Expr MINUS Expr                           {}               
-    | Expr STAR Expr                            {}
-    | Expr DIV Expr                             {}
-    | Expr MOD Expr                             {} 
-    | Expr XOR Expr                             {}
-    | Expr LSHIFT Expr                          {}
-    | Expr RSHIFT Expr                          {}
-    | NOT Expr                                  {}
-    | MINUS Expr                                {}
-    | PLUS Expr                                 {}
-    | LPAR Expr RPAR                            {}
-    | MethodInvocation                          {}
-    | ParseArgs                                 {} 
+    | Expr EQ Expr                              {$$ = insert_expr("Operacao","Eq",$1,$3);}
+    | Expr GE Expr                              {$$ = insert_expr("Operacao","Ge",$1,$3);}
+    | Expr GT Expr                              {$$ = insert_expr("Operacao","Gt",$1,$3);}
+    | Expr LE Expr                              {$$ = insert_expr("Operacao","Le",$1,$3);}
+    | Expr LT Expr                              {$$ = insert_expr("Operacao","Lt",$1,$3);}
+    | Expr NE Expr                              {$$ = insert_expr("Operacao","Ne",$1,$3);}
+    | Expr PLUS Expr                            {$$ = insert_expr("Operacao","Add",$1,$3);}
+    | Expr MINUS Expr                           {$$ = insert_expr("Operacao","Sub",$1,$3);}               
+    | Expr STAR Expr                            {$$ = insert_expr("Operacao","Mul",$1,$3);}
+    | Expr DIV Expr                             {$$ = insert_expr("Operacao","Div",$1,$3);}
+    | Expr MOD Expr                             {$$ = insert_expr("Operacao","Mod",$1,$3);} 
+    | Expr XOR Expr                             {$$ = insert_expr("Operacao","Xor",$1,$3);}
+    | Expr LSHIFT Expr                          {$$ = insert_expr("Operacao","Lshift",$1,$3);}
+    | Expr RSHIFT Expr                          {$$ = insert_expr("Operacao","Rshift",$1,$3);}
+    | NOT Expr                                  {$$ = insert_expr("Operacao","Not",$2,NULL);}
+    | MINUS Expr                                {$$ = insert_expr("Operacao","Minus",$2,NULL);}
+    | PLUS Expr                                 {$$ = insert_expr("Operacao","Plus",$2,NULL);}
+    | LPAR ExprA RPAR                           {$$ = $2;}
+    | MethodInvocation                          {$$ = $1;}
+    | ParseArgs                                 {$$ = $1;} 
     | ID                                        {$$ = insert_expr("Id",$1,NULL,NULL);}
-    | ID DOTLENGTH                              {}
-    | REALLIT                                   {}
-    | BOOLLIT                                   {}
-    | INTLIT                                    {}
+    | ID DOTLENGTH                              {$$ = insert_expr("Length",$1,NULL,NULL);}
+    | REALLIT                                   {$$ = insert_expr("RealLit",$1,NULL,NULL);}
+    | BOOLLIT                                   {$$ = insert_expr("BoolLit",$1,NULL,NULL);}
+    | INTLIT                                    {$$ = insert_expr("DecLit",$1,NULL,NULL);}
     ; 
 
 

@@ -3,6 +3,7 @@
 //Pedro Almeida 2017255094	
 
 	#include "structures.h"
+	#include "functions.h"
 	#include "y.tab.h"
 	int num_linhas = 1;
 	int num_colunas = 1;
@@ -127,83 +128,6 @@ while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng; yylval.id = strd
 
 %%
 
-void print_tree(){
-	char  *auxiliar = "";
-	is_metodos* metodos= myprogram->metodos;
-	is_fielddecl_list* field;
-	is_methoddecl_list* method;
-	is_methodparams_list* params;
-	is_methodbody_list* body;
-	is_vardecl_list* vardecl;
-	is_statment_list* statment;
-
-	printf("Program\n");
-	printf("..Id(%s)\n",myprogram->classname);
-	while(metodos != NULL){
-		if(strcmp("Field",metodos->evocation) == 0){
-			field = metodos->ifl;
-			while(field != NULL){
-				printf("..FieldDecl\n");
-				if(strcmp("",field->type) != 0){
-					printf("....%s\n",field->type);
-					auxiliar = field->type; 
-				}else{
-					printf("....%s\n",auxiliar);
-				}
-				printf("....Id(%s)\n",field->name);
-				field = field->next;
-			}
-		}else{
-			printf("..MethodDecl\n");
-			method = metodos->imdl;
-			printf("....MethodHeader\n");
-			printf("......%s\n",method->imhl->type);
-			printf("......Id(%s)\n",method->imhl->name);
-			params = method->imhl->impl;
-			printf("......MethodParams\n");
-			while(params != NULL){
-				printf("........ParamDecl\n");
-				printf("..........%s\n",params->type);
-				printf("..........Id(%s)\n",params->name);
-				params = params->next;
-			}
-			printf("....MethodBody\n");
-			body = metodos->imdl->imbl;
-			while(body != NULL){
-				if(strcmp("VarDecl",body->type) == 0){
-					vardecl = body->ivdl;
-					while(vardecl != NULL){
-						printf("......VarDecl\n");
-						
-						if(strcmp("",vardecl->type) != 0){
-							printf("........%s\n",vardecl->type);
-							auxiliar = vardecl->type; 
-						}else{
-							printf("........%s\n",auxiliar);
-						}
-						
-
-						printf("........Id(%s)\n",vardecl->name);
-						vardecl = vardecl->next;
-					}
-				}else{
-					statment = body->statment;
-					printf("......%s\n",statment->name_function);
-					while(statment->expr != NULL){
-						printf("........%s\n",statment->expr->value);
-						statment->expr = statment->expr->next;
-					}
-					
-				}
-				body = body->next;
-			}
-		}
-		metodos= metodos->next;
-	}
-
-	
-}
-
 
 int main(int argc, char *argv[]){
 	if(argc == 2){
@@ -222,7 +146,7 @@ int main(int argc, char *argv[]){
 			flag = 2;
 			yyparse();
 			if(erro_sintaxe == 0){
-				print_tree();
+				print_tree(myprogram);
 			}
 		}
 	}else if(argc == 1){

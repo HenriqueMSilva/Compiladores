@@ -1,8 +1,10 @@
-class Factorial {
-    public static int factorial(int n) {
-    	int agur;
+class Error {
+    public static double argument;
+    public static int error(float n) {
+    	
+    	int argu;
     	System.out.print(a && b || c);
-    	System.out.print("pedro");
-    	System.out.print("pewpew");
+    	int pedro;
+
     }
 }

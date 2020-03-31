@@ -5,14 +5,16 @@
 typedef struct _s10 {
 	char *operation;
 	char *value;
-    struct _s10* next;
+    struct _s10* expr1;
+    struct _s10* expr2;
 } is_expression_list;
 
 // STATMENT
 typedef struct _s9 {
 	char *name_function;
-	struct _s9* statment;
 	is_expression_list* expr;
+	struct _s9* statment1;
+	struct _s9* statment2;
 } is_statment_list;
 
 
