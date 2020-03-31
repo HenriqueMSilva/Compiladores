@@ -4,7 +4,7 @@
 #include <string.h>
 #include "functions.h"
 #include "y.tab.h"
-int yydebug = 0;
+int yydebug = 1;
 
 extern int linha_erro, coluna_erro, num_colunas, num_linhas, error_sequence,erro_sintaxe;
 extern char* yytext;
@@ -120,19 +120,19 @@ VarDeclNext: /*empty*/                                      {$$ = NULL;}
 
 
 Statement:  IF LPAR  ExprA RPAR Statement    %prec REDUCE   {$$ = insert_multiple_statement("If", $3, $5, NULL);}
-        |   IF LPAR  ExprA RPAR Statement ELSE Statement    {$$ = insert_multiple_statement("IfElse", $3, $5, $7);}
-        |   WHILE LPAR   ExprA RPAR Statement               {}
+        |   IF LPAR  ExprA RPAR Statement ELSE Statement    {$$ = insert_multiple_statement("If", $3, $5, $7);}
+        |   WHILE LPAR ExprA RPAR Statement                 {}
         |   RETURN StatementExpOp SEMICOLON                 {$$ = insert_statment("Return",NULL,$2);}
-        |   LBRACE StatementZrOuMais RBRACE                 {}
+        |   LBRACE StatementZrOuMais RBRACE                 {$$ = $2;}
         |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = insert_statment("Print",NULL,$3);}
         |   MethodInvocation SEMICOLON                      {$$ = insert_statment("Call",NULL,$1);}
         |   ID ASSIGN ExprA  SEMICOLON                      {$$ = insert_statment("AssignStatment",NULL,insert_expr("Assign",$1,$3,NULL));}
         |   ParseArgs SEMICOLON                             {$$ = insert_statment("ParseArgs",NULL,$1);}
-        |   SEMICOLON                                       {$$ = NULL;}
+        |   SEMICOLON                                       {$$ = NULL;printf("semi\n");}
     ; 
 
-StatementZrOuMais: /*empty*/                                {}
-            | Statement  StatementZrOuMais                  {}
+StatementZrOuMais: /*empty*/                                {$$ = NULL;}
+            | Statement  StatementZrOuMais                  {$$ = insert_multiple_statement("Statment", NULL, $1, $2);}
     ;
 
 StatementExpOp: /*empty*/                                   {$$ = NULL;}

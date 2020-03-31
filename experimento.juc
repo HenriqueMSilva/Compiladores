@@ -2,18 +2,9 @@ class Error {
     public static double argument;
     public static int error(double n) {
 
-    	if (Miguel+Paulo==juntos_nos_projetos_todos) {
-	      	System.out.print("20 no projeto de SD");
-	      	System.out.print("20 no projeto de PPP");
-	      	System.out.print("20 no projeto de POO");
-	      	System.out.print("20 no projeto de TI");
-	      	System.out.print("20 no projeto de MULTIMEDIA");
-	      	System.out.print("20 no projeto de IRC");
-      	}
+    	{{{{a=2;{b=3;{c=1;};};};};};};
 
 
-
-      	
     	//System.out.print("asdsad");
     	//soQuero800NestaMeta((((1__3))),miguel,soQuero800NestaMeta(1+1));
     	//System.out.print(Paulo = Gostoso);

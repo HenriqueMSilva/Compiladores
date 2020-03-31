@@ -128,11 +128,10 @@ is_statment_list*  insert_multiple_statement(char *name_function, is_expression_
     
     //if ExpA Statment
     if(else_next_statment == NULL){
-        isl->statment1 = NULL;
+        isl->statment2 = NULL;
     }else{
     //if ExpA Statment Else Statment
         isl->statment2 = else_next_statment;
-
     }
 
     return isl;
@@ -210,38 +209,37 @@ void print_expr(is_expression_list* expr, int n){
 
 }
 
+int printNameFunction(is_statment_list* statment, int n){
+    int i=0;
 
+    if(strcmp("Statment",statment->name_function) == 0  || strcmp("AssignStatment",statment->name_function) == 0 ||  strcmp("Call",statment->name_function) == 0) {
+        // NAO FAZ NADA
+    }else {
+        for(i=0;i<n;i++){
+            printf(".");
+        }
+        printf("%s\n",statment->name_function);
+        n = n+2;
+    }
+    return n;
+}
 
 void funca_recursiva_statment(is_statment_list* statment, int n){
-    int i=0; 
-    is_statment_list* statment_head = statment;
 
-    while(statment != NULL){
+    n = printNameFunction(statment,n);
+
+    if(statment->expr != NULL){
+
+        print_expr(statment->expr,n);
         
-        for(i=0;i<n;i++){
-            printf(".");
-        }
-        printf("%s\n",statment->name_function);
-
-        print_expr(statment->expr,n+2);
-
-
-
-        statment = statment->statment1;
     }
-    statment = statment_head;
-    while(statment != NULL){
-        
-        for(i=0;i<n;i++){
-            printf(".");
-        }
-        printf("%s\n",statment->name_function);
+    
+    if(statment->statment1 != NULL){
+        funca_recursiva_statment(statment->statment1, n);
+    }
 
-        print_expr(statment->expr,n+2);
-
-        
-
-        statment = statment->statment1;
+    if(statment->statment2 != NULL){
+        funca_recursiva_statment(statment->statment2, n);
     }
 }
 
@@ -310,25 +308,30 @@ void print_tree(is_program* myprogram){
                 }else{
                     // STATEMENTS
                     statment = body->statment;
-                    if(strcmp("Print",statment->name_function) == 0 || strcmp("Return",statment->name_function) == 0){
-                        
-                        printf("......%s\n",statment->name_function);
-                        if(statment->expr != NULL){
-                            print_expr(statment->expr,8);
+                    if(statment != NULL){
+                        if(strcmp("Print",statment->name_function) == 0 || strcmp("Return",statment->name_function) == 0){
+                            
+                            printf("......%s\n",statment->name_function);
+                            if(statment->expr != NULL){
+                                print_expr(statment->expr,8);
+                            }
+
+                        }else if(strcmp("If",statment->name_function) == 0){
+
+                            funca_recursiva_statment(statment,6);
+                            
+                        }else if(strcmp("Statment",statment->name_function) == 0){
+
+                            funca_recursiva_statment(statment,6);
+
+                        }else{
+
+                            //CASOS ESPECIAIS TIPO CALL / ASSIGN / PARSEARGS
+                            if(statment->expr != NULL){
+                                print_expr(statment->expr,6);
+                            } 
                         }
-
-                    }else if(strcmp("If",statment->name_function) == 0){
-                        
-                        funca_recursiva_statment(statment,6);
-                    
-                    }else{
-
-                        //CASOS ESPECIAIS TIPO CALL / ASSIGN / PARSEARGS
-                        if(statment->expr != NULL){
-                            print_expr(statment->expr,6);
-                        } 
                     }
-
                     
                 }
 

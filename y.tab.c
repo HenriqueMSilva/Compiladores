@@ -69,7 +69,7 @@
 #include <string.h>
 #include "functions.h"
 #include "y.tab.h"
-int yydebug = 0;
+int yydebug = 1;
 
 extern int linha_erro, coluna_erro, num_colunas, num_linhas, error_sequence,erro_sintaxe;
 extern char* yytext;
@@ -1649,7 +1649,7 @@ yyreduce:
 
   case 29:
 #line 123 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.state) = insert_multiple_statement("IfElse", (yyvsp[-4].iel), (yyvsp[-2].state), (yyvsp[0].state));}
+    {(yyval.state) = insert_multiple_statement("If", (yyvsp[-4].iel), (yyvsp[-2].state), (yyvsp[0].state));}
 #line 1654 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1667,7 +1667,7 @@ yyreduce:
 
   case 32:
 #line 126 "jucompiler.y" /* yacc.c:1646  */
-    {}
+    {(yyval.state) = (yyvsp[-1].state);}
 #line 1672 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1697,19 +1697,19 @@ yyreduce:
 
   case 37:
 #line 131 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.state) = NULL;}
+    {(yyval.state) = NULL;printf("semi\n");}
 #line 1702 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
 #line 134 "jucompiler.y" /* yacc.c:1646  */
-    {}
+    {(yyval.state) = NULL;}
 #line 1708 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
 #line 135 "jucompiler.y" /* yacc.c:1646  */
-    {}
+    {(yyval.state) = insert_multiple_statement("Statment", NULL, (yyvsp[-1].state), (yyvsp[0].state));}
 #line 1714 "y.tab.c" /* yacc.c:1646  */
     break;
 
