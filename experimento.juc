@@ -2,7 +2,21 @@ class Error {
     public static double argument;
     public static int error(double n) {
 
-    	{{{{a=2;{b=3;{c=1;};};};};};};
+
+		if (a){
+	      {{return;}}
+	      {{{{{{{{{{{{{{{{return;}}}}}}}}}}}}}}}}
+	    }
+	    
+	    { i = 1;
+            j = 1.0;
+            k = true;}
+    	
+    	/*while((caso_da_zara_de_SI(caso_da_zara_de_SI(caso_da_zara_de_SI())))){
+	     	vontade_de_morrer = vontade_de_morrer*1_000_000.0__0__0;
+	    }*/
+
+    	//{{{{a=2;{b=3;{c=1;};};};};};};
 
 
     	//System.out.print("asdsad");

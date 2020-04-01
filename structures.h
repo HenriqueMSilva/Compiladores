@@ -12,6 +12,7 @@ typedef struct _s10 {
 // STATMENT
 typedef struct _s9 {
 	char *name_function;
+	int num_statements;
 	is_expression_list* expr;
 	struct _s9* statment1;
 	struct _s9* statment2;

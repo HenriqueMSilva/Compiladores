@@ -122,10 +122,11 @@ is_vardecl_list* insert_vardecl(char *type , char *id, is_vardecl_list* vardecl)
 }
 
 
-is_statment_list*  insert_multiple_statement(char *name_function, is_expression_list* expr, is_statment_list* next_statment, is_statment_list* else_next_statment ){
+is_statment_list*  insert_multiple_statement(char *name_function, is_expression_list* expr, is_statment_list* next_statment, is_statment_list* else_next_statment, int num_statements){
 
     is_statment_list* isl = insert_statment( name_function,  next_statment, expr);
     
+    isl->num_statements = num_statements;
     //if ExpA Statment
     if(else_next_statment == NULL){
         isl->statment2 = NULL;
@@ -177,7 +178,7 @@ void print_expr(is_expression_list* expr, int n){
             printf(".");
         }
         printf("%s\n",expr->value);
-    }else if(strcmp("ParseArgs",expr->operation) == 0 || strcmp("Call",expr->operation) == 0 || strcmp("Assign",expr->operation) == 0){
+    }else if(strcmp("ParseArgs",expr->operation) == 0 || strcmp("Call",expr->operation) == 0 || strcmp("Assign",expr->operation) == 0 || strcmp("Length",expr->operation) == 0){
         for(i=0;i<n;i++){
             printf(".");
         }
@@ -212,7 +213,13 @@ void print_expr(is_expression_list* expr, int n){
 int printNameFunction(is_statment_list* statment, int n){
     int i=0;
 
-    if(strcmp("Statment",statment->name_function) == 0  || strcmp("AssignStatment",statment->name_function) == 0 ||  strcmp("Call",statment->name_function) == 0) {
+    if(strcmp("IfElse",statment->name_function) == 0){
+        for(i=0;i<n;i++){
+            printf(".");
+        }
+        printf("If\n");
+        n = n+2;
+    }else if(strcmp("Statment",statment->name_function) == 0  || strcmp("AssignStatment",statment->name_function) == 0 ||  strcmp("Call",statment->name_function) == 0) {
         // NAO FAZ NADA
     }else {
         for(i=0;i<n;i++){
@@ -225,13 +232,21 @@ int printNameFunction(is_statment_list* statment, int n){
 }
 
 void funca_recursiva_statment(is_statment_list* statment, int n){
-
+    int i = 0, n_block=n;
     n = printNameFunction(statment,n);
 
     if(statment->expr != NULL){
 
         print_expr(statment->expr,n);
         
+    }
+
+    if(strcmp("If",statment->name_function) == 0 && statment->num_statements > 1){
+        for(i=0;i<n;i++){
+            printf(".");
+        }
+        printf("Block\n");
+        n=n+2;
     }
     
     if(statment->statment1 != NULL){
@@ -240,6 +255,21 @@ void funca_recursiva_statment(is_statment_list* statment, int n){
 
     if(statment->statment2 != NULL){
         funca_recursiva_statment(statment->statment2, n);
+    }
+
+    if(strcmp("If",statment->name_function) == 0){
+        for(i=0;i<n_block+2;i++){
+            printf(".");
+        }
+        printf("Block\n");
+
+    }
+
+    if(strcmp("While",statment->name_function) == 0 && statment->statment1 == NULL){
+        for(i=0;i<n_block;i++){
+            printf(".");
+        }
+        printf("Block\n");
     }
 }
 
@@ -316,14 +346,18 @@ void print_tree(is_program* myprogram){
                                 print_expr(statment->expr,8);
                             }
 
-                        }else if(strcmp("If",statment->name_function) == 0){
-
+                        }else if(strcmp("If",statment->name_function) == 0 || strcmp("While",statment->name_function) == 0 || strcmp("IfElse",statment->name_function) == 0){
+                            
                             funca_recursiva_statment(statment,6);
                             
                         }else if(strcmp("Statment",statment->name_function) == 0){
+                            n= 6;
 
-                            funca_recursiva_statment(statment,6);
-
+                            if(statment->num_statements > 1){
+                                printf("......Block\n");
+                                n=8;
+                            }
+                            funca_recursiva_statment(statment,n);
                         }else{
 
                             //CASOS ESPECIAIS TIPO CALL / ASSIGN / PARSEARGS

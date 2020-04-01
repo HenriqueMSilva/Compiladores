@@ -69,7 +69,8 @@
 #include <string.h>
 #include "functions.h"
 #include "y.tab.h"
-int yydebug = 1;
+int yydebug = 0;
+int num_statements=0;
 
 extern int linha_erro, coluna_erro, num_colunas, num_linhas, error_sequence,erro_sintaxe;
 extern char* yytext;
@@ -79,7 +80,7 @@ void yyerror(char* s);
 is_program* myprogram;
 
 
-#line 83 "y.tab.c" /* yacc.c:339  */
+#line 84 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -162,7 +163,8 @@ extern int yydebug;
     STRLIT = 303,
     REALLIT = 304,
     BOOLLIT = 305,
-    REDUCE = 306
+    REDUCE = 306,
+    UNARIO = 307
   };
 #endif
 /* Tokens.  */
@@ -215,13 +217,14 @@ extern int yydebug;
 #define REALLIT 304
 #define BOOLLIT 305
 #define REDUCE 306
+#define UNARIO 307
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 51 "jucompiler.y" /* yacc.c:355  */
+#line 53 "jucompiler.y" /* yacc.c:355  */
 
     char *id;
     is_program* ip;
@@ -235,7 +238,7 @@ union YYSTYPE
     is_statment_list* state;
     is_expression_list* iel;
 
-#line 239 "y.tab.c" /* yacc.c:355  */
+#line 242 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -252,7 +255,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 256 "y.tab.c" /* yacc.c:358  */
+#line 259 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -497,7 +500,7 @@ union yyalloc
 #define YYLAST   362
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  52
+#define YYNTOKENS  53
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  24
 /* YYNRULES -- Number of rules.  */
@@ -508,7 +511,7 @@ union yyalloc
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   306
+#define YYMAXUTOK   307
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -547,22 +550,22 @@ static const yytype_uint8 yytranslate[] =
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
       35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
-      45,    46,    47,    48,    49,    50,    51
+      45,    46,    47,    48,    49,    50,    51,    52
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    67,    67,    70,    71,    72,    73,    76,    79,    82,
-      83,    86,    87,    88,    92,    93,    96,    97,    98,   101,
-     102,   105,   108,   109,   110,   113,   116,   117,   122,   123,
-     124,   125,   126,   127,   128,   129,   130,   131,   134,   135,
-     138,   139,   142,   143,   149,   152,   153,   156,   157,   161,
-     166,   167,   168,   172,   173,   174,   175,   176,   177,   178,
-     179,   180,   181,   182,   183,   184,   185,   186,   187,   188,
-     189,   190,   191,   192,   193,   194,   195,   196,   197,   198,
-     204,   207,   209,   212,   215
+       0,    69,    69,    72,    73,    74,    75,    78,    81,    84,
+      85,    88,    89,    90,    94,    95,    98,    99,   100,   103,
+     104,   107,   110,   111,   112,   115,   118,   119,   124,   125,
+     126,   127,   128,   129,   130,   131,   132,   133,   136,   137,
+     140,   141,   144,   145,   151,   154,   155,   158,   159,   163,
+     168,   169,   170,   174,   175,   176,   177,   178,   179,   180,
+     181,   182,   183,   184,   185,   186,   187,   188,   189,   190,
+     191,   192,   193,   194,   195,   196,   197,   198,   199,   200,
+     206,   209,   211,   214,   217
 };
 #endif
 
@@ -577,11 +580,11 @@ static const char *const yytname[] =
   "LSHIFT", "RSHIFT", "XOR", "BOOL", "CLASS", "DOTLENGTH", "DOUBLE",
   "ELSE", "IF", "INT", "PRINT", "PARSEINT", "PUBLIC", "RETURN", "STATIC",
   "STRING", "VOID", "WHILE", "RESERVED", "ID", "INTLIT", "STRLIT",
-  "REALLIT", "BOOLLIT", "REDUCE", "$accept", "program", "metodos",
-  "MethodDecl", "FieldDecl", "FieldDeclNext", "Type", "MethodHeader",
-  "MethodParams", "MethodParamsNext", "MethodBody", "body", "VarDecl",
-  "VarDeclNext", "Statement", "StatementZrOuMais", "StatementExpOp",
-  "StatementPrint", "MethodInvocation", "ExpCommaExpOP",
+  "REALLIT", "BOOLLIT", "REDUCE", "UNARIO", "$accept", "program",
+  "metodos", "MethodDecl", "FieldDecl", "FieldDeclNext", "Type",
+  "MethodHeader", "MethodParams", "MethodParamsNext", "MethodBody", "body",
+  "VarDecl", "VarDeclNext", "Statement", "StatementZrOuMais",
+  "StatementExpOp", "StatementPrint", "MethodInvocation", "ExpCommaExpOP",
   "CommaExprZrOuMais", "ParseArgs", "ExprA", "Expr", YY_NULLPTR
 };
 #endif
@@ -596,7 +599,7 @@ static const yytype_uint16 yytoknum[] =
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
      295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-     305,   306
+     305,   306,   307
 };
 # endif
 
@@ -623,8 +626,8 @@ static const yytype_int16 yypact[] =
      199,   199,   199,    33,   -41,   -41,   -41,   129,   -41,   -41,
      -41,   247,   193,   193,    96,   150,   -41,   -41,   -41,   -41,
      -41,   133,   152,   -41,   -41,   -41,   -41,   -41,   145,   -41,
-     147,   -41,   148,   153,   151,    89,   156,   131,    41,    48,
-     -41,    48,   193,   -41,   -41,   199,   199,   199,   199,   199,
+     147,   -41,   148,   153,   151,    89,   156,   131,    41,   -41,
+     -41,   -41,   193,   -41,   -41,   199,   199,   199,   199,   199,
      199,   199,   199,   199,   199,   199,   199,   199,   199,   199,
      199,   157,   139,   159,   161,   177,   117,   142,   158,    78,
      -41,    24,   166,   -41,   193,   -41,   193,   -41,   -41,   299,
@@ -764,38 +767,38 @@ static const yytype_int16 yycheck[] =
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    31,    53,    46,     0,    11,     1,    25,    39,    54,
-      55,    56,    25,    54,    41,    23,    54,    54,    30,    33,
-      36,    43,    58,    59,    46,    46,    11,    62,    13,     6,
-      13,    57,     1,    11,    25,    35,    37,    38,    40,    44,
-      46,    58,    63,    64,    66,    70,    73,    42,    58,    60,
-      46,    60,    25,    25,    66,    67,    13,    13,    13,    13,
-      17,    20,    22,    46,    47,    49,    50,    68,    70,    73,
-      74,    75,    13,     4,    13,    46,    23,    63,    63,    25,
-      25,    15,    46,    14,    57,    14,    67,    23,    74,    48,
-      69,    74,     1,    46,     1,    46,    74,    13,    46,    75,
-      75,    75,     4,    32,    25,     3,     5,     7,     8,     9,
+       0,    31,    54,    46,     0,    11,     1,    25,    39,    55,
+      56,    57,    25,    55,    41,    23,    55,    55,    30,    33,
+      36,    43,    59,    60,    46,    46,    11,    63,    13,     6,
+      13,    58,     1,    11,    25,    35,    37,    38,    40,    44,
+      46,    59,    64,    65,    67,    71,    74,    42,    59,    61,
+      46,    61,    25,    25,    67,    68,    13,    13,    13,    13,
+      17,    20,    22,    46,    47,    49,    50,    69,    71,    74,
+      75,    76,    13,     4,    13,    46,    23,    64,    64,    25,
+      25,    15,    46,    14,    58,    14,    68,    23,    75,    48,
+      70,    75,     1,    46,     1,    46,    75,    13,    46,    76,
+      76,    76,     4,    32,    25,     3,     5,     7,     8,     9,
       10,    12,    16,    17,    18,    19,    21,    22,    27,    28,
-      29,    74,    74,     1,    71,    74,     6,    65,    24,     6,
-      61,    14,    14,    14,    15,    14,     4,    14,    74,    75,
-      75,    75,    75,    75,    75,    75,    75,    75,    75,    75,
-      75,    75,    75,    75,    75,    14,    25,    14,    14,     6,
-      72,    46,    25,    46,    58,    66,    25,    74,    74,    66,
-      74,    65,    46,    34,    24,    14,    72,    61,    66,    14
+      29,    75,    75,     1,    72,    75,     6,    66,    24,     6,
+      62,    14,    14,    14,    15,    14,     4,    14,    75,    76,
+      76,    76,    76,    76,    76,    76,    76,    76,    76,    76,
+      76,    76,    76,    76,    76,    14,    25,    14,    14,     6,
+      73,    46,    25,    46,    59,    67,    25,    75,    75,    67,
+      75,    66,    46,    34,    24,    14,    73,    62,    67,    14
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    52,    53,    54,    54,    54,    54,    55,    56,    57,
-      57,    58,    58,    58,    59,    59,    60,    60,    60,    61,
-      61,    62,    63,    63,    63,    64,    65,    65,    66,    66,
-      66,    66,    66,    66,    66,    66,    66,    66,    67,    67,
-      68,    68,    69,    69,    70,    71,    71,    72,    72,    73,
-      74,    74,    74,    75,    75,    75,    75,    75,    75,    75,
-      75,    75,    75,    75,    75,    75,    75,    75,    75,    75,
-      75,    75,    75,    75,    75,    75,    75,    75,    75,    75,
-      56,    66,    73,    70,    75
+       0,    53,    54,    55,    55,    55,    55,    56,    57,    58,
+      58,    59,    59,    59,    60,    60,    61,    61,    61,    62,
+      62,    63,    64,    64,    64,    65,    66,    66,    67,    67,
+      67,    67,    67,    67,    67,    67,    67,    67,    68,    68,
+      69,    69,    70,    70,    71,    72,    72,    73,    73,    74,
+      75,    75,    75,    76,    76,    76,    76,    76,    76,    76,
+      76,    76,    76,    76,    76,    76,    76,    76,    76,    76,
+      76,    76,    76,    76,    76,    76,    76,    76,    76,    76,
+      57,    67,    74,    71,    76
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -1486,505 +1489,505 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 67 "jucompiler.y" /* yacc.c:1646  */
+#line 69 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.ip)=myprogram=insert_program((yyvsp[-3].id), (yyvsp[-1].im));}
-#line 1492 "y.tab.c" /* yacc.c:1646  */
+#line 1495 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 70 "jucompiler.y" /* yacc.c:1646  */
+#line 72 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.im) = NULL;}
-#line 1498 "y.tab.c" /* yacc.c:1646  */
+#line 1501 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 71 "jucompiler.y" /* yacc.c:1646  */
+#line 73 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.im)=insert_metodos("Method",NULL,(yyvsp[-1].imdl),(yyvsp[0].im));}
-#line 1504 "y.tab.c" /* yacc.c:1646  */
+#line 1507 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 72 "jucompiler.y" /* yacc.c:1646  */
+#line 74 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.im)=insert_metodos("Field",(yyvsp[-1].ifl),NULL,(yyvsp[0].im));}
-#line 1510 "y.tab.c" /* yacc.c:1646  */
+#line 1513 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 73 "jucompiler.y" /* yacc.c:1646  */
+#line 75 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.im)=insert_metodos("Semicolon",NULL,NULL,(yyvsp[0].im));}
-#line 1516 "y.tab.c" /* yacc.c:1646  */
+#line 1519 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 76 "jucompiler.y" /* yacc.c:1646  */
+#line 78 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.imdl)=insert_methoddecl((yyvsp[-1].imhl),(yyvsp[0].imbl));}
-#line 1522 "y.tab.c" /* yacc.c:1646  */
+#line 1525 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 79 "jucompiler.y" /* yacc.c:1646  */
+#line 81 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.ifl)=insert_field((yyvsp[-3].id),(yyvsp[-2].id),(yyvsp[-1].ifl));}
-#line 1528 "y.tab.c" /* yacc.c:1646  */
+#line 1531 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 82 "jucompiler.y" /* yacc.c:1646  */
+#line 84 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.ifl) = NULL;}
-#line 1534 "y.tab.c" /* yacc.c:1646  */
+#line 1537 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 83 "jucompiler.y" /* yacc.c:1646  */
+#line 85 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.ifl)=insert_field("",(yyvsp[-1].id),(yyvsp[0].ifl));}
-#line 1540 "y.tab.c" /* yacc.c:1646  */
+#line 1543 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 86 "jucompiler.y" /* yacc.c:1646  */
+#line 88 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.id)="Bool";}
-#line 1546 "y.tab.c" /* yacc.c:1646  */
+#line 1549 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 87 "jucompiler.y" /* yacc.c:1646  */
+#line 89 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.id)="Int";}
-#line 1552 "y.tab.c" /* yacc.c:1646  */
+#line 1555 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 88 "jucompiler.y" /* yacc.c:1646  */
+#line 90 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.id)="Double";}
-#line 1558 "y.tab.c" /* yacc.c:1646  */
+#line 1561 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 92 "jucompiler.y" /* yacc.c:1646  */
+#line 94 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.imhl)=insert_methodheader((yyvsp[-4].id),(yyvsp[-3].id),(yyvsp[-1].impl));}
-#line 1564 "y.tab.c" /* yacc.c:1646  */
+#line 1567 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 93 "jucompiler.y" /* yacc.c:1646  */
+#line 95 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.imhl)=insert_methodheader("Void",(yyvsp[-3].id),(yyvsp[-1].impl));}
-#line 1570 "y.tab.c" /* yacc.c:1646  */
+#line 1573 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 96 "jucompiler.y" /* yacc.c:1646  */
+#line 98 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.impl) = NULL;}
-#line 1576 "y.tab.c" /* yacc.c:1646  */
+#line 1579 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 97 "jucompiler.y" /* yacc.c:1646  */
+#line 99 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.impl)=insert_methodparams((yyvsp[-2].id),(yyvsp[-1].id),(yyvsp[0].impl));}
-#line 1582 "y.tab.c" /* yacc.c:1646  */
+#line 1585 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 98 "jucompiler.y" /* yacc.c:1646  */
+#line 100 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.impl)=insert_methodparams("StringArray",(yyvsp[0].id),NULL);}
-#line 1588 "y.tab.c" /* yacc.c:1646  */
+#line 1591 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 101 "jucompiler.y" /* yacc.c:1646  */
+#line 103 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.impl) = NULL;}
-#line 1594 "y.tab.c" /* yacc.c:1646  */
+#line 1597 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 102 "jucompiler.y" /* yacc.c:1646  */
+#line 104 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.impl)=insert_methodparams((yyvsp[-2].id),(yyvsp[-1].id),(yyvsp[0].impl));}
-#line 1600 "y.tab.c" /* yacc.c:1646  */
+#line 1603 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 105 "jucompiler.y" /* yacc.c:1646  */
+#line 107 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.imbl) = (yyvsp[-1].imbl);}
-#line 1606 "y.tab.c" /* yacc.c:1646  */
+#line 1609 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 108 "jucompiler.y" /* yacc.c:1646  */
+#line 110 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.imbl) = NULL;}
-#line 1612 "y.tab.c" /* yacc.c:1646  */
+#line 1615 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 109 "jucompiler.y" /* yacc.c:1646  */
+#line 111 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.imbl)=insert_methodbody("VarDecl",(yyvsp[-1].ivdl),NULL,(yyvsp[0].imbl));}
-#line 1618 "y.tab.c" /* yacc.c:1646  */
+#line 1621 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 110 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.imbl)=insert_methodbody("Statement",NULL,(yyvsp[-1].state),(yyvsp[0].imbl));}
-#line 1624 "y.tab.c" /* yacc.c:1646  */
+#line 112 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.imbl)=insert_methodbody("Statement",NULL,(yyvsp[-1].state),(yyvsp[0].imbl));num_statements=0;}
+#line 1627 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 113 "jucompiler.y" /* yacc.c:1646  */
+#line 115 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.ivdl)=insert_vardecl((yyvsp[-3].id),(yyvsp[-2].id),(yyvsp[-1].ivdl));}
-#line 1630 "y.tab.c" /* yacc.c:1646  */
+#line 1633 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 116 "jucompiler.y" /* yacc.c:1646  */
+#line 118 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.ivdl) = NULL;}
-#line 1636 "y.tab.c" /* yacc.c:1646  */
+#line 1639 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 117 "jucompiler.y" /* yacc.c:1646  */
+#line 119 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.ivdl)=insert_vardecl("",(yyvsp[-1].id),(yyvsp[0].ivdl));}
-#line 1642 "y.tab.c" /* yacc.c:1646  */
+#line 1645 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 122 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.state) = insert_multiple_statement("If", (yyvsp[-2].iel), (yyvsp[0].state), NULL);}
-#line 1648 "y.tab.c" /* yacc.c:1646  */
+#line 124 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.state) = insert_multiple_statement("If", (yyvsp[-2].iel), (yyvsp[0].state), NULL,num_statements);num_statements=0;}
+#line 1651 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 123 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.state) = insert_multiple_statement("If", (yyvsp[-4].iel), (yyvsp[-2].state), (yyvsp[0].state));}
-#line 1654 "y.tab.c" /* yacc.c:1646  */
+#line 125 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.state) = insert_multiple_statement("IfElse", (yyvsp[-4].iel), (yyvsp[-2].state), (yyvsp[0].state),num_statements);num_statements=0;}
+#line 1657 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 124 "jucompiler.y" /* yacc.c:1646  */
-    {}
-#line 1660 "y.tab.c" /* yacc.c:1646  */
+#line 126 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.state) = insert_multiple_statement("While", (yyvsp[-2].iel), (yyvsp[0].state), NULL,num_statements);num_statements=0;}
+#line 1663 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 125 "jucompiler.y" /* yacc.c:1646  */
+#line 127 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.state) = insert_statment("Return",NULL,(yyvsp[-1].iel));}
-#line 1666 "y.tab.c" /* yacc.c:1646  */
+#line 1669 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 126 "jucompiler.y" /* yacc.c:1646  */
+#line 128 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.state) = (yyvsp[-1].state);}
-#line 1672 "y.tab.c" /* yacc.c:1646  */
+#line 1675 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 127 "jucompiler.y" /* yacc.c:1646  */
+#line 129 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.state) = insert_statment("Print",NULL,(yyvsp[-2].iel));}
-#line 1678 "y.tab.c" /* yacc.c:1646  */
+#line 1681 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 128 "jucompiler.y" /* yacc.c:1646  */
+#line 130 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.state) = insert_statment("Call",NULL,(yyvsp[-1].iel));}
-#line 1684 "y.tab.c" /* yacc.c:1646  */
+#line 1687 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 129 "jucompiler.y" /* yacc.c:1646  */
+#line 131 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.state) = insert_statment("AssignStatment",NULL,insert_expr("Assign",(yyvsp[-3].id),(yyvsp[-1].iel),NULL));}
-#line 1690 "y.tab.c" /* yacc.c:1646  */
+#line 1693 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 130 "jucompiler.y" /* yacc.c:1646  */
+#line 132 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.state) = insert_statment("ParseArgs",NULL,(yyvsp[-1].iel));}
-#line 1696 "y.tab.c" /* yacc.c:1646  */
+#line 1699 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 131 "jucompiler.y" /* yacc.c:1646  */
+#line 133 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.state) = NULL;printf("semi\n");}
-#line 1702 "y.tab.c" /* yacc.c:1646  */
+#line 1705 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 134 "jucompiler.y" /* yacc.c:1646  */
+#line 136 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.state) = NULL;}
-#line 1708 "y.tab.c" /* yacc.c:1646  */
+#line 1711 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 135 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.state) = insert_multiple_statement("Statment", NULL, (yyvsp[-1].state), (yyvsp[0].state));}
-#line 1714 "y.tab.c" /* yacc.c:1646  */
+#line 137 "jucompiler.y" /* yacc.c:1646  */
+    {(yyval.state) = insert_multiple_statement("Statment", NULL, (yyvsp[-1].state), (yyvsp[0].state),num_statements);num_statements++;}
+#line 1717 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 138 "jucompiler.y" /* yacc.c:1646  */
+#line 140 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = NULL;}
-#line 1720 "y.tab.c" /* yacc.c:1646  */
+#line 1723 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 139 "jucompiler.y" /* yacc.c:1646  */
+#line 141 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = (yyvsp[0].iel);}
-#line 1726 "y.tab.c" /* yacc.c:1646  */
+#line 1729 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 142 "jucompiler.y" /* yacc.c:1646  */
+#line 144 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("StrLit",(yyvsp[0].id),NULL,NULL);}
-#line 1732 "y.tab.c" /* yacc.c:1646  */
+#line 1735 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 143 "jucompiler.y" /* yacc.c:1646  */
+#line 145 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = (yyvsp[0].iel);}
-#line 1738 "y.tab.c" /* yacc.c:1646  */
+#line 1741 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 149 "jucompiler.y" /* yacc.c:1646  */
+#line 151 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Call",(yyvsp[-3].id),(yyvsp[-1].iel),NULL);}
-#line 1744 "y.tab.c" /* yacc.c:1646  */
+#line 1747 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 152 "jucompiler.y" /* yacc.c:1646  */
+#line 154 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = NULL;}
-#line 1750 "y.tab.c" /* yacc.c:1646  */
+#line 1753 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 153 "jucompiler.y" /* yacc.c:1646  */
+#line 155 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("CallMore","",(yyvsp[-1].iel),(yyvsp[0].iel));}
-#line 1756 "y.tab.c" /* yacc.c:1646  */
+#line 1759 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 156 "jucompiler.y" /* yacc.c:1646  */
+#line 158 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = NULL;}
-#line 1762 "y.tab.c" /* yacc.c:1646  */
+#line 1765 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 157 "jucompiler.y" /* yacc.c:1646  */
+#line 159 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("CallMore","",(yyvsp[-1].iel),(yyvsp[0].iel));}
-#line 1768 "y.tab.c" /* yacc.c:1646  */
+#line 1771 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 161 "jucompiler.y" /* yacc.c:1646  */
+#line 163 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("ParseArgs",(yyvsp[-4].id),(yyvsp[-2].iel),NULL);}
-#line 1774 "y.tab.c" /* yacc.c:1646  */
+#line 1777 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 166 "jucompiler.y" /* yacc.c:1646  */
+#line 168 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = (yyvsp[0].iel);}
-#line 1780 "y.tab.c" /* yacc.c:1646  */
+#line 1783 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 167 "jucompiler.y" /* yacc.c:1646  */
+#line 169 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Assign",(yyvsp[-2].id),(yyvsp[0].iel),NULL);}
-#line 1786 "y.tab.c" /* yacc.c:1646  */
+#line 1789 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 168 "jucompiler.y" /* yacc.c:1646  */
+#line 170 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Assign",(yyvsp[-3].id),(yyvsp[-1].iel),NULL);}
-#line 1792 "y.tab.c" /* yacc.c:1646  */
+#line 1795 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 172 "jucompiler.y" /* yacc.c:1646  */
+#line 174 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","And",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1798 "y.tab.c" /* yacc.c:1646  */
+#line 1801 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 173 "jucompiler.y" /* yacc.c:1646  */
+#line 175 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Or",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1804 "y.tab.c" /* yacc.c:1646  */
+#line 1807 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 174 "jucompiler.y" /* yacc.c:1646  */
+#line 176 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Eq",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1810 "y.tab.c" /* yacc.c:1646  */
+#line 1813 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 175 "jucompiler.y" /* yacc.c:1646  */
+#line 177 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Ge",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1816 "y.tab.c" /* yacc.c:1646  */
+#line 1819 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 176 "jucompiler.y" /* yacc.c:1646  */
+#line 178 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Gt",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1822 "y.tab.c" /* yacc.c:1646  */
+#line 1825 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 177 "jucompiler.y" /* yacc.c:1646  */
+#line 179 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Le",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1828 "y.tab.c" /* yacc.c:1646  */
+#line 1831 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 178 "jucompiler.y" /* yacc.c:1646  */
+#line 180 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Lt",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1834 "y.tab.c" /* yacc.c:1646  */
+#line 1837 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 179 "jucompiler.y" /* yacc.c:1646  */
+#line 181 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Ne",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1840 "y.tab.c" /* yacc.c:1646  */
+#line 1843 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 180 "jucompiler.y" /* yacc.c:1646  */
+#line 182 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Add",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1846 "y.tab.c" /* yacc.c:1646  */
+#line 1849 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 181 "jucompiler.y" /* yacc.c:1646  */
+#line 183 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Sub",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1852 "y.tab.c" /* yacc.c:1646  */
+#line 1855 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 182 "jucompiler.y" /* yacc.c:1646  */
+#line 184 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Mul",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1858 "y.tab.c" /* yacc.c:1646  */
+#line 1861 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 183 "jucompiler.y" /* yacc.c:1646  */
+#line 185 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Div",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1864 "y.tab.c" /* yacc.c:1646  */
+#line 1867 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 184 "jucompiler.y" /* yacc.c:1646  */
+#line 186 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Mod",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1870 "y.tab.c" /* yacc.c:1646  */
+#line 1873 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 185 "jucompiler.y" /* yacc.c:1646  */
+#line 187 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Xor",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1876 "y.tab.c" /* yacc.c:1646  */
+#line 1879 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 186 "jucompiler.y" /* yacc.c:1646  */
+#line 188 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Lshift",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1882 "y.tab.c" /* yacc.c:1646  */
+#line 1885 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 187 "jucompiler.y" /* yacc.c:1646  */
+#line 189 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Rshift",(yyvsp[-2].iel),(yyvsp[0].iel));}
-#line 1888 "y.tab.c" /* yacc.c:1646  */
+#line 1891 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 188 "jucompiler.y" /* yacc.c:1646  */
+#line 190 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Not",(yyvsp[0].iel),NULL);}
-#line 1894 "y.tab.c" /* yacc.c:1646  */
+#line 1897 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 189 "jucompiler.y" /* yacc.c:1646  */
+#line 191 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Minus",(yyvsp[0].iel),NULL);}
-#line 1900 "y.tab.c" /* yacc.c:1646  */
+#line 1903 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 190 "jucompiler.y" /* yacc.c:1646  */
+#line 192 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Operacao","Plus",(yyvsp[0].iel),NULL);}
-#line 1906 "y.tab.c" /* yacc.c:1646  */
+#line 1909 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 191 "jucompiler.y" /* yacc.c:1646  */
+#line 193 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = (yyvsp[-1].iel);}
-#line 1912 "y.tab.c" /* yacc.c:1646  */
+#line 1915 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 192 "jucompiler.y" /* yacc.c:1646  */
+#line 194 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = (yyvsp[0].iel);}
-#line 1918 "y.tab.c" /* yacc.c:1646  */
+#line 1921 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 193 "jucompiler.y" /* yacc.c:1646  */
+#line 195 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = (yyvsp[0].iel);}
-#line 1924 "y.tab.c" /* yacc.c:1646  */
+#line 1927 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 194 "jucompiler.y" /* yacc.c:1646  */
+#line 196 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Id",(yyvsp[0].id),NULL,NULL);}
-#line 1930 "y.tab.c" /* yacc.c:1646  */
+#line 1933 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 195 "jucompiler.y" /* yacc.c:1646  */
+#line 197 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("Length",(yyvsp[-1].id),NULL,NULL);}
-#line 1936 "y.tab.c" /* yacc.c:1646  */
+#line 1939 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 196 "jucompiler.y" /* yacc.c:1646  */
+#line 198 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("RealLit",(yyvsp[0].id),NULL,NULL);}
-#line 1942 "y.tab.c" /* yacc.c:1646  */
+#line 1945 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 197 "jucompiler.y" /* yacc.c:1646  */
+#line 199 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("BoolLit",(yyvsp[0].id),NULL,NULL);}
-#line 1948 "y.tab.c" /* yacc.c:1646  */
+#line 1951 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 79:
-#line 198 "jucompiler.y" /* yacc.c:1646  */
+#line 200 "jucompiler.y" /* yacc.c:1646  */
     {(yyval.iel) = insert_expr("DecLit",(yyvsp[0].id),NULL,NULL);}
-#line 1954 "y.tab.c" /* yacc.c:1646  */
+#line 1957 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 80:
-#line 204 "jucompiler.y" /* yacc.c:1646  */
+#line 206 "jucompiler.y" /* yacc.c:1646  */
     {}
-#line 1960 "y.tab.c" /* yacc.c:1646  */
+#line 1963 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 81:
-#line 207 "jucompiler.y" /* yacc.c:1646  */
+#line 209 "jucompiler.y" /* yacc.c:1646  */
     {}
-#line 1966 "y.tab.c" /* yacc.c:1646  */
+#line 1969 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 82:
-#line 209 "jucompiler.y" /* yacc.c:1646  */
+#line 211 "jucompiler.y" /* yacc.c:1646  */
     {}
-#line 1972 "y.tab.c" /* yacc.c:1646  */
+#line 1975 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 83:
-#line 212 "jucompiler.y" /* yacc.c:1646  */
+#line 214 "jucompiler.y" /* yacc.c:1646  */
     {}
-#line 1978 "y.tab.c" /* yacc.c:1646  */
+#line 1981 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 84:
-#line 215 "jucompiler.y" /* yacc.c:1646  */
+#line 217 "jucompiler.y" /* yacc.c:1646  */
     {}
-#line 1984 "y.tab.c" /* yacc.c:1646  */
+#line 1987 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1988 "y.tab.c" /* yacc.c:1646  */
+#line 1991 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2212,7 +2215,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 218 "jucompiler.y" /* yacc.c:1906  */
+#line 220 "jucompiler.y" /* yacc.c:1906  */
 
 
 void yyerror(char *msg) {

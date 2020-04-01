@@ -4,7 +4,8 @@
 #include <string.h>
 #include "functions.h"
 #include "y.tab.h"
-int yydebug = 1;
+int yydebug = 0;
+int num_statements=0;
 
 extern int linha_erro, coluna_erro, num_colunas, num_linhas, error_sequence,erro_sintaxe;
 extern char* yytext;
@@ -46,6 +47,7 @@ is_program* myprogram;
 
 
 %nonassoc REDUCE
+%nonassoc UNARIO
 %right ELSE
 
 %union{
@@ -107,7 +109,7 @@ MethodBody: LBRACE body RBRACE                              {$$ = $2;}
 
 body:   /*empty*/                                           {$$ = NULL;}
     |   VarDecl  body                                       {$$=insert_methodbody("VarDecl",$1,NULL,$2);} 
-    |   Statement body                                      {$$=insert_methodbody("Statement",NULL,$1,$2);} 
+    |   Statement body                                      {$$=insert_methodbody("Statement",NULL,$1,$2);num_statements=0;} 
     ;
 
 VarDecl: Type ID  VarDeclNext SEMICOLON                     {$$=insert_vardecl($1,$2,$3);}
@@ -119,9 +121,9 @@ VarDeclNext: /*empty*/                                      {$$ = NULL;}
 
 
 
-Statement:  IF LPAR  ExprA RPAR Statement    %prec REDUCE   {$$ = insert_multiple_statement("If", $3, $5, NULL);}
-        |   IF LPAR  ExprA RPAR Statement ELSE Statement    {$$ = insert_multiple_statement("If", $3, $5, $7);}
-        |   WHILE LPAR ExprA RPAR Statement                 {}
+Statement:  IF LPAR  ExprA RPAR Statement    %prec REDUCE   {$$ = insert_multiple_statement("If", $3, $5, NULL,num_statements);num_statements=0;}
+        |   IF LPAR  ExprA RPAR Statement ELSE Statement    {$$ = insert_multiple_statement("IfElse", $3, $5, $7,num_statements);num_statements=0;}
+        |   WHILE LPAR ExprA RPAR Statement                 {$$ = insert_multiple_statement("While", $3, $5, NULL,num_statements);num_statements=0;}
         |   RETURN StatementExpOp SEMICOLON                 {$$ = insert_statment("Return",NULL,$2);}
         |   LBRACE StatementZrOuMais RBRACE                 {$$ = $2;}
         |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = insert_statment("Print",NULL,$3);}
@@ -132,7 +134,7 @@ Statement:  IF LPAR  ExprA RPAR Statement    %prec REDUCE   {$$ = insert_multipl
     ; 
 
 StatementZrOuMais: /*empty*/                                {$$ = NULL;}
-            | Statement  StatementZrOuMais                  {$$ = insert_multiple_statement("Statment", NULL, $1, $2);}
+            | Statement  StatementZrOuMais                  {$$ = insert_multiple_statement("Statment", NULL, $1, $2,num_statements);num_statements++;}
     ;
 
 StatementExpOp: /*empty*/                                   {$$ = NULL;}
@@ -185,9 +187,9 @@ Expr: Expr AND Expr                             {$$ = insert_expr("Operacao","An
     | Expr XOR Expr                             {$$ = insert_expr("Operacao","Xor",$1,$3);}
     | Expr LSHIFT Expr                          {$$ = insert_expr("Operacao","Lshift",$1,$3);}
     | Expr RSHIFT Expr                          {$$ = insert_expr("Operacao","Rshift",$1,$3);}
-    | NOT Expr                                  {$$ = insert_expr("Operacao","Not",$2,NULL);}
-    | MINUS Expr                                {$$ = insert_expr("Operacao","Minus",$2,NULL);}
-    | PLUS Expr                                 {$$ = insert_expr("Operacao","Plus",$2,NULL);}
+    | NOT Expr %prec UNARIO                     {$$ = insert_expr("Operacao","Not",$2,NULL);}
+    | MINUS Expr %prec UNARIO                   {$$ = insert_expr("Operacao","Minus",$2,NULL);}
+    | PLUS Expr %prec UNARIO                    {$$ = insert_expr("Operacao","Plus",$2,NULL);}
     | LPAR ExprA RPAR                           {$$ = $2;}
     | MethodInvocation                          {$$ = $1;}
     | ParseArgs                                 {$$ = $1;} 
