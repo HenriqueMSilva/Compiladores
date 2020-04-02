@@ -50,8 +50,8 @@ Grammar
    27 Statement: IF LPAR ExprA RPAR Statement
    28          | IF LPAR ExprA RPAR Statement ELSE Statement
    29          | WHILE LPAR ExprA RPAR Statement
-   30          | RETURN StatementExpOp SEMICOLON
-   31          | LBRACE StatementZrOuMais RBRACE
+   30          | LBRACE StatementZrOuMais RBRACE
+   31          | RETURN StatementExpOp SEMICOLON
    32          | PRINT LPAR StatementPrint RPAR SEMICOLON
    33          | MethodInvocation SEMICOLON
    34          | ID ASSIGN ExprA SEMICOLON
@@ -132,7 +132,7 @@ DIV (262) 63
 EQ (263) 54
 GE (264) 55
 GT (265) 56
-LBRACE (266) 1 20 31
+LBRACE (266) 1 20 30
 LE (267) 57
 LPAR (268) 13 14 27 28 29 32 43 48 51 71 81 82 83
 RPAR (269) 13 14 27 28 29 32 43 48 51 71 81 82 83
@@ -144,9 +144,9 @@ NE (274) 59
 NOT (275) 68
 OR (276) 53
 PLUS (277) 60 70
-RBRACE (278) 1 20 31
+RBRACE (278) 1 20 30
 RSQ (279) 17 48
-SEMICOLON (280) 5 7 24 30 32 33 34 35 36 79 80
+SEMICOLON (280) 5 7 24 31 32 33 34 35 36 79 80
 ARROW (281)
 LSHIFT (282) 66
 RSHIFT (283) 67
@@ -161,7 +161,7 @@ INT (291) 11
 PRINT (292) 32
 PARSEINT (293) 48 81
 PUBLIC (294) 6 7
-RETURN (295) 30
+RETURN (295) 31
 STATIC (296) 6 7
 STRING (297) 17
 VOID (298) 14
@@ -210,9 +210,9 @@ Statement (67)
     on left: 27 28 29 30 31 32 33 34 35 36 80, on right: 23 27 28 29
     38
 StatementZrOuMais (68)
-    on left: 37 38, on right: 31 38
+    on left: 37 38, on right: 30 38
 StatementExpOp (69)
-    on left: 39 40, on right: 30
+    on left: 39 40, on right: 31
 StatementPrint (70)
     on left: 41 42, on right: 32
 MethodInvocation (71)
@@ -551,7 +551,7 @@ State 32
 
 State 33
 
-   31 Statement: LBRACE . StatementZrOuMais RBRACE
+   30 Statement: LBRACE . StatementZrOuMais RBRACE
 
     error      shift, and go to state 32
     LBRACE     shift, and go to state 33
@@ -603,7 +603,7 @@ State 37
 
 State 38
 
-   30 Statement: RETURN . StatementExpOp SEMICOLON
+   31 Statement: RETURN . StatementExpOp SEMICOLON
 
     LPAR      shift, and go to state 59
     MINUS     shift, and go to state 60
@@ -800,7 +800,7 @@ State 54
 
 State 55
 
-   31 Statement: LBRACE StatementZrOuMais . RBRACE
+   30 Statement: LBRACE StatementZrOuMais . RBRACE
 
     RBRACE  shift, and go to state 87
 
@@ -975,7 +975,7 @@ State 66
 
 State 67
 
-   30 Statement: RETURN StatementExpOp . SEMICOLON
+   31 Statement: RETURN StatementExpOp . SEMICOLON
 
     SEMICOLON  shift, and go to state 104
 
@@ -1200,9 +1200,9 @@ State 86
 
 State 87
 
-   31 Statement: LBRACE StatementZrOuMais RBRACE .
+   30 Statement: LBRACE StatementZrOuMais RBRACE .
 
-    $default  reduce using rule 31 (Statement)
+    $default  reduce using rule 30 (Statement)
 
 
 State 88
@@ -1411,9 +1411,9 @@ State 103
 
 State 104
 
-   30 Statement: RETURN StatementExpOp SEMICOLON .
+   31 Statement: RETURN StatementExpOp SEMICOLON .
 
-    $default  reduce using rule 30 (Statement)
+    $default  reduce using rule 31 (Statement)
 
 
 State 105

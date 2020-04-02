@@ -122,11 +122,10 @@ is_vardecl_list* insert_vardecl(char *type , char *id, is_vardecl_list* vardecl)
 }
 
 
-is_statment_list*  insert_multiple_statement(char *name_function, is_expression_list* expr, is_statment_list* next_statment, is_statment_list* else_next_statment, int num_statements){
+is_statment_list*  insert_multiple_statement(char *name_function, is_expression_list* expr, is_statment_list* next_statment, is_statment_list* else_next_statment){
 
     is_statment_list* isl = insert_statment( name_function,  next_statment, expr);
     
-    isl->num_statements = num_statements;
     //if ExpA Statment
     if(else_next_statment == NULL){
         isl->statment2 = NULL;
@@ -134,6 +133,24 @@ is_statment_list*  insert_multiple_statement(char *name_function, is_expression_
     //if ExpA Statment Else Statment
         isl->statment2 = else_next_statment;
     }
+
+
+    if(strcmp("Statment",isl->name_function) == 0){
+        if(next_statment != NULL){
+            isl->num_statements++; 
+        }
+
+        if(else_next_statment != NULL){
+            isl->num_statements += else_next_statment->num_statements; 
+        }
+    }else if(strcmp("Block",isl->name_function) == 0 && next_statment == NULL){
+        return NULL;
+    }else if(strcmp("Block",isl->name_function) == 0 && next_statment != NULL){
+       isl->num_statements = next_statment->num_statements; 
+    }else{
+        isl->num_statements = 1; 
+    }
+
 
     return isl;
 }
@@ -213,7 +230,7 @@ void print_expr(is_expression_list* expr, int n){
 int printNameFunction(is_statment_list* statment, int n){
     int i=0;
 
-    if(strcmp("IfElse",statment->name_function) == 0){
+     if(strcmp("IfElse",statment->name_function) == 0){
         for(i=0;i<n;i++){
             printf(".");
         }
@@ -221,6 +238,14 @@ int printNameFunction(is_statment_list* statment, int n){
         n = n+2;
     }else if(strcmp("Statment",statment->name_function) == 0  || strcmp("AssignStatment",statment->name_function) == 0 ||  strcmp("Call",statment->name_function) == 0) {
         // NAO FAZ NADA
+    }else if(strcmp("Block",statment->name_function) == 0 ){
+        if(statment->statment1 != NULL &&statment->statment1->num_statements > 1){
+            for(i=0;i<n;i++){
+                printf(".");
+            }
+            printf("%s\n",statment->name_function);
+            n = n+2;
+        }
     }else {
         for(i=0;i<n;i++){
             printf(".");
@@ -232,7 +257,9 @@ int printNameFunction(is_statment_list* statment, int n){
 }
 
 void funca_recursiva_statment(is_statment_list* statment, int n){
-    int i = 0, n_block=n;
+    int i = 0, entry=0;
+
+    //printf("%s -> %d\n",statment->name_function,statment->num_statements);
     n = printNameFunction(statment,n);
 
     if(statment->expr != NULL){
@@ -241,41 +268,48 @@ void funca_recursiva_statment(is_statment_list* statment, int n){
         
     }
 
-    if(strcmp("If",statment->name_function) == 0 && statment->num_statements > 1){
-        for(i=0;i<n;i++){
-            printf(".");
-        }
-        printf("Block\n");
-        n=n+2;
-    }
-    
     if(statment->statment1 != NULL){
         funca_recursiva_statment(statment->statment1, n);
+    }else{
+        if(strcmp("If",statment->name_function) == 0 ){
+            for(i=0;i<n;i++){
+                printf(".");
+            }
+            printf("Block\n");
+            entry=1;
+        }
     }
 
     if(statment->statment2 != NULL){
         funca_recursiva_statment(statment->statment2, n);
     }
 
-    if(strcmp("If",statment->name_function) == 0){
-        for(i=0;i<n_block+2;i++){
-            printf(".");
+    if(strcmp("If",statment->name_function) == 0 ){
+        if(statment->statment1 == NULL && entry == 0){
+            for(i=0;i<n;i++){
+                printf(".");
+            }
+            printf("Block\n");
         }
-        printf("Block\n");
-
+        if(statment->statment2 == NULL && strcmp("While",statment->name_function) != 0){
+            for(i=0;i<n;i++){
+                printf(".");
+            }
+            printf("Block\n");
+        }
+        n = n+2;
+    }else if(strcmp("While",statment->name_function) == 0){
+        if(statment->statment1 == NULL){
+            for(i=0;i<n;i++){
+                printf(".");
+            }
+            printf("Block\n");
+        }
     }
 
-    if(strcmp("While",statment->name_function) == 0 && statment->statment1 == NULL){
-        for(i=0;i<n_block;i++){
-            printf(".");
-        }
-        printf("Block\n");
-    }
 }
 
-
 void print_tree(is_program* myprogram){
-    int n;
     char  *auxiliar = "";
     is_metodos* metodos= myprogram->metodos;
     is_fielddecl_list* field;
@@ -346,18 +380,10 @@ void print_tree(is_program* myprogram){
                                 print_expr(statment->expr,8);
                             }
 
-                        }else if(strcmp("If",statment->name_function) == 0 || strcmp("While",statment->name_function) == 0 || strcmp("IfElse",statment->name_function) == 0){
+                        }else if(strcmp("If",statment->name_function) == 0 || strcmp("While",statment->name_function) == 0 || strcmp("IfElse",statment->name_function) == 0 || strcmp("Statment",statment->name_function) == 0 || strcmp("Block",statment->name_function) == 0){
                             
                             funca_recursiva_statment(statment,6);
                             
-                        }else if(strcmp("Statment",statment->name_function) == 0){
-                            n= 6;
-
-                            if(statment->num_statements > 1){
-                                printf("......Block\n");
-                                n=8;
-                            }
-                            funca_recursiva_statment(statment,n);
                         }else{
 
                             //CASOS ESPECIAIS TIPO CALL / ASSIGN / PARSEARGS
