@@ -5,7 +5,7 @@
 #include "functions.h"
 #include "y.tab.h"
 int yydebug = 0;
-int num_statements=1;
+int num_statements=0;
 
 extern int linha_erro, coluna_erro, num_colunas, num_linhas, error_sequence,erro_sintaxe;
 extern char* yytext;
@@ -121,21 +121,20 @@ VarDeclNext: /*empty*/                                      {$$ = NULL;}
 
 
 
-Statement:  IF LPAR  ExprA RPAR Statement     %prec REDUCE  {$$ = insert_multiple_statement("If", $3, $5, NULL);}
-        |   IF LPAR  ExprA RPAR Statement ELSE Statement    {$$ = insert_multiple_statement("If", $3, $5, $7);}
-        |   WHILE LPAR ExprA RPAR Statement                 {$$ = insert_multiple_statement("While", $3, $5, NULL);}
-        |   LBRACE StatementZrOuMais RBRACE                 {$$ = insert_multiple_statement("Block", NULL, $2, NULL);}
-
+Statement:  IF LPAR  ExprA RPAR Statement    %prec REDUCE   {$$ = insert_multiple_statement("If", $3, $5, NULL,num_statements);num_statements=0;}
+        |   IF LPAR  ExprA RPAR Statement ELSE Statement    {$$ = insert_multiple_statement("IfElse", $3, $5, $7,num_statements);num_statements=0;}
+        |   WHILE LPAR ExprA RPAR Statement                 {$$ = insert_multiple_statement("While", $3, $5, NULL,num_statements);num_statements=0;}
         |   RETURN StatementExpOp SEMICOLON                 {$$ = insert_statment("Return",NULL,$2);}
+        |   LBRACE StatementZrOuMais RBRACE                 {$$ = $2;}
         |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = insert_statment("Print",NULL,$3);}
         |   MethodInvocation SEMICOLON                      {$$ = insert_statment("Call",NULL,$1);}
         |   ID ASSIGN ExprA  SEMICOLON                      {$$ = insert_statment("AssignStatment",NULL,insert_expr("Assign",$1,$3,NULL));}
         |   ParseArgs SEMICOLON                             {$$ = insert_statment("ParseArgs",NULL,$1);}
-        |   SEMICOLON                                       {$$ = NULL;}
+        |   SEMICOLON                                       {$$ = NULL;printf("semi\n");}
     ; 
 
 StatementZrOuMais: /*empty*/                                {$$ = NULL;}
-            | Statement  StatementZrOuMais                  {$$ = insert_multiple_statement("Statment", NULL, $1, $2);}
+            | Statement  StatementZrOuMais                  {$$ = insert_multiple_statement("Statment", NULL, $1, $2,num_statements);num_statements++;}
     ;
 
 StatementExpOp: /*empty*/                                   {$$ = NULL;}
