@@ -15,8 +15,16 @@ clang-3.9 -o jucompiler lex.yy.c
 
 ./jucompiler -l < Comp2020/meta1/IdentifiersAndKeywords2.juc | diff Comp2020/meta1/IdentifiersAndKeywords2.out -
 
-ver str lit
-aspas 10/15
+
+$ git checkout 923a62fac2f114f13bf388b542020b3982c8a982 .
+
+
+
+
+
+
+
+
 
 
 0.0e0 sim

@@ -92,6 +92,18 @@ is_methodparams_list* insert_methodparams(char *type , char *name, is_methodpara
 
 is_methodbody_list* insert_methodbody(char *type, is_vardecl_list* vardecl , is_statment_list* statment, is_methodbody_list* body){
 
+        //ver se o st é um block
+        if(statment != NULL && strcmp("Block", statment->name_function ) == 0 && statment->num_statements == 0){
+        
+            is_statment_list* to_free = statment;    
+            statment = statment->statment1;
+            free(to_free);
+        }
+
+
+
+
+
 		is_methodbody_list* imbl=(is_methodbody_list*)malloc(sizeof(is_methodbody_list));
 
         imbl->type=(char*)strdup(type);
@@ -105,6 +117,13 @@ is_methodbody_list* insert_methodbody(char *type, is_vardecl_list* vardecl , is_
 
         imbl->next = body;
 
+        //ver se st e body ta a null-> return NULL
+        //tinha um statment que era so {}
+        if(strcmp("Statment",(char*)strdup(type)) == 0 && imbl->statment == NULL && body == NULL){
+            is_methodbody_list* to_free = imbl;    
+            imbl = NULL ;
+            free(to_free);
+        }
 
         return imbl;
 }
@@ -122,18 +141,144 @@ is_vardecl_list* insert_vardecl(char *type , char *id, is_vardecl_list* vardecl)
 }
 
 
-is_statment_list*  insert_multiple_statement(char *name_function, is_expression_list* expr, is_statment_list* next_statment, is_statment_list* else_next_statment, int num_statements){
+is_statment_list*  insert_multiple_statement(char *name_function, is_expression_list* expr, is_statment_list* next_statment, is_statment_list* else_next_statment){
 
     is_statment_list* isl = insert_statment( name_function,  next_statment, expr);
-    
-    isl->num_statements = num_statements;
+    is_statment_list* to_free = isl;
+
+
     //if ExpA Statment
     if(else_next_statment == NULL){
         isl->statment2 = NULL;
+    
     }else{
     //if ExpA Statment Else Statment
         isl->statment2 = else_next_statment;
     }
+
+
+
+    //calcula o numero de statments que estao daqui para baixo (incluindo o proprio node)
+    if( isl->statment1 != NULL ){
+        if(strcmp("Block",isl->statment1->name_function) == 0 ){
+            if(isl->statment1->num_statements == 0){
+                // st1 = Block {}
+                isl->num_statements += 0;
+            }else{
+                // st1 = Block {Alguma coisa}
+                isl->num_statements += 1;
+            }
+
+        }else if(strcmp("While",isl->statment1->name_function) == 0 || strcmp("IfElse",isl->statment1->name_function) == 0 || strcmp("If",isl->statment1->name_function) == 0){ 
+            isl->num_statements += 1;
+       
+        }else{
+
+            isl->num_statements += isl->statment1->num_statements;
+        }
+    }
+
+
+
+
+    if( isl->statment2 != NULL ){
+        if(strcmp("Block",isl->statment2->name_function) == 0){
+            //isl->num_statements += 1;
+
+            if(isl->statment2->num_statements == 0){
+                // st2 = Block {}
+                isl->num_statements += 0;
+            }else{
+                // st2 = Block {Alguma coisa}
+                isl->num_statements += 1;
+            }
+
+
+        }else if(strcmp("While",isl->statment2->name_function) == 0 || strcmp("IfElse",isl->statment2->name_function) == 0 || strcmp("If",isl->statment2->name_function) == 0){ 
+            isl->num_statements += 1;
+       
+        }else{
+            isl->num_statements += isl->statment2->num_statements;
+        }
+        
+    }
+
+
+    //aumentamos 1 statment se nao estivermos em nodes "Block" ou em "Statment"
+    if(  strcmp("While",isl->name_function) != 0 && strcmp("IfElse",isl->name_function) != 0  && strcmp("If",isl->name_function) != 0  && strcmp("Block",isl->name_function) != 0  && strcmp("Statment",isl->name_function) != 0 ){  
+        isl->num_statements += 1;
+    }
+
+
+
+
+
+
+
+
+
+    //APAGO OS BLOCK COM 0
+    //1) So criamos o node "Block" se ele tiver Statments suficientes
+    if( strcmp("Block",isl->name_function) == 0 && isl->num_statements == 1 ){
+        //nao vou criar o node "Block"
+        free(isl);
+        isl = next_statment;
+    }
+
+
+    //2) Nao estou nem num if, nem num while e tenho um block com 0 sttments ha minha frente 
+    if(  strcmp("If",isl->name_function) != 0 && strcmp("While",isl->name_function) != 0 && strcmp("IfElse",isl->name_function) != 0 ){
+
+
+        if( isl->statment1 != NULL && strcmp("Block",isl->statment1->name_function) == 0 && isl->statment1->num_statements == 0  ){
+
+            //vou apagar o block
+            to_free =  isl->statment1;
+        
+            isl->statment1 = NULL;
+        
+            free(to_free);
+
+        }
+
+        if( isl->statment2 != NULL && strcmp("Block",isl->statment2->name_function) == 0 && isl->statment2->num_statements == 0  ){
+
+            //vou apagar o block
+            to_free =  isl->statment2;
+        
+            isl->statment2 = NULL;
+        
+            free(to_free);
+
+          }
+
+    }
+
+    //3) if(Expr); ou while(Expr); preciso de adicionar 1 block 
+    if( ( strcmp("If",isl->name_function) == 0 || strcmp("While",isl->name_function) == 0 || strcmp("IfElse",isl->name_function) == 0 ) && isl->statment1 == NULL ) {
+        isl->statment1 = insert_statment( "Block",  NULL, NULL);
+    }
+
+    //4) else; preciso de adicionar block
+    if( strcmp("IfElse", isl->name_function) == 0 && isl->statment2 == NULL){
+        isl->statment2 = insert_statment( "Block",  NULL, NULL);
+    }
+
+
+
+   //5) if(Expr) St ;    preciso de adicionar block 2
+    if( strcmp("If", isl->name_function) == 0 ){
+        isl->statment2 = insert_statment( "Block",  NULL, NULL);
+    }
+    
+
+
+
+    /*se estiver num if, s->s1 = isl->s1;  isl->s1 = "Statment" s;  s->s2 =    new "Block" b;
+    */
+
+
+    //sem else Block ("if" s2 == NULL)
 
     return isl;
 }
@@ -148,6 +293,7 @@ is_statment_list* insert_statment( char *name_function, is_statment_list* statme
         isl->statment1=statment;
         isl->statment2=NULL;
         isl->expr=expr;
+        isl->num_statements=0;
 
         return isl;
 
@@ -219,7 +365,7 @@ int printNameFunction(is_statment_list* statment, int n){
         }
         printf("If\n");
         n = n+2;
-    }else if(strcmp("Statment",statment->name_function) == 0  || strcmp("AssignStatment",statment->name_function) == 0 ||  strcmp("Call",statment->name_function) == 0) {
+    }else if(strcmp("ParseArgsStatment",statment->name_function) == 0  || strcmp("Statment",statment->name_function) == 0  || strcmp("AssignStatment",statment->name_function) == 0 ||  strcmp("Call",statment->name_function) == 0) {
         // NAO FAZ NADA
     }else {
         for(i=0;i<n;i++){
@@ -232,7 +378,6 @@ int printNameFunction(is_statment_list* statment, int n){
 }
 
 void funca_recursiva_statment(is_statment_list* statment, int n){
-    int i = 0, n_block=n;
     n = printNameFunction(statment,n);
 
     if(statment->expr != NULL){
@@ -241,14 +386,26 @@ void funca_recursiva_statment(is_statment_list* statment, int n){
         
     }
 
-    if(strcmp("If",statment->name_function) == 0 && statment->num_statements > 1){
+    /*if(strcmp("If",statment->name_function) == 0 && statment->num_statements > 1){
         for(i=0;i<n;i++){
             printf(".");
         }
         printf("Block\n");
         n=n+2;
-    }
+    }*/
     
+
+
+    //so printo se o node Statment tiver 1 filho 
+    /*if(strcmp("Statment",statment->name_function) == 0 && statment->num_statements > 1){
+        for(i=0;i<n;i++){
+            printf(".");
+        }
+        printf("Block %d\n",statment->num_statements);
+        n=n+2;
+    }*/
+
+
     if(statment->statment1 != NULL){
         funca_recursiva_statment(statment->statment1, n);
     }
@@ -257,25 +414,24 @@ void funca_recursiva_statment(is_statment_list* statment, int n){
         funca_recursiva_statment(statment->statment2, n);
     }
 
-    if(strcmp("If",statment->name_function) == 0){
+    /*if(strcmp("If",statment->name_function) == 0){
         for(i=0;i<n_block+2;i++){
             printf(".");
         }
         printf("Block\n");
 
-    }
+    }*/
 
-    if(strcmp("While",statment->name_function) == 0 && statment->statment1 == NULL){
+    /*if(strcmp("While",statment->name_function) == 0 && statment->statment1 == NULL){
         for(i=0;i<n_block;i++){
             printf(".");
         }
         printf("Block\n");
-    }
+    }*/
 }
 
 
 void print_tree(is_program* myprogram){
-    int n;
     char  *auxiliar = "";
     is_metodos* metodos= myprogram->metodos;
     is_fielddecl_list* field;
@@ -339,28 +495,29 @@ void print_tree(is_program* myprogram){
                     // STATEMENTS
                     statment = body->statment;
                     if(statment != NULL){
-                        if(strcmp("Print",statment->name_function) == 0 || strcmp("Return",statment->name_function) == 0){
+
+                        if(strcmp("Print",statment->name_function) == 0 || strcmp("Return",statment->name_function) == 0 ){
                             
                             printf("......%s\n",statment->name_function);
                             if(statment->expr != NULL){
                                 print_expr(statment->expr,8);
                             }
 
-                        }else if(strcmp("If",statment->name_function) == 0 || strcmp("While",statment->name_function) == 0 || strcmp("IfElse",statment->name_function) == 0){
+                        }else if(strcmp("If",statment->name_function) == 0 || strcmp("While",statment->name_function) == 0 || strcmp("IfElse",statment->name_function) == 0 || strcmp("Statment",statment->name_function) == 0 || strcmp("Block",statment->name_function) == 0 ){
                             
                             funca_recursiva_statment(statment,6);
                             
-                        }else if(strcmp("Statment",statment->name_function) == 0){
+                        /*}else if(strcmp("Statment",statment->name_function) == 0){
                             n= 6;
 
                             if(statment->num_statements > 1){
                                 printf("......Block\n");
                                 n=8;
                             }
-                            funca_recursiva_statment(statment,n);
+                            funca_recursiva_statment(statment,n);*/
                         }else{
 
-                            //CASOS ESPECIAIS TIPO CALL / ASSIGN / PARSEARGS
+                            //CASOS ESPECIAIS TIPO CALL / ASSIGN / PARSEARGSSTATMENT
                             if(statment->expr != NULL){
                                 print_expr(statment->expr,6);
                             } 

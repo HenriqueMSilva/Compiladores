@@ -28,8 +28,8 @@ is_program* myprogram;
 %type<impl>MethodParams MethodParamsNext
 %type<imbl>body MethodBody
 %type<ivdl>VarDecl VarDeclNext
-%type<state> Statement StatementZrOuMais
-%type<iel>StatementPrint StatementExpOp Expr ExprA MethodInvocation ParseArgs ExpCommaExpOP CommaExprZrOuMais
+%type<state> Statement StatementZrOuMais 
+%type<iel>StatementPrint StatementExpOp  Expr ExprA MethodInvocation  ParseArgs ExpCommaExpOP CommaExprZrOuMais
 %type<id>Type
 
 
@@ -38,12 +38,14 @@ is_program* myprogram;
 %left OR
 %left AND
 %left XOR
-%left GE LE LT GT EQ NE
+%left EQ NE
+%left GE GT LT LE
 %left LSHIFT RSHIFT
 %left PLUS MINUS
 %left STAR DIV MOD
 %right NOT
-%left LPAR RPAR LSQ RSQ LBRACE RBRACE
+%left LPAR RPAR LSQ RSQ
+
 
 
 %nonassoc REDUCE
@@ -109,7 +111,7 @@ MethodBody: LBRACE body RBRACE                              {$$ = $2;}
 
 body:   /*empty*/                                           {$$ = NULL;}
     |   VarDecl  body                                       {$$=insert_methodbody("VarDecl",$1,NULL,$2);} 
-    |   Statement body                                      {$$=insert_methodbody("Statement",NULL,$1,$2);num_statements=0;} 
+    |   Statement body                                      {$$=insert_methodbody("Statement",NULL,$1,$2);} 
     ;
 
 VarDecl: Type ID  VarDeclNext SEMICOLON                     {$$=insert_vardecl($1,$2,$3);}
@@ -119,22 +121,23 @@ VarDeclNext: /*empty*/                                      {$$ = NULL;}
            | COMMA ID  VarDeclNext                          {$$=insert_vardecl("",$2,$3);}
     ;
 
+Statement:  IF LPAR  ExprA RPAR   Statement  %prec REDUCE        {$$ = insert_multiple_statement("If", $3, $5, NULL);}
+        |   IF LPAR  ExprA RPAR Statement ELSE Statement    {$$ = insert_multiple_statement("IfElse", $3, $5, $7);}
 
 
-Statement:  IF LPAR  ExprA RPAR Statement    %prec REDUCE   {$$ = insert_multiple_statement("If", $3, $5, NULL,num_statements);num_statements=0;}
-        |   IF LPAR  ExprA RPAR Statement ELSE Statement    {$$ = insert_multiple_statement("IfElse", $3, $5, $7,num_statements);num_statements=0;}
-        |   WHILE LPAR ExprA RPAR Statement                 {$$ = insert_multiple_statement("While", $3, $5, NULL,num_statements);num_statements=0;}
-        |   RETURN StatementExpOp SEMICOLON                 {$$ = insert_statment("Return",NULL,$2);}
-        |   LBRACE StatementZrOuMais RBRACE                 {$$ = $2;}
-        |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = insert_statment("Print",NULL,$3);}
-        |   MethodInvocation SEMICOLON                      {$$ = insert_statment("Call",NULL,$1);}
-        |   ID ASSIGN ExprA  SEMICOLON                      {$$ = insert_statment("AssignStatment",NULL,insert_expr("Assign",$1,$3,NULL));}
-        |   ParseArgs SEMICOLON                             {$$ = insert_statment("ParseArgs",NULL,$1);}
-        |   SEMICOLON                                       {$$ = NULL;printf("semi\n");}
+        |   WHILE LPAR ExprA RPAR Statement                 {$$ = insert_multiple_statement("While", $3, $5, NULL);}
+        |   RETURN StatementExpOp SEMICOLON                 {$$ = insert_multiple_statement("Return", $2, NULL, NULL);}
+        |   LBRACE StatementZrOuMais RBRACE                 {$$ = insert_multiple_statement("Block", NULL, $2, NULL);}
+        |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = insert_multiple_statement("Print", $3, NULL, NULL);}
+        |   MethodInvocation SEMICOLON                      {$$ = insert_multiple_statement("Call", $1, NULL, NULL);}
+        |   ID ASSIGN ExprA  SEMICOLON                      {$$ = insert_multiple_statement("AssignStatment", insert_expr("Assign",$1,$3,NULL), NULL, NULL );}
+        |   ParseArgs SEMICOLON                             {$$ = insert_multiple_statement("ParseArgsStatment", $1,NULL, NULL);}
+        |   SEMICOLON                                       {$$ = NULL;}
     ; 
 
+
 StatementZrOuMais: /*empty*/                                {$$ = NULL;}
-            | Statement  StatementZrOuMais                  {$$ = insert_multiple_statement("Statment", NULL, $1, $2,num_statements);num_statements++;}
+            | Statement  StatementZrOuMais                  {$$ = insert_multiple_statement("Statment", NULL, $1, $2);}
     ;
 
 StatementExpOp: /*empty*/                                   {$$ = NULL;}
@@ -187,9 +190,9 @@ Expr: Expr AND Expr                             {$$ = insert_expr("Operacao","An
     | Expr XOR Expr                             {$$ = insert_expr("Operacao","Xor",$1,$3);}
     | Expr LSHIFT Expr                          {$$ = insert_expr("Operacao","Lshift",$1,$3);}
     | Expr RSHIFT Expr                          {$$ = insert_expr("Operacao","Rshift",$1,$3);}
-    | NOT Expr %prec UNARIO                     {$$ = insert_expr("Operacao","Not",$2,NULL);}
-    | MINUS Expr %prec UNARIO                   {$$ = insert_expr("Operacao","Minus",$2,NULL);}
-    | PLUS Expr %prec UNARIO                    {$$ = insert_expr("Operacao","Plus",$2,NULL);}
+    | NOT Expr                      {$$ = insert_expr("Operacao","Not",$2,NULL);}
+    | MINUS Expr %prec NOT                   {$$ = insert_expr("Operacao","Minus",$2,NULL);}
+    | PLUS Expr %prec NOT                    {$$ = insert_expr("Operacao","Plus",$2,NULL);}
     | LPAR ExprA RPAR                           {$$ = $2;}
     | MethodInvocation                          {$$ = $1;}
     | ParseArgs                                 {$$ = $1;} 
@@ -203,18 +206,18 @@ Expr: Expr AND Expr                             {$$ = insert_expr("Operacao","An
 
 
 
-FieldDecl : error SEMICOLON                                 {}
+FieldDecl : error SEMICOLON                                 {$$=NULL;}
     ;
 
-Statement : error SEMICOLON                                 {}
+Statement : error SEMICOLON                                 {$$=NULL;}
     ;
-ParseArgs: PARSEINT LPAR error RPAR                         {}
+ParseArgs: PARSEINT LPAR error RPAR                         {$$=NULL;}
     ; 
 
-MethodInvocation: ID LPAR error RPAR                        {}
+MethodInvocation: ID LPAR error RPAR                        {$$=NULL;}
     ;
 
-Expr: LPAR error RPAR                                       {}
+Expr: LPAR error RPAR                                       {$$=NULL;}
     ;
 
 %%

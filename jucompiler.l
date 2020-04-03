@@ -143,7 +143,7 @@ int main(int argc, char *argv[]){
 
 		}else if(strcmp(argv[1],"-t") == 0){
 
-			flag = 2;
+			flag = 1;
 			yyparse();
 			if(erro_sintaxe == 0){
 				print_tree(myprogram);
