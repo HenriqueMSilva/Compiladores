@@ -1492,7 +1492,7 @@ yyreduce:
     {
         case 2:
 #line 70 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.ip)=myprogram=insert_program((yyvsp[-3].id), (yyvsp[-1].im));}
+    {(yyval.ip)=myprogram=insert_program((yyvsp[-3].id), (yyvsp[-1].im)); free((yyvsp[-3].id));}
 #line 1497 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1564,13 +1564,13 @@ yyreduce:
 
   case 14:
 #line 95 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.imhl)=insert_methodheader((yyvsp[-4].id),(yyvsp[-3].id),(yyvsp[-1].impl));}
+    {(yyval.imhl)=insert_methodheader((yyvsp[-4].id),(yyvsp[-3].id),(yyvsp[-1].impl)); free((yyvsp[-3].id));}
 #line 1569 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
 #line 96 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.imhl)=insert_methodheader("Void",(yyvsp[-3].id),(yyvsp[-1].impl));}
+    {(yyval.imhl)=insert_methodheader("Void",(yyvsp[-3].id),(yyvsp[-1].impl)); free((yyvsp[-3].id));}
 #line 1575 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1582,13 +1582,13 @@ yyreduce:
 
   case 17:
 #line 100 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.impl)=insert_methodparams((yyvsp[-2].id),(yyvsp[-1].id),(yyvsp[0].impl));}
+    {(yyval.impl)=insert_methodparams((yyvsp[-2].id),(yyvsp[-1].id),(yyvsp[0].impl)); free((yyvsp[-1].id));}
 #line 1587 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
 #line 101 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.impl)=insert_methodparams("StringArray",(yyvsp[0].id),NULL);}
+    {(yyval.impl)=insert_methodparams("StringArray",(yyvsp[0].id),NULL); free((yyvsp[0].id));}
 #line 1593 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1600,7 +1600,7 @@ yyreduce:
 
   case 20:
 #line 105 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.impl)=insert_methodparams((yyvsp[-2].id),(yyvsp[-1].id),(yyvsp[0].impl));}
+    {(yyval.impl)=insert_methodparams((yyvsp[-2].id),(yyvsp[-1].id),(yyvsp[0].impl)); free((yyvsp[-1].id));}
 #line 1605 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1630,7 +1630,7 @@ yyreduce:
 
   case 25:
 #line 116 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.ivdl)=insert_vardecl((yyvsp[-3].id),(yyvsp[-2].id),(yyvsp[-1].ivdl));}
+    {(yyval.ivdl)=insert_vardecl((yyvsp[-3].id),(yyvsp[-2].id),(yyvsp[-1].ivdl)); free((yyvsp[-2].id));}
 #line 1635 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1642,7 +1642,7 @@ yyreduce:
 
   case 27:
 #line 120 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.ivdl)=insert_vardecl("",(yyvsp[-1].id),(yyvsp[0].ivdl));}
+    {(yyval.ivdl)=insert_vardecl("",(yyvsp[-1].id),(yyvsp[0].ivdl)); free((yyvsp[-1].id));}
 #line 1647 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1690,7 +1690,7 @@ yyreduce:
 
   case 35:
 #line 132 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.state) = insert_multiple_statement("AssignStatment", insert_expr("Assign",(yyvsp[-3].id),(yyvsp[-1].iel),NULL), NULL, NULL );}
+    {(yyval.state) = insert_multiple_statement("AssignStatment", insert_expr("Assign",(yyvsp[-3].id),(yyvsp[-1].iel),NULL), NULL, NULL ); free((yyvsp[-3].id)); }
 #line 1695 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1732,7 +1732,7 @@ yyreduce:
 
   case 42:
 #line 146 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("StrLit",(yyvsp[0].id),NULL,NULL);}
+    {(yyval.iel) = insert_expr("StrLit",(yyvsp[0].id),NULL,NULL); free((yyvsp[0].id));}
 #line 1737 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1744,7 +1744,7 @@ yyreduce:
 
   case 44:
 #line 153 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Call",(yyvsp[-3].id),(yyvsp[-1].iel),NULL);}
+    {(yyval.iel) = insert_expr("Call",(yyvsp[-3].id),(yyvsp[-1].iel),NULL); free((yyvsp[-3].id));}
 #line 1749 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1774,7 +1774,7 @@ yyreduce:
 
   case 49:
 #line 165 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("ParseArgs",(yyvsp[-4].id),(yyvsp[-2].iel),NULL);}
+    {(yyval.iel) = insert_expr("ParseArgs",(yyvsp[-4].id),(yyvsp[-2].iel),NULL); free((yyvsp[-4].id));}
 #line 1779 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1786,13 +1786,13 @@ yyreduce:
 
   case 51:
 #line 171 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Assign",(yyvsp[-2].id),(yyvsp[0].iel),NULL);}
+    {(yyval.iel) = insert_expr("Assign",(yyvsp[-2].id),(yyvsp[0].iel),NULL); free((yyvsp[-2].id));}
 #line 1791 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
 #line 172 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Assign",(yyvsp[-3].id),(yyvsp[-1].iel),NULL);}
+    {(yyval.iel) = insert_expr("Assign",(yyvsp[-3].id),(yyvsp[-1].iel),NULL); free((yyvsp[-3].id));}
 #line 1797 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1930,31 +1930,31 @@ yyreduce:
 
   case 75:
 #line 198 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Id",(yyvsp[0].id),NULL,NULL);}
+    {(yyval.iel) = insert_expr("Id",(yyvsp[0].id),NULL,NULL); free((yyvsp[0].id));}
 #line 1935 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
 #line 199 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Length",(yyvsp[-1].id),NULL,NULL);}
+    {(yyval.iel) = insert_expr("Length",(yyvsp[-1].id),NULL,NULL); free((yyvsp[-1].id));}
 #line 1941 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 77:
 #line 200 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("RealLit",(yyvsp[0].id),NULL,NULL);}
+    {(yyval.iel) = insert_expr("RealLit",(yyvsp[0].id),NULL,NULL); free((yyvsp[0].id));}
 #line 1947 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 78:
 #line 201 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("BoolLit",(yyvsp[0].id),NULL,NULL);}
+    {(yyval.iel) = insert_expr("BoolLit",(yyvsp[0].id),NULL,NULL); free((yyvsp[0].id));}
 #line 1953 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 79:
 #line 202 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("DecLit",(yyvsp[0].id),NULL,NULL);}
+    {(yyval.iel) = insert_expr("DecLit",(yyvsp[0].id),NULL,NULL); free((yyvsp[0].id));}
 #line 1959 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1978,7 +1978,7 @@ yyreduce:
 
   case 83:
 #line 216 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel)=NULL;}
+    {(yyval.iel)=NULL; free((yyvsp[-3].id));}
 #line 1983 "y.tab.c" /* yacc.c:1646  */
     break;
 

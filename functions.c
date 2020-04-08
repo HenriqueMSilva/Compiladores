@@ -20,10 +20,10 @@ is_metodos* insert_metodos(char *evocation, is_fielddecl_list* ifl, is_methoddec
 	    is_metodos* im=(is_metodos*)malloc(sizeof(is_metodos));
 
         im->evocation=(char*)strdup(evocation);
-        if(strcmp("Field",(char*)strdup(evocation)) == 0){
+        if(strcmp("Field",im->evocation) == 0){
         	im->ifl=ifl;
         	im->imdl=NULL;
-        }else if(strcmp("Method",(char*)strdup(evocation)) == 0){
+        }else if(strcmp("Method",im->evocation) == 0){
         	im->imdl=iml;
         	im->ifl=NULL;
         }else{
@@ -97,6 +97,7 @@ is_methodbody_list* insert_methodbody(char *type, is_vardecl_list* vardecl , is_
         
             is_statment_list* to_free = statment;    
             statment = statment->statment1;
+            free(to_free->name_function);
             free(to_free);
         }
 
@@ -107,7 +108,7 @@ is_methodbody_list* insert_methodbody(char *type, is_vardecl_list* vardecl , is_
 		is_methodbody_list* imbl=(is_methodbody_list*)malloc(sizeof(is_methodbody_list));
 
         imbl->type=(char*)strdup(type);
-        if(strcmp("VarDecl",(char*)strdup(type)) == 0){
+        if(strcmp("VarDecl",imbl->type) == 0){
         	imbl->ivdl=vardecl;
         	imbl->statment=NULL;
         }else{
@@ -119,9 +120,10 @@ is_methodbody_list* insert_methodbody(char *type, is_vardecl_list* vardecl , is_
 
         //ver se st e body ta a null-> return NULL
         //tinha um statment que era so {}
-        if(strcmp("Statment",(char*)strdup(type)) == 0 && imbl->statment == NULL && body == NULL){
+        if(strcmp("Statment",imbl->type) == 0 && imbl->statment == NULL && body == NULL){
             is_methodbody_list* to_free = imbl;    
             imbl = NULL ;
+            free(to_free->type);
             free(to_free);
         }
 
@@ -221,6 +223,7 @@ is_statment_list*  insert_multiple_statement(char *name_function, is_expression_
     //1) So criamos o node "Block" se ele tiver Statments suficientes
     if( strcmp("Block",isl->name_function) == 0 && isl->num_statements == 1 ){
         //nao vou criar o node "Block"
+        free(isl->name_function);
         free(isl);
         isl = next_statment;
     }
@@ -237,6 +240,7 @@ is_statment_list*  insert_multiple_statement(char *name_function, is_expression_
         
             isl->statment1 = NULL;
         
+            free(to_free->name_function);
             free(to_free);
 
         }
@@ -248,6 +252,7 @@ is_statment_list*  insert_multiple_statement(char *name_function, is_expression_
         
             isl->statment2 = NULL;
         
+            free(to_free->name_function);
             free(to_free);
 
           }
@@ -499,6 +504,8 @@ void free_is_expression_list(is_expression_list* expr){
         free_is_expression_list(expr->expr2);
     }
 
+    free(expr->operation);
+    free(expr->value);
     free(expr);
 }
 
@@ -515,6 +522,7 @@ void free_is_statment_list(is_statment_list* statment){
         free_is_statment_list(statment->statment2);
     }
 
+    free(statment->name_function);
     free(statment);
 
 }
@@ -526,6 +534,8 @@ void free_is_vardecl_list(is_vardecl_list* ivdl){
         free_is_vardecl_list(ivdl->next);        
     }
 
+    free(ivdl->type);
+    free(ivdl->name);
     free(ivdl);
 }
 
@@ -544,6 +554,7 @@ void free_is_methodbody_list(is_methodbody_list* imbl){
         free_is_methodbody_list(imbl->next);
     }
 
+    free(imbl->type);
     free(imbl);
 }
 
@@ -554,6 +565,8 @@ void free_is_methodparams_list(is_methodparams_list* impl){
         free_is_methodparams_list(impl->next);
     }
 
+    free(impl->type);
+    free(impl->name);
     free(impl);
 }
 
@@ -564,6 +577,8 @@ void free_is_methodheader_list(is_methodheader_list* imhl){
         free_is_methodparams_list(imhl->impl);
     }    
 
+    free(imhl->type);
+    free(imhl->name);
     free(imhl);
 
 }
@@ -591,6 +606,8 @@ void free_is_fielddecl_list(is_fielddecl_list* ifl){
         free_is_fielddecl_list(ifl->next);
     }
 
+    free(ifl->type);
+    free(ifl->name);
     free(ifl);
 }
 
@@ -611,7 +628,7 @@ void free_is_metodos(is_metodos* metodos){
             free_is_methoddecl_list(metodos->imdl);            
         }
 
-
+        free(metodos->evocation);
         free(metodos);
     
 }
@@ -624,6 +641,7 @@ void free_tree(is_program* myprogram){
             free_is_metodos(myprogram->metodos);
         }
         
+        free(myprogram->classname);
         free(myprogram);
     }
         
