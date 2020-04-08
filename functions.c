@@ -273,13 +273,6 @@ is_statment_list*  insert_multiple_statement(char *name_function, is_expression_
     
 
 
-
-    /*se estiver num if, s->s1 = isl->s1;  isl->s1 = "Statment" s;  s->s2 =    new "Block" b;
-    */
-
-
-    //sem else Block ("if" s2 == NULL)
-
     return isl;
 }
 
@@ -386,25 +379,6 @@ void funca_recursiva_statment(is_statment_list* statment, int n){
         
     }
 
-    /*if(strcmp("If",statment->name_function) == 0 && statment->num_statements > 1){
-        for(i=0;i<n;i++){
-            printf(".");
-        }
-        printf("Block\n");
-        n=n+2;
-    }*/
-    
-
-
-    //so printo se o node Statment tiver 1 filho 
-    /*if(strcmp("Statment",statment->name_function) == 0 && statment->num_statements > 1){
-        for(i=0;i<n;i++){
-            printf(".");
-        }
-        printf("Block %d\n",statment->num_statements);
-        n=n+2;
-    }*/
-
 
     if(statment->statment1 != NULL){
         funca_recursiva_statment(statment->statment1, n);
@@ -414,20 +388,7 @@ void funca_recursiva_statment(is_statment_list* statment, int n){
         funca_recursiva_statment(statment->statment2, n);
     }
 
-    /*if(strcmp("If",statment->name_function) == 0){
-        for(i=0;i<n_block+2;i++){
-            printf(".");
-        }
-        printf("Block\n");
 
-    }*/
-
-    /*if(strcmp("While",statment->name_function) == 0 && statment->statment1 == NULL){
-        for(i=0;i<n_block;i++){
-            printf(".");
-        }
-        printf("Block\n");
-    }*/
 }
 
 
@@ -507,14 +468,6 @@ void print_tree(is_program* myprogram){
                             
                             funca_recursiva_statment(statment,6);
                             
-                        /*}else if(strcmp("Statment",statment->name_function) == 0){
-                            n= 6;
-
-                            if(statment->num_statements > 1){
-                                printf("......Block\n");
-                                n=8;
-                            }
-                            funca_recursiva_statment(statment,n);*/
                         }else{
 
                             //CASOS ESPECIAIS TIPO CALL / ASSIGN / PARSEARGSSTATMENT
@@ -531,4 +484,147 @@ void print_tree(is_program* myprogram){
         }
         metodos= metodos->next;
     }   
+}
+
+
+
+void free_is_expression_list(is_expression_list* expr){
+
+    if(expr->expr1){
+        free_is_expression_list(expr->expr1);
+    }
+
+
+    if(expr->expr2){
+        free_is_expression_list(expr->expr2);
+    }
+
+    free(expr);
+}
+
+void free_is_statment_list(is_statment_list* statment){
+    if(statment->expr != NULL){
+        free_is_expression_list(statment->expr);
+    }
+
+    if(statment->statment1 != NULL){
+        free_is_statment_list(statment->statment1);
+    }
+
+    if(statment->statment2 != NULL){
+        free_is_statment_list(statment->statment2);
+    }
+
+    free(statment);
+
+}
+
+
+void free_is_vardecl_list(is_vardecl_list* ivdl){
+
+    if(ivdl->next != NULL){
+        free_is_vardecl_list(ivdl->next);        
+    }
+
+    free(ivdl);
+}
+
+
+void free_is_methodbody_list(is_methodbody_list* imbl){
+
+    if(imbl->ivdl != NULL){
+        free_is_vardecl_list(imbl->ivdl);     
+    }
+
+    if(imbl->statment!= NULL){
+        free_is_statment_list(imbl->statment);
+    }
+
+    if(imbl->next != NULL){
+        free_is_methodbody_list(imbl->next);
+    }
+
+    free(imbl);
+}
+
+
+
+void free_is_methodparams_list(is_methodparams_list* impl){
+    if(impl->next){
+        free_is_methodparams_list(impl->next);
+    }
+
+    free(impl);
+}
+
+
+void free_is_methodheader_list(is_methodheader_list* imhl){
+
+    if(imhl->impl != NULL){
+        free_is_methodparams_list(imhl->impl);
+    }    
+
+    free(imhl);
+
+}
+
+void free_is_methoddecl_list(is_methoddecl_list* imdl){
+
+    //method header
+    if(imdl->imhl != NULL ){
+        free_is_methodheader_list(imdl->imhl);
+    }
+
+    //method body
+    if(imdl->imbl != NULL ){
+        free_is_methodbody_list(imdl->imbl);
+    }
+    
+    free(imdl);
+
+}            
+
+
+void free_is_fielddecl_list(is_fielddecl_list* ifl){
+
+    if(ifl->next != NULL){
+        free_is_fielddecl_list(ifl->next);
+    }
+
+    free(ifl);
+}
+
+
+
+void free_is_metodos(is_metodos* metodos){
+
+ 
+        if(metodos->next != NULL){
+            free_is_metodos(metodos->next);            
+        }
+
+        if(metodos->ifl != NULL){
+            free_is_fielddecl_list(metodos->ifl);            
+        }
+
+        if(metodos->imdl != NULL){
+            free_is_methoddecl_list(metodos->imdl);            
+        }
+
+
+        free(metodos);
+    
+}
+
+
+void free_tree(is_program* myprogram){
+    if(myprogram != NULL){
+
+        if(myprogram->metodos != NULL){
+            free_is_metodos(myprogram->metodos);
+        }
+        
+        free(myprogram);
+    }
+        
 }

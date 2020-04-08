@@ -49,7 +49,6 @@ is_program* myprogram;
 
 
 %nonassoc REDUCE
-%nonassoc UNARIO
 %right ELSE
 
 %union{
@@ -163,12 +162,12 @@ CommaExprZrOuMais: /*empty*/                                 {$$ = NULL;}
     ;
 
 
-ParseArgs:  PARSEINT LPAR ID LSQ  ExprA RSQ RPAR  {$$ = insert_expr("ParseArgs",$3,$5,NULL);}
+ParseArgs:  PARSEINT LPAR ID LSQ  ExprA RSQ RPAR              {$$ = insert_expr("ParseArgs",$3,$5,NULL);}
     ;
 
 
 
-ExprA: Expr                                     {$$ = $1;}
+ExprA: Expr                                      {$$ = $1;}
     |  ID ASSIGN ExprA                          {$$ = insert_expr("Assign",$1,$3,NULL);}
     |  LPAR ID ASSIGN ExprA RPAR                {$$ = insert_expr("Assign",$2,$4,NULL);}
     ;
@@ -190,9 +189,9 @@ Expr: Expr AND Expr                             {$$ = insert_expr("Operacao","An
     | Expr XOR Expr                             {$$ = insert_expr("Operacao","Xor",$1,$3);}
     | Expr LSHIFT Expr                          {$$ = insert_expr("Operacao","Lshift",$1,$3);}
     | Expr RSHIFT Expr                          {$$ = insert_expr("Operacao","Rshift",$1,$3);}
-    | NOT Expr                      {$$ = insert_expr("Operacao","Not",$2,NULL);}
-    | MINUS Expr %prec NOT                   {$$ = insert_expr("Operacao","Minus",$2,NULL);}
-    | PLUS Expr %prec NOT                    {$$ = insert_expr("Operacao","Plus",$2,NULL);}
+    | NOT Expr                                  {$$ = insert_expr("Operacao","Not",$2,NULL);}
+    | MINUS Expr %prec NOT                      {$$ = insert_expr("Operacao","Minus",$2,NULL);}
+    | PLUS Expr %prec NOT                       {$$ = insert_expr("Operacao","Plus",$2,NULL);}
     | LPAR ExprA RPAR                           {$$ = $2;}
     | MethodInvocation                          {$$ = $1;}
     | ParseArgs                                 {$$ = $1;} 

@@ -12,3 +12,13 @@ is_statment_list*  insert_multiple_statement(char *name_function, is_expression_
 is_statment_list* insert_statment( char *name_function, is_statment_list* statment, is_expression_list* expr);
 is_expression_list* insert_expr(char *operation, char *value, is_expression_list* expr1,  is_expression_list* expr2);
 void print_tree(is_program* myprogram);
+void free_tree(is_program* myprogram);
+void free_is_metodos(is_metodos* metodos);
+void free_is_fielddecl_list(is_fielddecl_list* ifl);
+void free_is_methoddecl_list(is_methoddecl_list* imdl);
+void free_is_methodheader_list(is_methodheader_list* imhl);
+void free_is_methodparams_list(is_methodparams_list* impl);
+void free_is_methodbody_list(is_methodbody_list* imbl);
+void free_is_vardecl_list(is_vardecl_list* ivdl);
+void free_is_statment_list(is_statment_list* statment);
+void free_is_expression_list(is_expression_list* expr);

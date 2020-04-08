@@ -93,8 +93,7 @@ extern int yydebug;
     STRLIT = 303,
     REALLIT = 304,
     BOOLLIT = 305,
-    REDUCE = 306,
-    UNARIO = 307
+    REDUCE = 306
   };
 #endif
 /* Tokens.  */
@@ -147,14 +146,13 @@ extern int yydebug;
 #define REALLIT 304
 #define BOOLLIT 305
 #define REDUCE 306
-#define UNARIO 307
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 53 "jucompiler.y" /* yacc.c:1909  */
+#line 54 "jucompiler.y" /* yacc.c:1909  */
 
     char *id;
     is_program* ip;
@@ -168,7 +166,7 @@ union YYSTYPE
     is_statment_list* state;
     is_expression_list* iel;
 
-#line 172 "y.tab.h" /* yacc.c:1909  */
+#line 170 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

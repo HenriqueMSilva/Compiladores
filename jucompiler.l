@@ -140,7 +140,8 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[1],"-e2") == 0){
 			flag = 1;
 			yyparse();
-
+			free_tree(myprogram);
+			
 		}else if(strcmp(argv[1],"-t") == 0){
 
 			flag = 1;
@@ -148,10 +149,13 @@ int main(int argc, char *argv[]){
 			if(erro_sintaxe == 0){
 				print_tree(myprogram);
 			}
+			free_tree(myprogram);
+			
 		}
 	}else if(argc == 1){
 			flag = 1;
 			yyparse();
+			free_tree(myprogram);
 		}
 	return 0;
 }
