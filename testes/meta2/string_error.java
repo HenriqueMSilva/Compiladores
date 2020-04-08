@@ -5,8 +5,10 @@ class Teste {
   public static int main(String[] args){
     int ru; int vv;
       if(false)
-        "strlit"
+        int
       else
         return;
+
+
   }
 }

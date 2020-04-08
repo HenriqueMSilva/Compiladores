@@ -97,8 +97,14 @@ is_methodbody_list* insert_methodbody(char *type, is_vardecl_list* vardecl , is_
         
             is_statment_list* to_free = statment;    
             statment = statment->statment1;
-            free(to_free->name_function);
+
+            if(to_free->name_function != NULL){
+                free(to_free->name_function);
+                to_free->name_function = NULL;
+            }
+                
             free(to_free);
+            to_free = NULL;
         }
 
 
@@ -123,8 +129,15 @@ is_methodbody_list* insert_methodbody(char *type, is_vardecl_list* vardecl , is_
         if(strcmp("Statment",imbl->type) == 0 && imbl->statment == NULL && body == NULL){
             is_methodbody_list* to_free = imbl;    
             imbl = NULL ;
-            free(to_free->type);
+
+            if(to_free->type != NULL){
+                free(to_free->type);
+                to_free->type = NULL;
+            }
+        
             free(to_free);
+            to_free = NULL;
+
         }
 
         return imbl;
@@ -494,142 +507,229 @@ void print_tree(is_program* myprogram){
 
 
 void free_is_expression_list(is_expression_list* expr){
+    if(expr != NULL){
 
-    if(expr->expr1){
-        free_is_expression_list(expr->expr1);
+        if(expr->expr1){
+            free_is_expression_list(expr->expr1);
+        }
+
+
+        if(expr->expr2){
+            free_is_expression_list(expr->expr2);
+        }
+
+        if(expr->operation != NULL){
+            free(expr->operation);
+            expr->operation = NULL;
+        }
+
+        if(expr->value != NULL){
+            free(expr->value);
+            expr->value = NULL;
+        }
+
+        free(expr);
+        expr = NULL;
     }
 
-
-    if(expr->expr2){
-        free_is_expression_list(expr->expr2);
-    }
-
-    free(expr->operation);
-    free(expr->value);
-    free(expr);
 }
 
 void free_is_statment_list(is_statment_list* statment){
-    if(statment->expr != NULL){
-        free_is_expression_list(statment->expr);
-    }
+    if(statment != NULL){
 
-    if(statment->statment1 != NULL){
-        free_is_statment_list(statment->statment1);
-    }
+        if(statment->expr != NULL){
+            free_is_expression_list(statment->expr);
+        }
 
-    if(statment->statment2 != NULL){
-        free_is_statment_list(statment->statment2);
-    }
+        if(statment->statment1 != NULL){
+            free_is_statment_list(statment->statment1);
+        }
 
-    free(statment->name_function);
-    free(statment);
+        if(statment->statment2 != NULL){
+            free_is_statment_list(statment->statment2);
+        }
+
+        if(statment->name_function != NULL){
+            free(statment->name_function);
+            statment->name_function = NULL;
+        }
+
+        free(statment);
+        statment = NULL;
+    }
 
 }
 
 
 void free_is_vardecl_list(is_vardecl_list* ivdl){
+    if(ivdl != NULL){
 
-    if(ivdl->next != NULL){
-        free_is_vardecl_list(ivdl->next);        
+        if(ivdl->next != NULL){
+            free_is_vardecl_list(ivdl->next);        
+        }
+
+
+        if(ivdl->type != NULL){
+            free(ivdl->type);
+            ivdl->type = NULL;
+        }
+
+        if(ivdl->name != NULL){
+            free(ivdl->name);
+            ivdl->name = NULL;
+        }
+
+        free(ivdl);
+        ivdl = NULL;
     }
-
-    free(ivdl->type);
-    free(ivdl->name);
-    free(ivdl);
 }
 
 
 void free_is_methodbody_list(is_methodbody_list* imbl){
+    if(imbl != NULL){
 
-    if(imbl->ivdl != NULL){
-        free_is_vardecl_list(imbl->ivdl);     
+        if(imbl->ivdl != NULL){
+            free_is_vardecl_list(imbl->ivdl);     
+        }
+
+        if(imbl->statment!= NULL){
+            free_is_statment_list(imbl->statment);
+        }
+
+        if(imbl->next != NULL){
+            free_is_methodbody_list(imbl->next);
+        }
+
+        if(imbl->type != NULL){
+            free(imbl->type);
+            imbl->type = NULL;
+        }
+
+        free(imbl);
+        imbl = NULL;    
     }
 
-    if(imbl->statment!= NULL){
-        free_is_statment_list(imbl->statment);
-    }
-
-    if(imbl->next != NULL){
-        free_is_methodbody_list(imbl->next);
-    }
-
-    free(imbl->type);
-    free(imbl);
 }
 
 
 
 void free_is_methodparams_list(is_methodparams_list* impl){
-    if(impl->next){
-        free_is_methodparams_list(impl->next);
+    if(impl != NULL){
+
+        if(impl->next){
+            free_is_methodparams_list(impl->next);
+        }
+
+        if(impl->type != NULL){
+            free(impl->type);
+            impl->type = NULL;
+        }
+
+
+        if(impl->name != NULL){
+            free(impl->name);
+            impl->name = NULL;
+        }
+
+        free(impl);
+        impl = NULL;
     }
 
-    free(impl->type);
-    free(impl->name);
-    free(impl);
 }
 
 
 void free_is_methodheader_list(is_methodheader_list* imhl){
+    if(imhl != NULL){
 
-    if(imhl->impl != NULL){
-        free_is_methodparams_list(imhl->impl);
-    }    
+        if(imhl->impl != NULL){
+            free_is_methodparams_list(imhl->impl);
+        }    
 
-    free(imhl->type);
-    free(imhl->name);
-    free(imhl);
+        if(imhl->type != NULL){
+            free(imhl->type);
+            imhl->type = NULL;
+        }
+
+        if(imhl->name != NULL){
+            free(imhl->name);
+            imhl->name = NULL;
+        }
+
+        free(imhl);
+        imhl = NULL;
+    }
 
 }
 
 void free_is_methoddecl_list(is_methoddecl_list* imdl){
+    if(imdl != NULL){
 
-    //method header
-    if(imdl->imhl != NULL ){
-        free_is_methodheader_list(imdl->imhl);
-    }
+        //method header
+        if(imdl->imhl != NULL ){
+            free_is_methodheader_list(imdl->imhl);
+        }
 
-    //method body
-    if(imdl->imbl != NULL ){
-        free_is_methodbody_list(imdl->imbl);
-    }
+        //method body
+        if(imdl->imbl != NULL ){
+            free_is_methodbody_list(imdl->imbl);
+        }
     
-    free(imdl);
+        free(imdl);
+        imdl = NULL;
+    }
 
 }            
 
 
 void free_is_fielddecl_list(is_fielddecl_list* ifl){
+    if(ifl != NULL){
 
-    if(ifl->next != NULL){
-        free_is_fielddecl_list(ifl->next);
+        if(ifl->next != NULL){
+            free_is_fielddecl_list(ifl->next);
+        }
+
+
+        if(ifl->type != NULL){
+            free(ifl->type);
+            ifl->type = NULL;
+        }
+
+        if(ifl->name != NULL){
+            free(ifl->name);
+            ifl->name = NULL;
+        }
+
+        free(ifl);
+        ifl = NULL;
     }
-
-    free(ifl->type);
-    free(ifl->name);
-    free(ifl);
 }
 
 
 
 void free_is_metodos(is_metodos* metodos){
 
- 
-        if(metodos->next != NULL){
-            free_is_metodos(metodos->next);            
-        }
+        if(metodos != NULL){
+     
+            if(metodos->next != NULL){
+                free_is_metodos(metodos->next);            
+            }
 
-        if(metodos->ifl != NULL){
-            free_is_fielddecl_list(metodos->ifl);            
-        }
+            if(metodos->ifl != NULL){
+                free_is_fielddecl_list(metodos->ifl);            
+            }
 
-        if(metodos->imdl != NULL){
-            free_is_methoddecl_list(metodos->imdl);            
-        }
+            if(metodos->imdl != NULL){
+                free_is_methoddecl_list(metodos->imdl);            
+            }
 
-        free(metodos->evocation);
-        free(metodos);
+            if(metodos->evocation != NULL){
+                free(metodos->evocation);
+                metodos->evocation = NULL;
+            }
+
+            free(metodos);
+            metodos = NULL;
+        }
     
 }
 
@@ -641,8 +741,12 @@ void free_tree(is_program* myprogram){
             free_is_metodos(myprogram->metodos);
         }
         
-        free(myprogram->classname);
+        if(myprogram->classname != NULL){
+            free(myprogram->classname);
+        }
+
         free(myprogram);
+        myprogram = NULL;
     }
         
 }

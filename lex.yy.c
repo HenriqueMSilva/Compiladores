@@ -1052,7 +1052,7 @@ YY_RULE_SETUP
 case 11:
 YY_RULE_SETUP
 #line 63 "jucompiler.l"
-{BEGIN 0; strcat(strlit, "\"");  if(flag == 0 && error_sequence== 0){ printf("STRLIT(%s)\n",strlit);} num_colunas += yyleng; yylval.id = strdup(strlit); if(error_sequence == 0){return STRLIT;} }
+{BEGIN 0; strcat(strlit, "\"");  if(flag == 0 && error_sequence== 0){ printf("STRLIT(%s)\n",strlit);} num_colunas += yyleng; yylval.id = strdup(strlit); if(error_sequence == 0){return STRLIT;}else{ free(yylval.id); } }
 	YY_BREAK
 case YY_STATE_EOF(ASPAS):
 #line 64 "jucompiler.l"

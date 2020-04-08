@@ -152,12 +152,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 54 "jucompiler.y" /* yacc.c:1909  */
+#line 69 "jucompiler.y" /* yacc.c:1909  */
 
     char *id;
     is_program* ip;
     is_metodos* im;
     is_fielddecl_list* ifl;
+
     is_methoddecl_list* imdl;
     is_methodheader_list* imhl;
     is_methodparams_list* impl;
@@ -166,7 +167,7 @@ union YYSTYPE
     is_statment_list* state;
     is_expression_list* iel;
 
-#line 170 "y.tab.h" /* yacc.c:1909  */
+#line 171 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
