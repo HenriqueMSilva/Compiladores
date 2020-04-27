@@ -4,6 +4,8 @@
 
 	#include "structures.h"
 	#include "functions.h"
+	#include "symbol_table.h"
+	#include "semantics.h"
 	#include "y.tab.h"
 	int num_linhas = 1;
 	int num_colunas = 1;
@@ -15,6 +17,8 @@
 	int error_sequence = 0;
 
 	extern is_program* myprogram;
+	header_global 	*symtab_global 	= NULL;
+	header_local 	*symtab_local 	= NULL;
 %}
 
 valid_escape			\f|\t|\\{2}|\\\"
@@ -60,7 +64,7 @@ reallit					({und_real}+"."{und_real}*{exponte}?)|({und_real}+{exponte})|("."{un
 \"								{BEGIN ASPAS;strcpy(strlit, "\"");error_sequence=0;linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
 <ASPAS>{valid_escape}			{if(error_sequence== 0){strcat(strlit, yytext);}num_colunas += yyleng;}
 <ASPAS>{lineTerminator} 		{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas = 1;num_linhas++;}
-<ASPAS>\"						{BEGIN 0; strcat(strlit, "\"");  if(flag == 0 && error_sequence== 0){ printf("STRLIT(%s)\n",strlit);} num_colunas += yyleng; yylval.id = strdup(strlit); if(error_sequence == 0){return STRLIT;} }
+<ASPAS>\"						{BEGIN 0; strcat(strlit, "\"");  if(flag == 0 && error_sequence== 0){ printf("STRLIT(%s)\n",strlit);} num_colunas += yyleng; yylval.id = strdup(strlit); if(error_sequence == 0){return STRLIT;}else{ free(yylval.id); } }
 <ASPAS><<EOF>> 					{BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);}
 <ASPAS>\\{lineTerminator}		{BEGIN 0; error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro); num_linhas++ ; num_colunas = 1;}							
 <ASPAS>\\{invalid_escape}		{error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (%s)\n", num_linhas, num_colunas, yytext);num_colunas += yyleng;}							
@@ -69,51 +73,51 @@ reallit					({und_real}+"."{und_real}*{exponte}?)|({und_real}+{exponte})|("."{un
 
 
 true|false				{if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return BOOLLIT;}
-"&&" 					{if(flag==0){printf("AND\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return AND;}
-"=" 					{if(flag==0){printf("ASSIGN\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return ASSIGN;}
-"*" 					{if(flag==0){printf("STAR\n");}num_colunas+= yyleng;  yylval.id = strdup(yytext); return STAR;}
-"," 					{if(flag==0){printf("COMMA\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return COMMA;}
-"/" 					{if(flag==0){printf("DIV\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return DIV;}
-"=="					{if(flag==0){printf("EQ\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return EQ;}
-">=" 					{if(flag==0){printf("GE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return GE;}
-">" 					{if(flag==0){printf("GT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return GT;}
-"{" 					{if(flag==0){printf("LBRACE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return LBRACE;}
-"<=" 					{if(flag==0){printf("LE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return LE;}
-"(" 					{if(flag==0){printf("LPAR\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return LPAR;}	
-")" 					{if(flag==0){printf("RPAR\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return RPAR;}
-"["						{if(flag==0){printf("LSQ\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return LSQ;}
-"<" 					{if(flag==0){printf("LT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return LT;}
-"-" 					{if(flag==0){printf("MINUS\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return MINUS;}
-"%" 					{if(flag==0){printf("MOD\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return MOD;}
-"!=" 					{if(flag==0){printf("NE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return NE;}
-"!" 					{if(flag==0){printf("NOT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return NOT;}
-"||" 					{if(flag==0){printf("OR\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return OR;}
-"+" 					{if(flag==0){printf("PLUS\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return PLUS;}
-"}" 					{if(flag==0){printf("RBRACE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return RBRACE;}
-"]"     				{if(flag==0){printf("RSQ\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return RSQ;}
-";" 					{if(flag==0){printf("SEMICOLON\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return SEMICOLON;}
-"->"     				{if(flag==0){printf("ARROW\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return ARROW;}
-"<<"     				{if(flag==0){printf("LSHIFT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return LSHIFT;}
-">>"     				{if(flag==0){printf("RSHIFT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return RSHIFT;}
-"^"     				{if(flag==0){printf("XOR\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return XOR;}
-boolean					{if(flag==0){printf("BOOL\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return BOOL;}
-class					{if(flag==0){printf("CLASS\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return CLASS;}
-".length"				{if(flag==0){printf("DOTLENGTH\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return DOTLENGTH;}
-double					{if(flag==0){printf("DOUBLE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return DOUBLE;}
-else 					{if(flag==0){printf("ELSE\n");}num_colunas+= yyleng;yylval.id = strdup(yytext);  return ELSE;}
-if 						{if(flag==0){printf("IF\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return IF;}
-int 					{if(flag==0){printf("INT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return INT;}
-"System.out.print" 		{if(flag==0){printf("PRINT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return PRINT;}
-"Integer.parseInt" 		{if(flag==0){printf("PARSEINT\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return PARSEINT;} 
-public					{if(flag==0){printf("PUBLIC\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return PUBLIC;}
-return 					{if(flag==0){printf("RETURN\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return RETURN;}
-static					{if(flag==0){printf("STATIC\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return STATIC;}
-String					{if(flag==0){printf("STRING\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return STRING;}
-void					{if(flag==0){printf("VOID\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return VOID;} 
-while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng; yylval.id = strdup(yytext); return WHILE;}
+"&&" 					{if(flag==0){printf("AND\n");}num_colunas+= yyleng; yylval.id = yytext; return AND;}
+"=" 					{if(flag==0){printf("ASSIGN\n");}num_colunas+= yyleng; yylval.id = yytext; return ASSIGN;}
+"*" 					{if(flag==0){printf("STAR\n");}num_colunas+= yyleng;  yylval.id = yytext; return STAR;}
+"," 					{if(flag==0){printf("COMMA\n");}num_colunas+= yyleng; yylval.id = yytext; return COMMA;}
+"/" 					{if(flag==0){printf("DIV\n");}num_colunas+= yyleng; yylval.id = yytext; return DIV;}
+"=="					{if(flag==0){printf("EQ\n");}num_colunas+= yyleng; yylval.id = yytext; return EQ;}
+">=" 					{if(flag==0){printf("GE\n");}num_colunas+= yyleng; yylval.id = yytext; return GE;}
+">" 					{if(flag==0){printf("GT\n");}num_colunas+= yyleng; yylval.id = yytext; return GT;}
+"{" 					{if(flag==0){printf("LBRACE\n");}num_colunas+= yyleng; yylval.id = yytext; return LBRACE;}
+"<=" 					{if(flag==0){printf("LE\n");}num_colunas+= yyleng; yylval.id = yytext; return LE;}
+"(" 					{if(flag==0){printf("LPAR\n");}num_colunas+= yyleng; yylval.id = yytext; return LPAR;}	
+")" 					{if(flag==0){printf("RPAR\n");}num_colunas+= yyleng; yylval.id = yytext; return RPAR;}
+"["						{if(flag==0){printf("LSQ\n");}num_colunas+= yyleng; yylval.id = yytext; return LSQ;}
+"<" 					{if(flag==0){printf("LT\n");}num_colunas+= yyleng; yylval.id = yytext; return LT;}
+"-" 					{if(flag==0){printf("MINUS\n");}num_colunas+= yyleng; yylval.id = yytext; return MINUS;}
+"%" 					{if(flag==0){printf("MOD\n");}num_colunas+= yyleng; yylval.id = yytext; return MOD;}
+"!=" 					{if(flag==0){printf("NE\n");}num_colunas+= yyleng; yylval.id = yytext; return NE;}
+"!" 					{if(flag==0){printf("NOT\n");}num_colunas+= yyleng; yylval.id = yytext; return NOT;}
+"||" 					{if(flag==0){printf("OR\n");}num_colunas+= yyleng; yylval.id = yytext; return OR;}
+"+" 					{if(flag==0){printf("PLUS\n");}num_colunas+= yyleng; yylval.id = yytext; return PLUS;}
+"}" 					{if(flag==0){printf("RBRACE\n");}num_colunas+= yyleng; yylval.id = yytext; return RBRACE;}
+"]"     				{if(flag==0){printf("RSQ\n");}num_colunas+= yyleng; yylval.id = yytext; return RSQ;}
+";" 					{if(flag==0){printf("SEMICOLON\n");}num_colunas+= yyleng; yylval.id = yytext; return SEMICOLON;}
+"->"     				{if(flag==0){printf("ARROW\n");}num_colunas+= yyleng; yylval.id = yytext; return ARROW;}
+"<<"     				{if(flag==0){printf("LSHIFT\n");}num_colunas+= yyleng; yylval.id = yytext; return LSHIFT;}
+">>"     				{if(flag==0){printf("RSHIFT\n");}num_colunas+= yyleng; yylval.id = yytext; return RSHIFT;}
+"^"     				{if(flag==0){printf("XOR\n");}num_colunas+= yyleng; yylval.id = yytext; return XOR;}
+boolean					{if(flag==0){printf("BOOL\n");}num_colunas+= yyleng; yylval.id = yytext; return BOOL;}
+class					{if(flag==0){printf("CLASS\n");}num_colunas+= yyleng; yylval.id = yytext; return CLASS;}
+".length"				{if(flag==0){printf("DOTLENGTH\n");}num_colunas+= yyleng; yylval.id = yytext; return DOTLENGTH;}
+double					{if(flag==0){printf("DOUBLE\n");}num_colunas+= yyleng; yylval.id = yytext; return DOUBLE;}
+else 					{if(flag==0){printf("ELSE\n");}num_colunas+= yyleng;yylval.id = yytext;  return ELSE;}
+if 						{if(flag==0){printf("IF\n");}num_colunas+= yyleng; yylval.id = yytext; return IF;}
+int 					{if(flag==0){printf("INT\n");}num_colunas+= yyleng; yylval.id = yytext; return INT;}
+"System.out.print" 		{if(flag==0){printf("PRINT\n");}num_colunas+= yyleng; yylval.id = yytext; return PRINT;}
+"Integer.parseInt" 		{if(flag==0){printf("PARSEINT\n");}num_colunas+= yyleng; yylval.id = yytext; return PARSEINT;} 
+public					{if(flag==0){printf("PUBLIC\n");}num_colunas+= yyleng; yylval.id = yytext; return PUBLIC;}
+return 					{if(flag==0){printf("RETURN\n");}num_colunas+= yyleng; yylval.id = yytext; return RETURN;}
+static					{if(flag==0){printf("STATIC\n");}num_colunas+= yyleng; yylval.id = yytext; return STATIC;}
+String					{if(flag==0){printf("STRING\n");}num_colunas+= yyleng; yylval.id = yytext; return STRING;}
+void					{if(flag==0){printf("VOID\n");}num_colunas+= yyleng; yylval.id = yytext; return VOID;} 
+while					{if(flag==0){printf("WHILE\n");}num_colunas+= yyleng; yylval.id = yytext; return WHILE;}
 
 
-{reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext);return RESERVED;}
+{reserved}				{if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = yytext; return RESERVED;}
 
 
 {letras}{alfanum}*		{if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng; yylval.id = strdup(yytext); return ID;}
@@ -140,7 +144,8 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[1],"-e2") == 0){
 			flag = 1;
 			yyparse();
-
+			free_tree(myprogram);
+			
 		}else if(strcmp(argv[1],"-t") == 0){
 
 			flag = 1;
@@ -148,17 +153,32 @@ int main(int argc, char *argv[]){
 			if(erro_sintaxe == 0){
 				print_tree(myprogram);
 			}
+<<<<<<< HEAD
+		}else if(strcmp(argv[1],"-s") == 0){
+			int errors;
+
+		    yyparse();
+		    errors=check_program(myprogram);
+		    if(errors>0)
+		        printf("The program has %d errors!\n", errors);
+		    //show_table();
+		    yylex_destroy();
+=======
+			free_tree(myprogram);
+			
+>>>>>>> 5c6fff40daac1da7fe1bb91dd461e5350ccf87a0
 		}
 	}else if(argc == 1){
 			flag = 1;
 			yyparse();
+			free_tree(myprogram);
 		}
 	return 0;
 }
 
 int yywrap()
 {
-	yylval.id = strdup(yytext);
+	yylval.id = yytext;
 return 1;
 }
 

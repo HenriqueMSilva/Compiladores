@@ -16,6 +16,8 @@ is_program* myprogram;
 
 %}
 
+
+
 %token AND ASSIGN STAR COMMA DIV EQ GE GT LBRACE LE LPAR RPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RSQ SEMICOLON ARROW LSHIFT RSHIFT XOR BOOL CLASS DOTLENGTH DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC RETURN STATIC STRING VOID WHILE RESERVED
 
 %token<id>ID INTLIT STRLIT REALLIT BOOLLIT
@@ -49,14 +51,27 @@ is_program* myprogram;
 
 
 %nonassoc REDUCE
-%nonassoc UNARIO
 %right ELSE
+
+/*
+%destructor{ if($$!= NULL){free($$); $$ = NULL;} } <id>
+%destructor{ if($$!= NULL){free_is_metodos($$); $$ = NULL; } } <im>
+%destructor{ if($$!= NULL){free_is_fielddecl_list($$); $$ = NULL; } } <ifl>
+%destructor{ if($$!= NULL){free_is_methoddecl_list($$); $$ = NULL;} } <imdl>
+%destructor{ if($$!= NULL){free_is_methodheader_list($$); $$ = NULL;} } <imhl>
+%destructor{ if($$!= NULL){free_is_methodparams_list($$); $$ = NULL;} } <impl>
+%destructor{ if($$!= NULL){free_is_methodbody_list($$); $$ = NULL;} } <imbl>
+%destructor{ if($$!= NULL){free_is_vardecl_list($$); $$ = NULL;} } <ivdl>
+%destructor{ if($$!= NULL){free_is_statment_list($$); $$ = NULL;} } <state>
+%destructor{ if($$!= NULL){free_is_expression_list($$); $$ = NULL;} } <iel>
+*/
 
 %union{
     char *id;
     is_program* ip;
     is_metodos* im;
     is_fielddecl_list* ifl;
+
     is_methoddecl_list* imdl;
     is_methodheader_list* imhl;
     is_methodparams_list* impl;
@@ -68,11 +83,11 @@ is_program* myprogram;
 
 %%
 
-program: CLASS ID LBRACE metodos RBRACE                     {$$=myprogram=insert_program($2, $4);}
+program: CLASS ID LBRACE metodos RBRACE                     {$$=myprogram=insert_program($2, $4); free($2);}
     ;
 
 metodos: /*empty*/                                          {$$ = NULL;}
-        | MethodDecl metodos                                {$$=insert_metodos("Method",NULL,$1,$2);}      
+        | MethodDecl metodos                                {$$=insert_metodos("Method",NULL,$1,$2);}     
         | FieldDecl  metodos                                {$$=insert_metodos("Field",$1,NULL,$2);}
         | SEMICOLON  metodos                                {$$=insert_metodos("Semicolon",NULL,NULL,$2);}
     ;
@@ -80,11 +95,11 @@ metodos: /*empty*/                                          {$$ = NULL;}
 MethodDecl: PUBLIC STATIC MethodHeader MethodBody           {$$=insert_methoddecl($3,$4);}
     ;
 
-FieldDecl:  PUBLIC STATIC Type ID FieldDeclNext SEMICOLON   {$$=insert_field($3,$4,$5);}
+FieldDecl:  PUBLIC STATIC Type ID FieldDeclNext SEMICOLON   {$$=insert_field($3,$4,$5);free($4);}
     ;
 
 FieldDeclNext:  /*empty*/                                   {$$ = NULL;}     
-             |  COMMA ID FieldDeclNext                      {$$=insert_field("",$2,$3);}
+             |  COMMA ID FieldDeclNext                      {$$=insert_field("",$2,$3); free($2);}
     ;
 
 Type: BOOL                                                  {$$="Bool";}
@@ -93,35 +108,35 @@ Type: BOOL                                                  {$$="Bool";}
 
     ;
 
-MethodHeader: Type ID LPAR MethodParams RPAR                {$$=insert_methodheader($1,$2,$4);}
-            | VOID ID LPAR MethodParams RPAR                {$$=insert_methodheader("Void",$2,$4);}
+MethodHeader: Type ID LPAR MethodParams RPAR                {$$=insert_methodheader($1,$2,$4);free($2);}
+            | VOID ID LPAR MethodParams RPAR                {$$=insert_methodheader("Void",$2,$4);free($2);}
     ;
 
 MethodParams:  /*empty*/                                    {$$ = NULL;}
-            | Type ID MethodParamsNext                      {$$=insert_methodparams($1,$2,$3);}
-            | STRING LSQ RSQ ID                             {$$=insert_methodparams("StringArray",$4,NULL);}
+            | Type ID MethodParamsNext                      {$$=insert_methodparams($1,$2,$3);free($2);}
+            | STRING LSQ RSQ ID                             {$$=insert_methodparams("StringArray",$4,NULL);free($4);}
     ;
 
 MethodParamsNext: /*empty*/                                 {$$ = NULL;}
-                | COMMA Type ID MethodParamsNext            {$$=insert_methodparams($2,$3,$4);}
+                | COMMA Type ID MethodParamsNext            {$$=insert_methodparams($2,$3,$4);free($3);}
     ;
 
-MethodBody: LBRACE body RBRACE                              {$$ = $2;} 
+MethodBody: LBRACE body RBRACE                              {$$ = $2;}
     ;
 
 body:   /*empty*/                                           {$$ = NULL;}
-    |   VarDecl  body                                       {$$=insert_methodbody("VarDecl",$1,NULL,$2);} 
-    |   Statement body                                      {$$=insert_methodbody("Statement",NULL,$1,$2);} 
+    |   VarDecl  body                                       {$$=insert_methodbody("VarDecl",$1,NULL,$2);}
+    |   Statement body                                      {$$=insert_methodbody("Statement",NULL,$1,$2);}
     ;
 
-VarDecl: Type ID  VarDeclNext SEMICOLON                     {$$=insert_vardecl($1,$2,$3);}
+VarDecl: Type ID  VarDeclNext SEMICOLON                     {$$=insert_vardecl($1,$2,$3);free($2);}
     ;
 
 VarDeclNext: /*empty*/                                      {$$ = NULL;}
-           | COMMA ID  VarDeclNext                          {$$=insert_vardecl("",$2,$3);}
+           | COMMA ID  VarDeclNext                          {$$=insert_vardecl("",$2,$3);free($2);}
     ;
 
-Statement:  IF LPAR  ExprA RPAR   Statement  %prec REDUCE        {$$ = insert_multiple_statement("If", $3, $5, NULL);}
+Statement:  IF LPAR  ExprA RPAR   Statement  %prec REDUCE   {$$ = insert_multiple_statement("If", $3, $5, NULL);}
         |   IF LPAR  ExprA RPAR Statement ELSE Statement    {$$ = insert_multiple_statement("IfElse", $3, $5, $7);}
 
 
@@ -130,7 +145,7 @@ Statement:  IF LPAR  ExprA RPAR   Statement  %prec REDUCE        {$$ = insert_mu
         |   LBRACE StatementZrOuMais RBRACE                 {$$ = insert_multiple_statement("Block", NULL, $2, NULL);}
         |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = insert_multiple_statement("Print", $3, NULL, NULL);}
         |   MethodInvocation SEMICOLON                      {$$ = insert_multiple_statement("Call", $1, NULL, NULL);}
-        |   ID ASSIGN ExprA  SEMICOLON                      {$$ = insert_multiple_statement("AssignStatment", insert_expr("Assign",$1,$3,NULL), NULL, NULL );}
+        |   ID ASSIGN ExprA  SEMICOLON                      {$$ = insert_multiple_statement("AssignStatment", insert_expr("Assign",$1,$3,NULL), NULL, NULL );free($1);}
         |   ParseArgs SEMICOLON                             {$$ = insert_multiple_statement("ParseArgsStatment", $1,NULL, NULL);}
         |   SEMICOLON                                       {$$ = NULL;}
     ; 
@@ -144,18 +159,18 @@ StatementExpOp: /*empty*/                                   {$$ = NULL;}
             |     ExprA                                     {$$ = $1;}
     ;
 
-StatementPrint: STRLIT                                      {$$ = insert_expr("StrLit",$1,NULL,NULL);}
+StatementPrint: STRLIT                                      {$$ = insert_expr("StrLit",$1,NULL,NULL);free($1);}
         |     ExprA                                         {$$ = $1;}
     ;
 
 
 
 
-MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {$$ = insert_expr("Call",$1,$3,NULL);}
+MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {$$ = insert_expr("Call",$1,$3,NULL);free($1);}
     ;
 
 ExpCommaExpOP: /*empty*/                                     {$$ = NULL;} 
-            |  ExprA CommaExprZrOuMais                       {$$ = insert_expr("CallMore","",$1,$2);} 
+            |  ExprA CommaExprZrOuMais                       {$$ = insert_expr("CallMore","",$1,$2);}
     ;
 
 CommaExprZrOuMais: /*empty*/                                 {$$ = NULL;}
@@ -163,14 +178,14 @@ CommaExprZrOuMais: /*empty*/                                 {$$ = NULL;}
     ;
 
 
-ParseArgs:  PARSEINT LPAR ID LSQ  ExprA RSQ RPAR  {$$ = insert_expr("ParseArgs",$3,$5,NULL);}
+ParseArgs:  PARSEINT LPAR ID LSQ  ExprA RSQ RPAR             {$$ = insert_expr("ParseArgs",$3,$5,NULL);free($3);}
     ;
 
 
 
 ExprA: Expr                                     {$$ = $1;}
-    |  ID ASSIGN ExprA                          {$$ = insert_expr("Assign",$1,$3,NULL);}
-    |  LPAR ID ASSIGN ExprA RPAR                {$$ = insert_expr("Assign",$2,$4,NULL);}
+    |  ID ASSIGN ExprA                          {$$ = insert_expr("Assign",$1,$3,NULL);free($1);}
+    |  LPAR ID ASSIGN ExprA RPAR                {$$ = insert_expr("Assign",$2,$4,NULL);free($2);}
     ;
 
 
@@ -186,21 +201,21 @@ Expr: Expr AND Expr                             {$$ = insert_expr("Operacao","An
     | Expr MINUS Expr                           {$$ = insert_expr("Operacao","Sub",$1,$3);}               
     | Expr STAR Expr                            {$$ = insert_expr("Operacao","Mul",$1,$3);}
     | Expr DIV Expr                             {$$ = insert_expr("Operacao","Div",$1,$3);}
-    | Expr MOD Expr                             {$$ = insert_expr("Operacao","Mod",$1,$3);} 
+    | Expr MOD Expr                             {$$ = insert_expr("Operacao","Mod",$1,$3);}
     | Expr XOR Expr                             {$$ = insert_expr("Operacao","Xor",$1,$3);}
     | Expr LSHIFT Expr                          {$$ = insert_expr("Operacao","Lshift",$1,$3);}
     | Expr RSHIFT Expr                          {$$ = insert_expr("Operacao","Rshift",$1,$3);}
-    | NOT Expr                      {$$ = insert_expr("Operacao","Not",$2,NULL);}
-    | MINUS Expr %prec NOT                   {$$ = insert_expr("Operacao","Minus",$2,NULL);}
-    | PLUS Expr %prec NOT                    {$$ = insert_expr("Operacao","Plus",$2,NULL);}
+    | NOT Expr                                  {$$ = insert_expr("Operacao","Not",$2,NULL);}
+    | MINUS Expr %prec NOT                      {$$ = insert_expr("Operacao","Minus",$2,NULL);}
+    | PLUS Expr %prec NOT                       {$$ = insert_expr("Operacao","Plus",$2,NULL);}
     | LPAR ExprA RPAR                           {$$ = $2;}
     | MethodInvocation                          {$$ = $1;}
     | ParseArgs                                 {$$ = $1;} 
-    | ID                                        {$$ = insert_expr("Id",$1,NULL,NULL);}
-    | ID DOTLENGTH                              {$$ = insert_expr("Length",$1,NULL,NULL);}
-    | REALLIT                                   {$$ = insert_expr("RealLit",$1,NULL,NULL);}
-    | BOOLLIT                                   {$$ = insert_expr("BoolLit",$1,NULL,NULL);}
-    | INTLIT                                    {$$ = insert_expr("DecLit",$1,NULL,NULL);}
+    | ID                                        {$$ = insert_expr("Id",$1,NULL,NULL);free($1);}
+    | ID DOTLENGTH                              {$$ = insert_expr("Length",$1,NULL,NULL);free($1);}
+    | REALLIT                                   {$$ = insert_expr("RealLit",$1,NULL,NULL);free($1);}
+    | BOOLLIT                                   {$$ = insert_expr("BoolLit",$1,NULL,NULL);free($1);}
+    | INTLIT                                    {$$ = insert_expr("DecLit",$1,NULL,NULL);free($1);}
     ; 
 
 
@@ -214,7 +229,7 @@ Statement : error SEMICOLON                                 {$$=NULL;}
 ParseArgs: PARSEINT LPAR error RPAR                         {$$=NULL;}
     ; 
 
-MethodInvocation: ID LPAR error RPAR                        {$$=NULL;}
+MethodInvocation: ID LPAR error RPAR                        {$$=NULL; free($1);}
     ;
 
 Expr: LPAR error RPAR                                       {$$=NULL;}
@@ -225,5 +240,6 @@ Expr: LPAR error RPAR                                       {$$=NULL;}
 void yyerror(char *msg) {
     erro_sintaxe=1;
     printf("Line %d, col %d: %s: %s\n", num_linhas, num_colunas - (int) strlen(yylval.id) , msg, yylval.id);
+
  
 }
