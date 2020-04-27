@@ -153,7 +153,6 @@ int main(int argc, char *argv[]){
 			if(erro_sintaxe == 0){
 				print_tree(myprogram);
 			}
-<<<<<<< HEAD
 		}else if(strcmp(argv[1],"-s") == 0){
 			int errors;
 
@@ -162,11 +161,6 @@ int main(int argc, char *argv[]){
 		    if(errors>0)
 		        printf("The program has %d errors!\n", errors);
 		    //show_table();
-		    yylex_destroy();
-=======
-			free_tree(myprogram);
-			
->>>>>>> 5c6fff40daac1da7fe1bb91dd461e5350ccf87a0
 		}
 	}else if(argc == 1){
 			flag = 1;
