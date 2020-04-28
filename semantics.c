@@ -6,52 +6,63 @@
 int check_program(is_program* p) {
     int errorcount=0;
 
-    errorcount=check_metodos(p->metodos);
+    insert_classname(p->classname);
+    errorcount = check_metodos(p->metodos);
     return errorcount;
 }
 
-int check_metodos(is_metodos* metodos) {
+int check_metodos(is_metodos* metodos){
     int errorcount=0;
     is_metodos* tmp;
     
-    for(tmp=ivl; tmp; tmp=tmp->next)
-        errorcount+=check_vardec(tmp->val);
+    for(tmp=metodos; tmp; tmp=tmp->next){
+        if(tmp->ifl != NULL){
+            errorcount+=check_field_list(tmp->ifl);
+        }
+        if(tmp->imdl != NULL){
+            errorcount+=check_method_list(tmp->imdl);
+        }
+    }
     return errorcount;
 }
 
-int check_vardec(is_vardec* iv) {
-    switch(iv->disc_d) {
-        case d_integer:
-            return check_integer_dec(iv->data_vardec.u_integer_dec);
-        case d_character:
-            return check_character_dec(iv->data_vardec.u_character_dec);
-        case d_double:
-            return check_double_dec(iv->data_vardec.u_double_dec);    
+int check_field_list(is_fielddecl_list* ifl) {
+
+    table_element_global* newel = insert_el(ifl->name, ifl->type, NULL , "FieldDeclaration");
+
+    if(newel==NULL) {
+        printf("Symbol %s already defined!\n", ifl->name);
+        return 1;
     }
+
     return 0;
 }
 
-int check_integer_dec(is_integer_dec* iid) {
-    table_element* newel=insert_el(iid->id, integer);
+int check_method_list(is_methoddecl_list* imdl) {
+    int errorcount=0;
+    is_methoddecl_list* tmp = imdl;
+
+    if(tmp->imhl != NULL){
+        errorcount+=check_methodheader_list(tmp->imhl);
+    }    
+    /*if(tmp->imdl != NULL){
+        errorcount+=check_methodbody_list(imdl->imdl);
+    }*/
+
+    return errorcount;
+}
+
+int check_methodheader_list(is_methodheader_list* imhl) {
+    table_element_global* newel = insert_el(imhl->name, imhl->type, imhl->impl , "MethodDeclaration");
 
     if(newel==NULL) {
-        printf("Symbol %s already defined!\n", iid->id);
+        printf("Symbol %s already defined!\n", imhl->name);
         return 1;
     }
     return 0;
 }
 
-int check_character_dec(is_character_dec* icd) {
-        table_element* newel=insert_el(icd->id, character);
-
-        if(newel==NULL) {
-            printf("Symbol %s already defined!\n", icd->id);
-            return 1;
-        }
-        return 0;
-}
-
-int check_double_dec(is_double_dec* idd) {
+/*int check_double_dec(is_double_dec* idd) {
     table_element* newel=insert_el(idd->id, doub);
 
     if(newel==NULL) {
@@ -85,7 +96,7 @@ int check_write_statement(is_write_statement* iws) {
         return 1;
     }
     return 0;
-}
+}*/
 
 
 

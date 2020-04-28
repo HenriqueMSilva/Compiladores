@@ -156,11 +156,15 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[1],"-s") == 0){
 			int errors;
 
+			flag = 1;
 		    yyparse();
 		    errors=check_program(myprogram);
-		    if(errors>0)
+		    if(errors>0){
 		        printf("The program has %d errors!\n", errors);
-		    //show_table();
+		    }else{
+		    	show_table();
+		    	print_tree(myprogram);
+		    }
 		}
 	}else if(argc == 1){
 			flag = 1;

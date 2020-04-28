@@ -9,7 +9,7 @@ is_program* insert_program(char *id, is_metodos* metodos){
 	is_program* ip=(is_program*)malloc(sizeof(is_program));
 
 	ip->metodos=metodos;
-	ip->classname=(char*)strdup(id);  ;
+	ip->classname=(char*)strdup(id);
 
 	return ip;
 }
