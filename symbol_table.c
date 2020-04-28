@@ -15,6 +15,7 @@ header_global* insert_classname(char *str){
 	stg->declarations = NULL;
 
 	symtab_global = stg;
+	
 }
 
 
@@ -76,9 +77,11 @@ table_element_global *insert_el(char *str, char *type,  is_methodparams_list* im
 
 	if(symtab_global->declarations != NULL){	//Se table ja tem elementos
 		//Procura cauda da lista e verifica se simbolo ja existe (NOTA: assume-se uma tabela de simbolos globais!)
-		for(aux=symtab_global->declarations; aux; previous=aux, aux=aux->next)
-			if(strcmp(aux->name, str)==0)
+		for(aux=symtab_global->declarations; aux; previous=aux, aux=aux->next){
+			if(strcmp(aux->name, str)==0){
 				return NULL;
+			}
+		}
 		
 		previous->next=newSymbol;	//adiciona ao final da lista
 	}
@@ -88,33 +91,53 @@ table_element_global *insert_el(char *str, char *type,  is_methodparams_list* im
 	return newSymbol; 
 }
 
+char * lowerCase(char * str){
+	for(int i=0; i<=strlen(str); i++){
+		if(str[i]>=65&&str[i]<=90)
+         str[i]=str[i]+32;
+   }
+
+   return str;
+}
+
 void show_table(){
 
+	char * str;
 	header_global *aux = symtab_global;
 	printf("===== Class %s Symbol Table =====\n", aux->name);
 	while(aux->declarations != NULL){
-		if(aux->declarations->param_list_type == NULL){
-			printf("%s\t%s\n", aux->declarations->name, aux->declarations->type_return);
-		}else{
+		
 			
-			printf("%s", aux->declarations->name);
-			printf("\t(");
-			while(aux->declarations->param_list_type != NULL){
-				
-				printf("%s", aux->declarations->param_list_type->type_param);
-				aux->declarations->param_list_type = aux->declarations->param_list_type->next;
+		printf("%s", aux->declarations->name);
+		printf("\t(");
 
-				if(aux->declarations->param_list_type != NULL){
-					printf(",");
-				}
+		//parametros de entrada
+		while(aux->declarations->param_list_type != NULL){
+			str = lowerCase(aux->declarations->param_list_type->type_param);
+
+			if( strcmp(str,"stringarray") == 0 ){
+				str = "String[]";
 			}
+
+
+			printf("%s", str );
+			aux->declarations->param_list_type = aux->declarations->param_list_type->next;
+
+			if(aux->declarations->param_list_type != NULL){
+				printf(",");
+			}
+		
 			
-			printf(")\t");
-			printf("%s\n", aux->declarations->type_return);
+	
 		}
+		printf(")\t");
+		printf("%s\n", lowerCase(aux->declarations->type_return) );
 
 		aux->declarations = aux->declarations->next;
 	}
+	//ATENTION..............................................nao sei se e preciso TODO
+	printf("\n");
+
 }
 
 //Procura um identificador, devolve 0 caso nao exista

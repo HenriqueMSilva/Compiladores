@@ -15,10 +15,10 @@ clang-3.9 -o jucompiler lex.yy.c
 
 ./jucompiler -l < Comp2020/meta1/IdentifiersAndKeywords2.juc | diff Comp2020/meta1/IdentifiersAndKeywords2.out -
 
-
+_________________________________
 $ git checkout 923a62fac2f114f13bf388b542020b3982c8a982 .
 
-
+git ignore: https://stackoverflow.com/questions/43380622/github-desktop-is-committing-ignored-files
 
 
 
@@ -76,3 +76,13 @@ ___
 escrevo barra  -> vai ser escape->	 1) se depois vier um operador(excluindo "): significa que queremos apanhar o caracter do operador
 									2) se vier um caracter nao operador: significa que estamos a tentar apanhar um caracter de escape
 nota: \" é um caracter de escape 
+
+
+
+
+
+
+
+criar
+anotar 
+erros
