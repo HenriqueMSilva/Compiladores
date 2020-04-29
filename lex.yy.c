@@ -2375,7 +2375,7 @@ int main(int argc, char *argv[]){
 		        printf("The program has %d errors!\n", errors);
 		    }else{
 		    	show_table();
-		    	//print_tree(myprogram);
+		    	print_tree(myprogram);
 		    }
 		}
 	}else if(argc == 1){

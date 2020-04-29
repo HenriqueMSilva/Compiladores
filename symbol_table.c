@@ -15,128 +15,237 @@ header_global* insert_classname(char *str){
 	stg->declarations = NULL;
 
 	symtab_global = stg;
-	
+
+	return stg;
+
 }
 
+/*table_element_local *insert_el_local(char *str){
 
-//Insere um novo identificador na cauda de uma lista ligada de simbolo
-table_element_global *insert_el(char *str, char *type,  is_methodparams_list* imdl, char *declaration){
+	table_element_local *newSymbol =(table_element_local*) malloc(sizeof(table_element_local));
+	table_element_local *aux;
+	table_element_local* previous;
 
-	table_element_global *newSymbol =(table_element_global*) malloc(sizeof(table_element_global));
+
+}*/
+
+void tenta_inserir_na_tail_global(	table_element_global * newSymbol){
 	table_element_global *aux;
 	table_element_global* previous;
-	
-	//VARIAVEIS PARA AJUDAR A INSERIR NA TABELA OS PARAMETROS DO METEDO
-	is_methodparams_list* auxparam = imdl;
-	param_list *paramlist;
-	param_list *auxparamlist; 
 
-	//SE FOR UMA VARIAVEL O PARAMETRO LIST VAI SER NULL
-	if(strcmp(declaration,"FieldDeclaration") == 0){
-
-		newSymbol->name = (char*)strdup(str);
-		newSymbol->type_return= (char*)strdup(type);
-		newSymbol->param_list_type = NULL;
-
-	//CASO SEJA METHOD PODE OU NAO SER VAZIO
-	}else if(strcmp(declaration,"MethodDeclaration") == 0){
-
-		newSymbol->name = (char*)strdup(str);
-		newSymbol->type_return= (char*)strdup(type);
-		newSymbol->param_list_type = NULL;
-
-		//INSERIR OS PARAMETROS NA LISTA DE PARAMETROS DO METODO
-		//EXISTE 1 PARAMETRO?
-		if(auxparam != NULL){
-			paramlist =(param_list*) malloc(sizeof(param_list));
-
-			paramlist->type_param = (char*)strdup(auxparam->type);
-			paramlist->next = NULL;
-			
-			newSymbol->param_list_type = paramlist;
-
-			auxparamlist = paramlist;
-			
-			auxparam = auxparam->next;
-		}
-		//EXISTEM 2 PARAMETROS?
-		while(auxparam != NULL){
-			paramlist =(param_list*) malloc(sizeof(param_list));
-
-			paramlist->type_param = (char*)strdup(auxparam->type);
-			paramlist->next = NULL;
-			
-			auxparamlist->next = paramlist;
-			auxparamlist = paramlist;
-
-			auxparam = auxparam->next;
-		}
-
-	}
-	newSymbol->next=NULL;
-
+	//Vou inserir o node na Tabela de Simbolos Global
 	if(symtab_global->declarations != NULL){	//Se table ja tem elementos
+		
 		//Procura cauda da lista e verifica se simbolo ja existe (NOTA: assume-se uma tabela de simbolos globais!)
-		for(aux=symtab_global->declarations; aux; previous=aux, aux=aux->next){
-			if(strcmp(aux->name, str)==0){
-				return NULL;
+		for(aux = symtab_global->declarations; aux != NULL ; previous = aux, aux = aux->next){
+			if(strcmp(aux->name, newSymbol->name) == 0){
+				//TODO-controlo se ja foi declarado
+				return;
 			}
 		}
 		
-		previous->next=newSymbol;	//adiciona ao final da lista
+		previous->next = newSymbol;	//adiciona ao final da lista
+	}else{
+		symtab_global->declarations = newSymbol;	
 	}
-	else	//symtab_global tem um elemento -> o novo simbolo
-		symtab_global->declarations = newSymbol;		
+
+}
+
+
+//Insere um novo(s) elemtentos na global devido a FieldDeclaration             
+table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char * var_type){
+		
+	table_element_global *newSymbol;
+
+	table_element_global* para_dar_return;
+
+	//temos um filddec
+	if(ifdl != NULL){
+
+		newSymbol = (table_element_global*) malloc(sizeof(table_element_global));
+
+		para_dar_return = newSymbol;
+
+
+		newSymbol->name = (char*)strdup(ifdl->name);
+		newSymbol->param_list = (param_node*) malloc(sizeof(param_node));
+		newSymbol->type_return = NULL;
+		newSymbol->next = NULL;
+
+
+		newSymbol->param_list->type_param = (char*)strdup(var_type);
+		newSymbol->param_list->next = NULL;
+
+		tenta_inserir_na_tail_global(newSymbol);
+
+
+	}
+
+	ifdl = ifdl->next;
+
+	//ainda temos mais variaveis do tipo ifdl->type?
+	while(ifdl != NULL){
+
+		newSymbol = (table_element_global*) malloc(sizeof(table_element_global));
+
+		newSymbol->name = (char*)strdup(ifdl->name);
+		newSymbol->param_list = (param_node*) malloc(sizeof(param_node));
+		newSymbol->type_return = NULL;
+		newSymbol->next = NULL;
+
+
+		newSymbol->param_list->type_param = (char*)strdup(var_type);
+		newSymbol->param_list->next = NULL;
+
+
+		tenta_inserir_na_tail_global(newSymbol);
+
+
+		ifdl = ifdl->next;
+	}
+
+
+
+	return para_dar_return;
+
+}
+
+
+
+
+
+//Insere um novo elemtento na global devido a Metodo
+table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
+
+
+	table_element_global *newSymbol;
+
+
+	//VARIAVEIS PARA AJUDAR A INSERIR NA TABELA OS PARAMETROS DO METEDO
+	is_methodparams_list* ast_param_list = imhl->impl;
+	param_node *simb_input_param;
+	param_node *simb_last_param;
+
+	
+	newSymbol = (table_element_global*) malloc(sizeof(table_element_global));
+
+	newSymbol->name = (char*)strdup(imhl->name);
+	newSymbol->type_return= (char*)strdup(imhl->type);
+	newSymbol->param_list = NULL;
+	newSymbol->next = NULL;
+
+
+
+	//INSERIR OS PARAMETROS NA LISTA DE PARAMETROS DO METODO
+	//EXISTE 1 PARAMETRO?
+	if(ast_param_list != NULL){
+
+		simb_input_param = (param_node*) malloc(sizeof(param_node));
+		simb_input_param->type_param = (char*)strdup(ast_param_list->type);
+		simb_input_param->next = NULL;
+		
+		newSymbol->param_list = simb_input_param;
+
+		//ponteiro para o ultimo elemento da lista de parametros do metodo na tabela de simbolos
+		simb_last_param = simb_input_param;
+		
+		//avançamos para o proximo parametro da AST
+		ast_param_list = ast_param_list->next;
+	}
+
+	//EXISTEM 2 PARAMETROS?
+	while(ast_param_list != NULL){
+
+
+		simb_input_param = (param_node*) malloc(sizeof(param_node));
+		simb_input_param->type_param = (char*)strdup(ast_param_list->type);
+		simb_input_param->next = NULL;
+
+		//adiciona o elem a lista
+		simb_last_param->next = simb_input_param; 
+
+		//atualizamos o ponteiro para o ultimo elemento da lista
+		simb_last_param = simb_input_param;
+		
+		//avançamos para o proximo parametro da AST
+		ast_param_list = ast_param_list->next;
+	}
+
+
+	tenta_inserir_na_tail_global(newSymbol);
 	
 	return newSymbol; 
+
 }
 
 char * lowerCase(char * str){
-	for(int i=0; i<=strlen(str); i++){
-		if(str[i]>=65&&str[i]<=90)
-         str[i]=str[i]+32;
+	int i;
+	for(i=0; i <= strlen(str); i++){
+		if(str[i] >= 65 && str[i] <= 90)
+        	str[i] = str[i] + 32;
    }
 
    return str;
 }
 
-void show_table(){
-
+//reformular os prints dos field dec
+void show_tabela_global(){
 	char * str;
 	header_global *aux = symtab_global;
 	printf("===== Class %s Symbol Table =====\n", aux->name);
 	while(aux->declarations != NULL){
 		
+		//METODO
+		if(aux->declarations->type_return != NULL){
+	
+			printf("%s", aux->declarations->name);
+
+			printf("\t(");
+
+			//parametros de entrada
+			while(aux->declarations->param_list != NULL){
+				str = lowerCase(aux->declarations->param_list->type_param);
+
+				if( strcmp(str,"stringarray") == 0 ){
+					str = "String[]";
+				}
+
+
+				printf("%s", str );
+				aux->declarations->param_list = aux->declarations->param_list->next;
+
+				if(aux->declarations->param_list != NULL){
+					printf(",");
+				}
 			
-		printf("%s", aux->declarations->name);
-		printf("\t(");
-
-		//parametros de entrada
-		while(aux->declarations->param_list_type != NULL){
-			str = lowerCase(aux->declarations->param_list_type->type_param);
-
-			if( strcmp(str,"stringarray") == 0 ){
-				str = "String[]";
-			}
-
-
-			printf("%s", str );
-			aux->declarations->param_list_type = aux->declarations->param_list_type->next;
-
-			if(aux->declarations->param_list_type != NULL){
-				printf(",");
-			}
-		
 			
 	
-		}
-		printf(")\t");
-		printf("%s\n", lowerCase(aux->declarations->type_return) );
+			}
+			printf(")\t");
+			printf("%s\n", lowerCase(aux->declarations->type_return) );
 
+
+		}else{
+		//FieldDec
+		
+			printf("%s", aux->declarations->name);
+			printf("\t%s\n", lowerCase(aux->declarations->param_list->type_param) );
+
+
+
+		}
+
+		
 		aux->declarations = aux->declarations->next;
 	}
+
 	//ATENTION..............................................nao sei se e preciso TODO
 	printf("\n");
+}
+
+void show_table(){
+
+	show_tabela_global();
 
 }
 

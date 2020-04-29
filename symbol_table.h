@@ -22,12 +22,12 @@ typedef struct _hl{
 typedef struct param{
 	char *type_param;
 	struct param *next;
-} param_list;
+} param_node;
 
 //METODOS NA CLASSE
 typedef struct _teg{
 	char *name;
-	param_list *param_list_type;
+	param_node *param_list;
 	char *type_return;
 	struct _teg *next;
 } table_element_global;
@@ -40,8 +40,15 @@ typedef struct _hg{
 
 
 header_global* insert_classname(char *str);
-table_element_global *insert_el(char *str, char *type, is_methodparams_list* imdl, char *declaration);
+table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char * var_type);
+table_element_global *insert_el_metodo_global(is_methodheader_list* imhl);
+void tenta_inserir_na_tail_global(	table_element_global * newSymbol);
+
+table_element_local *insert_el_local(char *str);
+
+void show_tabela_global();
 void show_table();
+
 //table_element *search_el(char *str);
 
 #endif
