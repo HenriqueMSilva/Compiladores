@@ -333,7 +333,7 @@ void show_tabela_global(){
 	
 			printf("%s", aux->declarations->name);
 
-			printf("\t(");
+			printf("\t\t(");
 
 			//parametros de entrada
 			while(aux->declarations->param_list != NULL){
@@ -358,7 +358,7 @@ void show_tabela_global(){
 			
 	
 			}
-			printf(")\t");
+			printf(")\t\t");
 			printf("%s\n", lowerCase(aux->declarations->type_return) );
 
 
@@ -373,7 +373,7 @@ void show_tabela_global(){
 				str = "boolean";
 			}
 
-			printf("\t%s\n", str );
+			printf("\t\t%s\n", str );
 
 
 
@@ -455,7 +455,7 @@ void show_tabela_local(){
 			printf("%s\t\t%s", variavel->name, str );
 		
 			if(variavel->is_param == 1){
-				printf("\tparam" );
+				printf("\t\tparam" );
 			}
 			printf("\n");
 
