@@ -364,37 +364,66 @@ void show_tabela_global(){
 void show_tabela_local(){
 	char * str;
 	table_element_local *tabela_local = symtab_local;
-	method_var* variaveis;
+	method_var* variavel;
 
 	while(tabela_local != NULL){
 		str = tabela_local->name; 
-		printf("===== Method %s",str);
+
+
+		printf("===== Method %s(",str);
+
 		
+		variavel = tabela_local->tel;
+		
+		while(variavel != NULL){
+			//tudo o que nao for parametro de entrada nao nos interessa
+			if(variavel->is_param == 0){
+				variavel = variavel->next;
+				continue;
+			}
 
 
+			//so quero imprimir os parametros de entrada
+			str = lowerCase(variavel->type);
 
 
-
-		printf("Symbol Table =====\n");
-
-		variaveis =  tabela_local->tel;
-
-		while(variaveis != NULL){
-
-			str = lowerCase(variaveis->type);
 
 			if( strcmp(str,"stringarray") == 0 ){
 				str = "String[]";
 			}
 
-			printf("%s\t\t%s", variaveis->name, str );
+	
+
+			printf("%s", str);
 		
-			if(variaveis->is_param == 1){
+			if(variavel->next != NULL && variavel->next->is_param == 1){
+				printf(",");
+			}
+
+			variavel = variavel->next;
+		}
+		printf(") Symbol Table =====\n");
+
+
+
+		variavel = tabela_local->tel;
+
+		while(variavel != NULL){
+
+			str = lowerCase(variavel->type);
+
+			if( strcmp(str,"stringarray") == 0 ){
+				str = "String[]";
+			}
+
+			printf("%s\t\t%s", variavel->name, str );
+		
+			if(variavel->is_param == 1){
 				printf("\tparam" );
 			}
 			printf("\n");
 
-			variaveis = variaveis->next;
+			variavel = variavel->next;
 		}
 
 		
