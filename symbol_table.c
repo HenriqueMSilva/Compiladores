@@ -5,7 +5,7 @@
 #include<stdio.h>
 
 extern 	header_global 	*symtab_global;
-extern	header_local 	*symtab_local;
+extern	table_element_local 	*symtab_local;
 
 header_global* insert_classname(char *str){
 
@@ -20,14 +20,99 @@ header_global* insert_classname(char *str){
 
 }
 
-/*table_element_local *insert_el_local(char *str){
-
-	table_element_local *newSymbol =(table_element_local*) malloc(sizeof(table_element_local));
-	table_element_local *aux;
-	table_element_local* previous;
 
 
-}*/
+table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_methodbody_list* imbl){
+	//o body pode ser null, mas se chegamos aqui, imbl != null
+	char * tipo;
+
+	method_var *simb_last_param;
+	method_var *var_metodo;
+
+	is_methodparams_list* ast_param_list = imhl->impl;
+	is_vardecl_list* ast_var_dec_list = imbl->ivdl;
+	is_methodbody_list* ast_var_dec_or_statment = imbl;
+
+	table_element_local * new_method = (table_element_local*) malloc(sizeof(table_element_local));
+
+	new_method->name = (char*)strdup(imhl->name);
+	new_method->tel = (method_var*) malloc(sizeof(method_var));
+	new_method->next = NULL;
+
+	var_metodo = new_method->tel;
+
+	//primeira var e o return
+	var_metodo->name = (char*)strdup("return");
+	var_metodo->type = (char*)strdup(imhl->type);
+	var_metodo->is_param = 0;
+	var_metodo->next = NULL;
+
+	simb_last_param = var_metodo;
+
+
+	//parametros de entrada
+	while(ast_param_list != NULL){
+
+		var_metodo = (method_var*) malloc(sizeof(method_var));
+
+		var_metodo->name = (char*)strdup(ast_param_list->name);
+		var_metodo->type = (char*)strdup(ast_param_list->type);
+		var_metodo->is_param = 1;
+		var_metodo->next = NULL;
+
+		simb_last_param->next = var_metodo;
+		simb_last_param = var_metodo;  
+		
+		//avançamos para o proximo parametro da AST
+		ast_param_list = ast_param_list->next;
+	}
+
+	//percorrer o body entre statments e var decs
+	while(ast_var_dec_or_statment != NULL && ( ast_var_dec_or_statment->ivdl != NULL || ast_var_dec_or_statment->statment != NULL) ){
+
+		//e um statment e nao um var dec
+		if(ast_var_dec_or_statment->statment != NULL){
+			ast_var_dec_or_statment = ast_var_dec_or_statment->next;
+			continue;
+		}
+		
+
+		ast_var_dec_list = ast_var_dec_or_statment->ivdl;
+
+		//var decs que foram defenidas numa so linha
+		if(ast_var_dec_list != NULL){
+			tipo = ast_var_dec_list->type;
+		}
+
+		while(ast_var_dec_list != NULL){
+		
+
+			var_metodo = (method_var*) malloc(sizeof(method_var));
+
+			var_metodo->name = (char*)strdup(ast_var_dec_list->name);
+			var_metodo->type = (char*)strdup(tipo);
+			var_metodo->is_param = 0;
+			var_metodo->next = NULL;
+
+			simb_last_param->next = var_metodo;
+			simb_last_param = var_metodo;  
+			
+
+			ast_var_dec_list = ast_var_dec_list->next;
+
+
+		}
+
+		ast_var_dec_or_statment = ast_var_dec_or_statment->next;
+
+	}
+
+
+	//verifica se ja ha um metodo com este nome
+	tenta_inserir_na_tail_local(new_method);
+
+	return new_method;
+}
 
 void tenta_inserir_na_tail_global(	table_element_global * newSymbol){
 	table_element_global *aux;
@@ -51,6 +136,29 @@ void tenta_inserir_na_tail_global(	table_element_global * newSymbol){
 
 }
 
+
+void tenta_inserir_na_tail_local(table_element_local * new_method){
+	table_element_local* aux;
+	table_element_local* previous;
+
+
+	//Vou inserir o node na Tabela de Simbolos Local
+	if(symtab_local != NULL){	//Se table ja tem elementos
+		
+		//Procura cauda da lista e verifica se simbolo ja existe (NOTA: assume-se uma tabela de simbolos local)
+		for(aux = symtab_local; aux != NULL ; previous = aux, aux = aux->next){
+			if(strcmp(aux->name, new_method->name) == 0){
+				//TODO-controlo se ja foi declarado
+				return;
+			}
+		}
+		
+		previous->next = new_method;	//adiciona ao final da lista
+	}else{
+		symtab_local = new_method;	
+	}
+
+}
 
 //Insere um novo(s) elemtentos na global devido a FieldDeclaration             
 table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char * var_type){
@@ -188,11 +296,18 @@ char * lowerCase(char * str){
    return str;
 }
 
-//reformular os prints dos field dec
+
 void show_tabela_global(){
 	char * str;
 	header_global *aux = symtab_global;
+
+	//ficheiro vazio
+	if(aux == NULL){
+		return;
+	}
+
 	printf("===== Class %s Symbol Table =====\n", aux->name);
+	
 	while(aux->declarations != NULL){
 		
 		//METODO
@@ -243,9 +358,59 @@ void show_tabela_global(){
 	printf("\n");
 }
 
+
+
+//reformular os prints dos field dec
+void show_tabela_local(){
+	char * str;
+	table_element_local *tabela_local = symtab_local;
+	method_var* variaveis;
+
+	while(tabela_local != NULL){
+		str = tabela_local->name; 
+		printf("===== Method %s",str);
+		
+
+
+
+
+
+		printf("Symbol Table =====\n");
+
+		variaveis =  tabela_local->tel;
+
+		while(variaveis != NULL){
+
+			str = lowerCase(variaveis->type);
+
+			if( strcmp(str,"stringarray") == 0 ){
+				str = "String[]";
+			}
+
+			printf("%s\t\t%s", variaveis->name, str );
+		
+			if(variaveis->is_param == 1){
+				printf("\tparam" );
+			}
+			printf("\n");
+
+			variaveis = variaveis->next;
+		}
+
+		
+		tabela_local = tabela_local->next;
+		printf("\n");
+	}
+
+
+
+}
+
+
 void show_table(){
 
 	show_tabela_global();
+	show_tabela_local();
 
 }
 

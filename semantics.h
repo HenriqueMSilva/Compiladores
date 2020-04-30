@@ -6,3 +6,4 @@ int check_metodos(is_metodos* metodos);
 int check_field_list(is_fielddecl_list* ifl);
 int check_method_list(is_methoddecl_list* imdl);
 int check_methodheader_list(is_methodheader_list* imhl);
+int check_methodbody_list(is_methodheader_list* imhl, is_methodbody_list* imbl);

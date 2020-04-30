@@ -712,7 +712,7 @@ char *yytext;
 
 	extern is_program* myprogram;
 	header_global 	*symtab_global 	= NULL;
-	header_local 	*symtab_local 	= NULL;
+	table_element_local 	*symtab_local 	= NULL;
 #line 717 "lex.yy.c"
 
 #line 719 "lex.yy.c"

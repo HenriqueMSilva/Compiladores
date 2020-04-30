@@ -5,17 +5,17 @@
 typedef struct _tel{
 	char *name;
 	char *type;
-	char *param;
+	int is_param;
 	struct _tel *next;
-} table_element_local;
+} method_var;
 
 
 //TABELA DE SIMBOLOS LOCAL
 typedef struct _hl{
 	char *name;
-	table_element_local *tel;
+	method_var *tel;
 	struct _hl *next;
-} header_local;
+} table_element_local;
 
 
 //LISTA DAS VARIAVEIS QUE CADA METODO RECEBE
@@ -42,9 +42,11 @@ typedef struct _hg{
 header_global* insert_classname(char *str);
 table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char * var_type);
 table_element_global *insert_el_metodo_global(is_methodheader_list* imhl);
-void tenta_inserir_na_tail_global(	table_element_global * newSymbol);
 
-table_element_local *insert_el_local(char *str);
+table_element_local *insert_el_metodo_local(is_methodheader_list* imhl,is_methodbody_list* imbl);
+
+void tenta_inserir_na_tail_global(	table_element_global * newSymbol);
+void tenta_inserir_na_tail_local(	table_element_local * new_method);
 
 void show_tabela_global();
 void show_table();

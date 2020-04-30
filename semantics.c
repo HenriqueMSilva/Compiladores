@@ -31,8 +31,6 @@ int check_field_list(is_fielddecl_list* ifl ) {
     //table_element_global* newel = insert_el_fieldDec_global(ifl, ifl->type);
     insert_el_fieldDec_global(ifl, ifl->type);
 
-    //table_element_local*  newel_teste = insert_el_local("FieldDeclaration");
-
     /*if(newel==NULL) {
         printf("Symbol %s already defined!\n", ifl->name);
         return 1;
@@ -45,15 +43,19 @@ int check_method_list(is_methoddecl_list* imdl) {
     int errorcount=0;
     is_methoddecl_list* tmp = imdl;
 
+    //e sempre diferente de null
     if(tmp->imhl != NULL){
         errorcount+=check_methodheader_list(tmp->imhl);
     }    
-    /*if(tmp->imdl != NULL){
-        errorcount+=check_methodbody_list(imdl->imdl);
-    }*/
+    //o body pode ser null
+    if(tmp->imbl != NULL){
+        errorcount+=check_methodbody_list(tmp->imhl, tmp->imbl);
+    }
 
     return errorcount;
 }
+
+
 
 int check_methodheader_list(is_methodheader_list* imhl) {
     table_element_global* newel = insert_el_metodo_global(imhl);
@@ -62,6 +64,12 @@ int check_methodheader_list(is_methodheader_list* imhl) {
         printf("Symbol %s already defined!\n", imhl->name);
         return 1;
     }
+    return 0;
+}
+
+int check_methodbody_list(is_methodheader_list* imhl, is_methodbody_list* imbl){
+    insert_el_metodo_local(imhl, imbl);
+    
     return 0;
 }
 
