@@ -47,10 +47,10 @@ int check_method_list(is_methoddecl_list* imdl) {
     if(tmp->imhl != NULL){
         errorcount+=check_methodheader_list(tmp->imhl);
     }    
-    //o body pode ser null
-    if(tmp->imbl != NULL){
-        errorcount+=check_methodbody_list(tmp->imhl, tmp->imbl);
-    }
+
+    //Se o body for NULL queremos criar um node na simb com poucas variaveis
+    errorcount+=check_methodbody_list(tmp->imhl, tmp->imbl);
+    
 
     return errorcount;
 }

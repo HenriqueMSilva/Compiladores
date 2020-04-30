@@ -7,112 +7,7 @@
 extern 	header_global 	*symtab_global;
 extern	table_element_local 	*symtab_local;
 
-header_global* insert_classname(char *str){
 
-	header_global *stg=(header_global*) malloc(sizeof(header_global));
-
-	stg->name = (char*)strdup(str);
-	stg->declarations = NULL;
-
-	symtab_global = stg;
-
-	return stg;
-
-}
-
-
-
-table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_methodbody_list* imbl){
-	//o body pode ser null, mas se chegamos aqui, imbl != null
-	char * tipo;
-
-	method_var *simb_last_param;
-	method_var *var_metodo;
-
-	is_methodparams_list* ast_param_list = imhl->impl;
-	is_vardecl_list* ast_var_dec_list = imbl->ivdl;
-	is_methodbody_list* ast_var_dec_or_statment = imbl;
-
-	table_element_local * new_method = (table_element_local*) malloc(sizeof(table_element_local));
-
-	new_method->name = (char*)strdup(imhl->name);
-	new_method->tel = (method_var*) malloc(sizeof(method_var));
-	new_method->next = NULL;
-
-	var_metodo = new_method->tel;
-
-	//primeira var e o return
-	var_metodo->name = (char*)strdup("return");
-	var_metodo->type = (char*)strdup(imhl->type);
-	var_metodo->is_param = 0;
-	var_metodo->next = NULL;
-
-	simb_last_param = var_metodo;
-
-
-	//parametros de entrada
-	while(ast_param_list != NULL){
-
-		var_metodo = (method_var*) malloc(sizeof(method_var));
-
-		var_metodo->name = (char*)strdup(ast_param_list->name);
-		var_metodo->type = (char*)strdup(ast_param_list->type);
-		var_metodo->is_param = 1;
-		var_metodo->next = NULL;
-
-		simb_last_param->next = var_metodo;
-		simb_last_param = var_metodo;  
-		
-		//avançamos para o proximo parametro da AST
-		ast_param_list = ast_param_list->next;
-	}
-
-	//percorrer o body entre statments e var decs
-	while(ast_var_dec_or_statment != NULL && ( ast_var_dec_or_statment->ivdl != NULL || ast_var_dec_or_statment->statment != NULL) ){
-
-		//e um statment e nao um var dec
-		if(ast_var_dec_or_statment->statment != NULL){
-			ast_var_dec_or_statment = ast_var_dec_or_statment->next;
-			continue;
-		}
-		
-
-		ast_var_dec_list = ast_var_dec_or_statment->ivdl;
-
-		//var decs que foram defenidas numa so linha
-		if(ast_var_dec_list != NULL){
-			tipo = ast_var_dec_list->type;
-		}
-
-		while(ast_var_dec_list != NULL){
-		
-
-			var_metodo = (method_var*) malloc(sizeof(method_var));
-
-			var_metodo->name = (char*)strdup(ast_var_dec_list->name);
-			var_metodo->type = (char*)strdup(tipo);
-			var_metodo->is_param = 0;
-			var_metodo->next = NULL;
-
-			simb_last_param->next = var_metodo;
-			simb_last_param = var_metodo;  
-			
-
-			ast_var_dec_list = ast_var_dec_list->next;
-
-
-		}
-
-		ast_var_dec_or_statment = ast_var_dec_or_statment->next;
-
-	}
-
-
-	//verifica se ja ha um metodo com este nome
-	tenta_inserir_na_tail_local(new_method);
-
-	return new_method;
-}
 
 void tenta_inserir_na_tail_global(	table_element_global * newSymbol){
 	table_element_global *aux;
@@ -159,6 +54,138 @@ void tenta_inserir_na_tail_local(table_element_local * new_method){
 	}
 
 }
+
+
+char * lowerCase(char * str){
+	int i;
+	for(i=0; i <= strlen(str); i++){
+		if(str[i] >= 65 && str[i] <= 90)
+        	str[i] = str[i] + 32;
+   }
+
+   return str;
+}
+
+
+
+
+
+
+header_global* insert_classname(char *str){
+
+	header_global *stg=(header_global*) malloc(sizeof(header_global));
+
+	stg->name = (char*)strdup(str);
+	stg->declarations = NULL;
+
+	symtab_global = stg;
+
+	return stg;
+
+}
+
+
+
+table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_methodbody_list* imbl){
+	//o body pode ser null, mas se chegamos aqui, imbl != null
+	char * tipo;
+
+	method_var *simb_last_param;
+	method_var *var_metodo;
+
+	is_methodparams_list* ast_param_list = imhl->impl;
+
+
+	table_element_local * new_method = (table_element_local*) malloc(sizeof(table_element_local));
+
+	new_method->name = (char*)strdup(imhl->name);
+	new_method->tel = (method_var*) malloc(sizeof(method_var));
+	new_method->next = NULL;
+
+	var_metodo = new_method->tel;
+
+	//primeira var e o return
+	var_metodo->name = (char*)strdup("return");
+	var_metodo->type = (char*)strdup(imhl->type);
+	var_metodo->is_param = 0;
+	var_metodo->next = NULL;
+
+	simb_last_param = var_metodo;
+
+
+	//parametros de entrada
+	while(ast_param_list != NULL){
+
+		var_metodo = (method_var*) malloc(sizeof(method_var));
+
+		var_metodo->name = (char*)strdup(ast_param_list->name);
+		var_metodo->type = (char*)strdup(ast_param_list->type);
+		var_metodo->is_param = 1;
+		var_metodo->next = NULL;
+
+		simb_last_param->next = var_metodo;
+		simb_last_param = var_metodo;  
+		
+		//avançamos para o proximo parametro da AST
+		ast_param_list = ast_param_list->next;
+	}
+
+
+	//se o method body
+	if(imbl != NULL){
+		is_vardecl_list* ast_var_dec_list = imbl->ivdl;
+		is_methodbody_list* ast_var_dec_or_statment = imbl;
+
+
+		//percorrer o body entre statments e var decs
+		while(ast_var_dec_or_statment != NULL && ( ast_var_dec_or_statment->ivdl != NULL || ast_var_dec_or_statment->statment != NULL) ){
+
+			//e um statment e nao um var dec
+			if(ast_var_dec_or_statment->statment != NULL){
+				ast_var_dec_or_statment = ast_var_dec_or_statment->next;
+				continue;
+			}
+			
+
+			ast_var_dec_list = ast_var_dec_or_statment->ivdl;
+
+			//var decs que foram defenidas numa so linha
+			if(ast_var_dec_list != NULL){
+				tipo = ast_var_dec_list->type;
+			}
+
+			while(ast_var_dec_list != NULL){
+			
+
+				var_metodo = (method_var*) malloc(sizeof(method_var));
+
+				var_metodo->name = (char*)strdup(ast_var_dec_list->name);
+				var_metodo->type = (char*)strdup(tipo);
+				var_metodo->is_param = 0;
+				var_metodo->next = NULL;
+
+				simb_last_param->next = var_metodo;
+				simb_last_param = var_metodo;  
+				
+
+				ast_var_dec_list = ast_var_dec_list->next;
+
+
+			}
+
+			ast_var_dec_or_statment = ast_var_dec_or_statment->next;
+
+		}
+	}
+
+	//verifica se ja ha um metodo com este nome
+	tenta_inserir_na_tail_local(new_method);
+
+	return new_method;
+}
+
+
+
 
 //Insere um novo(s) elemtentos na global devido a FieldDeclaration             
 table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char * var_type){
@@ -286,15 +313,6 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 
 }
 
-char * lowerCase(char * str){
-	int i;
-	for(i=0; i <= strlen(str); i++){
-		if(str[i] >= 65 && str[i] <= 90)
-        	str[i] = str[i] + 32;
-   }
-
-   return str;
-}
 
 
 void show_tabela_global(){
@@ -325,6 +343,10 @@ void show_tabela_global(){
 					str = "String[]";
 				}
 
+				if( strcmp(str,"bool") == 0 ){
+					str = "boolean";
+				}
+
 
 				printf("%s", str );
 				aux->declarations->param_list = aux->declarations->param_list->next;
@@ -344,7 +366,14 @@ void show_tabela_global(){
 		//FieldDec
 		
 			printf("%s", aux->declarations->name);
-			printf("\t%s\n", lowerCase(aux->declarations->param_list->type_param) );
+
+			str = lowerCase(aux->declarations->param_list->type_param);
+
+			if( strcmp(str,"bool") == 0 ){
+				str = "boolean";
+			}
+
+			printf("\t%s\n", str );
 
 
 
@@ -392,6 +421,9 @@ void show_tabela_local(){
 				str = "String[]";
 			}
 
+			if( strcmp(str,"bool") == 0 ){
+				str = "boolean";
+			}
 	
 
 			printf("%s", str);
@@ -414,6 +446,10 @@ void show_tabela_local(){
 
 			if( strcmp(str,"stringarray") == 0 ){
 				str = "String[]";
+			}
+
+			if( strcmp(str,"bool") == 0 ){
+				str = "boolean";
 			}
 
 			printf("%s\t\t%s", variavel->name, str );
