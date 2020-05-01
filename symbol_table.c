@@ -19,6 +19,20 @@ extern	table_element_local 	*symtab_local;
 	//se for expr-> fazer a logica
 
 }*/
+int var_declarada(method_var * lista, method_var* var_metodo){
+	while(lista != NULL){
+		if(strcmp(lista->name, var_metodo->name) == 0){
+			return 1;
+		}
+
+		lista = lista->next;
+	}
+
+	return 0;
+
+}
+
+
 int assinatutas_iguais(table_element_global *newSymbol, table_element_global *aux){
 
 	param_node * param_newSymbol = newSymbol->param_list;
@@ -257,12 +271,21 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 					var_metodo->is_param = 0;
 					var_metodo->next = NULL;
 
-					simb_last_param->next = var_metodo;
-					simb_last_param = var_metodo;  
-					
 
-					ast_var_dec_list = ast_var_dec_list->next;
+					if( var_declarada(new_method->tel, var_metodo) == 1  ){
 
+						free(var_metodo);
+						ast_var_dec_list = ast_var_dec_list->next;
+
+					}else{
+
+						simb_last_param->next = var_metodo;
+						simb_last_param = var_metodo;  
+						
+
+						ast_var_dec_list = ast_var_dec_list->next;
+
+					}
 
 				}
 

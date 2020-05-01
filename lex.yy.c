@@ -2370,9 +2370,11 @@ int main(int argc, char *argv[]){
 
 			flag = 1;
 		    yyparse();
-		    errors=check_program(myprogram);
 
 			if(erro_sintaxe == 0){
+
+		    	errors=check_program(myprogram);
+			    
 
 			    if(errors>0){
 			        printf("The program has %d errors!\n", errors);
@@ -2393,6 +2395,7 @@ int main(int argc, char *argv[]){
 		if(erro_sintaxe == 0){
 
 		    errors=check_program(myprogram);
+		    
 		    if(errors>0){
 		        printf("The program has %d errors!\n", errors);
 		    }else{

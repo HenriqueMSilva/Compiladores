@@ -82,4 +82,8 @@ nota: \" é um caracter de escape
 
 Duviva:
 metodos podem ter mesmo nome se tiverem assinaturas diff?
-param de entrada com o mesmo nome
+param de entrada com o mesmo nome? o que se faz??
+
+Atençao:
+variaveis com nome return podem estragar as minhas comp (averiguar)
+
