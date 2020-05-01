@@ -2371,17 +2371,42 @@ int main(int argc, char *argv[]){
 			flag = 1;
 		    yyparse();
 		    errors=check_program(myprogram);
+
+			if(erro_sintaxe == 0){
+
+			    if(errors>0){
+			        printf("The program has %d errors!\n", errors);
+			    }else{
+			    	show_table();
+			    	//print_tree(myprogram);
+			    }
+			}
+
+
+
+		}
+	}else if(argc == 1){
+		int errors;
+		flag = 1;
+		yyparse();
+		
+		if(erro_sintaxe == 0){
+
+		    errors=check_program(myprogram);
 		    if(errors>0){
 		        printf("The program has %d errors!\n", errors);
 		    }else{
 		    	show_table();
 		    	print_tree(myprogram);
 		    }
+
 		}
-	}else if(argc == 1){
-			flag = 1;
-			yyparse();
-			free_tree(myprogram);
+
+		free_tree(myprogram);
+
+
+
+
 		}
 	return 0;
 }

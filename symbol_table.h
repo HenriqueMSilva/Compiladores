@@ -40,12 +40,17 @@ typedef struct _hg{
 
 
 header_global* insert_classname(char *str);
+
 table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char * var_type);
 table_element_global *insert_el_metodo_global(is_methodheader_list* imhl);
 
+void tenta_inserir_fieldDec_na_tail_global(	table_element_global * newSymbol);
+void tenta_inserir_metodo_na_tail_global(	table_element_global * newSymbol);
+int assinatutas_iguais(table_element_global *newSymbol, table_element_global *aux);
+
+
 table_element_local *insert_el_metodo_local(is_methodheader_list* imhl,is_methodbody_list* imbl);
 
-void tenta_inserir_na_tail_global(	table_element_global * newSymbol);
 void tenta_inserir_na_tail_local(	table_element_local * new_method);
 
 void show_tabela_global();

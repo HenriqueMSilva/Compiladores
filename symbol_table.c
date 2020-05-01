@@ -7,18 +7,96 @@
 extern 	header_global 	*symtab_global;
 extern	table_element_local 	*symtab_local;
 
+/*char * recursao_expr(is_expression_list* expr){
+
+	//se for ID verificar se ja foi declarado
+	if( strcmp(expr->operation, "Id" ) == 0 ){
+
+	}
 
 
-void tenta_inserir_na_tail_global(	table_element_global * newSymbol){
+	//se for realint intlot ou bool-> return
+	//se for expr-> fazer a logica
+
+}*/
+int assinatutas_iguais(table_element_global *newSymbol, table_element_global *aux){
+
+	param_node * param_newSymbol = newSymbol->param_list;
+	param_node * param_aux = aux->param_list;
+
+	//testo o return
+	if( strcmp(newSymbol->type_return, aux->type_return) != 0 ){
+		//metodos diferente
+		return 0;
+	}
+
+	while(param_newSymbol != NULL && param_aux != NULL){
+
+
+		//testo os parametros de entrada
+		if( strcmp(param_newSymbol->type_param, param_aux->type_param) != 0){
+			//parametro diff
+			return 0;
+		}
+
+
+
+		param_newSymbol = param_newSymbol->next;
+		param_aux = param_aux->next;
+	
+	}
+
+
+	//todos os param era iguais-> assinatura igual
+	if(param_newSymbol == NULL && param_aux == NULL){
+		return 1;
+	}
+
+	return 0;
+
+}
+
+
+void tenta_inserir_fieldDec_na_tail_global(table_element_global * newSymbol){
 	table_element_global *aux;
 	table_element_global* previous;
 
 	//Vou inserir o node na Tabela de Simbolos Global
 	if(symtab_global->declarations != NULL){	//Se table ja tem elementos
 		
-		//Procura cauda da lista e verifica se simbolo ja existe (NOTA: assume-se uma tabela de simbolos globais!)
+		//Procura cauda da lista e verifica se simbolo ja existe
 		for(aux = symtab_global->declarations; aux != NULL ; previous = aux, aux = aux->next){
-			if(strcmp(aux->name, newSymbol->name) == 0){
+
+
+			if(strcmp(aux->name, newSymbol->name) == 0 && aux->type_return == NULL ){
+				//encontramos um field dec declarado aj com este nome
+				printf("\nTODO FD: Symbol %s already defined\n",aux->name);
+				//TODO-controlo se ja foi declarado
+				return;
+			}
+		}
+		
+		previous->next = newSymbol;	//adiciona ao final da lista
+	}else{
+		symtab_global->declarations = newSymbol;	
+	}
+
+}
+
+
+void tenta_inserir_metodo_na_tail_global(table_element_global * newSymbol){
+	table_element_global *aux;
+	table_element_global* previous;
+
+	//Vou inserir o node na Tabela de Simbolos Global
+	if(symtab_global->declarations != NULL){	//Se table ja tem elementos
+		
+		//Procura cauda da lista e verifica se simbolo ja existe 
+		for(aux = symtab_global->declarations; aux != NULL ; previous = aux, aux = aux->next){
+			if(strcmp(aux->name, newSymbol->name) == 0 && aux->type_return != NULL && assinatutas_iguais(newSymbol, aux) == 1){
+
+				printf("\nTODO M: Symbol %s already defined\n",aux->name);
+
 				//TODO-controlo se ja foi declarado
 				return;
 			}
@@ -87,7 +165,6 @@ header_global* insert_classname(char *str){
 
 
 table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_methodbody_list* imbl){
-	//o body pode ser null, mas se chegamos aqui, imbl != null
 	char * tipo;
 
 	method_var *simb_last_param;
@@ -130,6 +207,9 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 		ast_param_list = ast_param_list->next;
 	}
 
+	//adicionar isto ha lista TODO
+	//verifica se ja ha um metodo com este nome
+	tenta_inserir_na_tail_local(new_method);
 
 	//se o method body
 	if(imbl != NULL){
@@ -139,47 +219,66 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 
 		//percorrer o body entre statments e var decs
 		while(ast_var_dec_or_statment != NULL && ( ast_var_dec_or_statment->ivdl != NULL || ast_var_dec_or_statment->statment != NULL) ){
+		//while(ast_var_dec_or_statment != NULL ){  ACHO QUE O WHILE PODIA SER SO ISTO
 
 			//e um statment e nao um var dec
+			//Statmente
+
 			if(ast_var_dec_or_statment->statment != NULL){
+				
+				//percorrer as expr
+				//is_expression_list* expr = ast_var_dec_or_statment->statment->expr;
+				//recursao_expr(expr);
+
+				//ir para statmet1
+				//ir para statmet2
+		
+
 				ast_var_dec_or_statment = ast_var_dec_or_statment->next;
-				continue;
-			}
-			
 
-			ast_var_dec_list = ast_var_dec_or_statment->ivdl;
+			//VarDec
+			}else{
 
-			//var decs que foram defenidas numa so linha
-			if(ast_var_dec_list != NULL){
-				tipo = ast_var_dec_list->type;
-			}
 
-			while(ast_var_dec_list != NULL){
-			
+				ast_var_dec_list = ast_var_dec_or_statment->ivdl;
 
-				var_metodo = (method_var*) malloc(sizeof(method_var));
+				//var decs que foram defenidas numa so linha
+				if(ast_var_dec_list != NULL){
+					tipo = ast_var_dec_list->type;
+				}
 
-				var_metodo->name = (char*)strdup(ast_var_dec_list->name);
-				var_metodo->type = (char*)strdup(tipo);
-				var_metodo->is_param = 0;
-				var_metodo->next = NULL;
-
-				simb_last_param->next = var_metodo;
-				simb_last_param = var_metodo;  
+				while(ast_var_dec_list != NULL){
 				
 
-				ast_var_dec_list = ast_var_dec_list->next;
+					var_metodo = (method_var*) malloc(sizeof(method_var));
+
+					var_metodo->name = (char*)strdup(ast_var_dec_list->name);
+					var_metodo->type = (char*)strdup(tipo);
+					var_metodo->is_param = 0;
+					var_metodo->next = NULL;
+
+					simb_last_param->next = var_metodo;
+					simb_last_param = var_metodo;  
+					
+
+					ast_var_dec_list = ast_var_dec_list->next;
+
+
+				}
+
+				ast_var_dec_or_statment = ast_var_dec_or_statment->next;
 
 
 			}
+			
 
-			ast_var_dec_or_statment = ast_var_dec_or_statment->next;
 
 		}
 	}
 
-	//verifica se ja ha um metodo com este nome
-	tenta_inserir_na_tail_local(new_method);
+
+
+
 
 	return new_method;
 }
@@ -211,7 +310,7 @@ table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char *
 		newSymbol->param_list->type_param = (char*)strdup(var_type);
 		newSymbol->param_list->next = NULL;
 
-		tenta_inserir_na_tail_global(newSymbol);
+		tenta_inserir_fieldDec_na_tail_global(newSymbol);
 
 
 	}
@@ -233,7 +332,7 @@ table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char *
 		newSymbol->param_list->next = NULL;
 
 
-		tenta_inserir_na_tail_global(newSymbol);
+		tenta_inserir_fieldDec_na_tail_global(newSymbol);
 
 
 		ifdl = ifdl->next;
@@ -307,7 +406,7 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 	}
 
 
-	tenta_inserir_na_tail_global(newSymbol);
+	tenta_inserir_metodo_na_tail_global(newSymbol);
 	
 	return newSymbol; 
 
@@ -333,7 +432,7 @@ void show_tabela_global(){
 	
 			printf("%s", aux->declarations->name);
 
-			printf("\t\t(");
+			printf("\t(");
 
 			//parametros de entrada
 			while(aux->declarations->param_list != NULL){
@@ -358,7 +457,7 @@ void show_tabela_global(){
 			
 	
 			}
-			printf(")\t\t");
+			printf(")\t");
 			printf("%s\n", lowerCase(aux->declarations->type_return) );
 
 
@@ -455,7 +554,7 @@ void show_tabela_local(){
 			printf("%s\t\t%s", variavel->name, str );
 		
 			if(variavel->is_param == 1){
-				printf("\t\tparam" );
+				printf("\tparam" );
 			}
 			printf("\n");
 

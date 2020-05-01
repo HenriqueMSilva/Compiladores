@@ -44,7 +44,7 @@ e-1 sim
 
 
 
-----------------
+----------------------------------------------------------------------------------------------------------------------------------
 
 "\ [este \ é do \n ou é \\n??]
 
@@ -78,11 +78,8 @@ escrevo barra  -> vai ser escape->	 1) se depois vier um operador(excluindo "): 
 nota: \" é um caracter de escape 
 
 
+3 META---------------------------------------------------------------------------------------------------------------------------------
 
-
-
-
-
-criar
-anotar 
-erros
+Duviva:
+metodos podem ter mesmo nome se tiverem assinaturas diff?
+param de entrada com o mesmo nome
