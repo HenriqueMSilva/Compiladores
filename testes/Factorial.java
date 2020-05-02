@@ -4,6 +4,9 @@ class Factorial {
 
     public static int factorial(int nn) {
         int n;
+        
+        n = 0+nn;
+
         if (n == 0)
             return 1;
         return n * factorial(n-1);

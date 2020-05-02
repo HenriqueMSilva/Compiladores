@@ -65,6 +65,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 
 	//se for expr-> fazer a logica
+	//add - or not...
 
 
 	expr->tipo = "undef";
@@ -72,6 +73,39 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 
 }
+
+void recursao_statment(is_statment_list* statment, table_element_local * new_method ){
+
+
+		//percorrer as expr	
+		if( statment->expr != NULL){
+			recursao_expr(statment->expr, new_method->tel);
+		}
+
+
+		//ir para statmet1
+		if(statment->statment1 != NULL ){
+			recursao_statment(statment->statment1, new_method );
+		}
+
+		//ir para statmet2
+		if(statment->statment2 != NULL ){
+			recursao_statment(statment->statment2, new_method );
+		}
+
+
+}
+ 
+
+
+
+
+
+
+
+
+
+
 
 char * var_declarada_globalmente(char* str){
 	table_element_global * tabela_global = symtab_global->declarations;
@@ -317,16 +351,10 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 
 			//e um statment e nao um var dec
 			//Statmente
-
 			if(ast_var_dec_or_statment->statment != NULL){
 				
-				//percorrer as expr
-				is_expression_list* expr = ast_var_dec_or_statment->statment->expr;
-				recursao_expr(expr, new_method->tel);
+				recursao_statment(ast_var_dec_or_statment->statment, new_method);
 
-				//ir para statmet1
-				//ir para statmet2
-		
 
 				ast_var_dec_or_statment = ast_var_dec_or_statment->next;
 

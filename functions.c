@@ -335,16 +335,33 @@ void print_expr(is_expression_list* expr, int n){
         for(i=0;i<n;i++){
             printf(".");
         }
-        printf("%s\n",expr->value);
+        printf("%s",expr->value);
+        
+        if(expr->tipo != NULL){
+            printf(" - %s",expr->tipo);
+        }
+        printf("\n");
+
     }else if(strcmp("ParseArgs",expr->operation) == 0 || strcmp("Call",expr->operation) == 0 || strcmp("Assign",expr->operation) == 0 || strcmp("Length",expr->operation) == 0){
         for(i=0;i<n;i++){
             printf(".");
         }
-        printf("%s\n",expr->operation);
+        printf("%s",expr->operation);
+
+        if(expr->tipo != NULL){
+            printf(" - %s",expr->tipo);
+        }
+        printf("\n");
+
         for(i=0;i<n+2;i++){
             printf(".");
         }
-        printf("Id(%s)\n",expr->value);
+        printf("Id(%s)",expr->value);
+        
+        if(expr->tipo != NULL){
+            printf(" - %s",expr->tipo);
+        }
+        printf("\n");
 
     }else if(strcmp("CallMore",expr->operation) == 0){
         apply = 1;
@@ -352,7 +369,12 @@ void print_expr(is_expression_list* expr, int n){
         for(i=0;i<n;i++){
             printf(".");
         }
-        printf("%s(%s)\n",expr->operation,expr->value);
+        printf("%s(%s)",expr->operation,expr->value);
+
+        if(expr->tipo != NULL){
+            printf(" - %s",expr->tipo);
+        }
+        printf("\n");
     }
 
     if(apply == 0){
