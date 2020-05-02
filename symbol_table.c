@@ -15,10 +15,9 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	//se for ID verificar se ja foi declarado
 	if( strcmp(expr->operation, "Id" ) == 0 ){
 	
-		//averiguar se a var foi declarado no metodo //serve para saber o tipo da var....
+		//averiguar se a var foi declarado no metodo //serve para saber o tipo da var
 		tipo =  var_declarada(lista_do_metodo, expr->value);
 
-		printf("%s %s\n",expr->value,tipo);
 		if( tipo != NULL ){
 			//estava declarada
 			expr->tipo = tipo;
@@ -28,7 +27,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 		//averiguar se a var foi declarado globalmente
 		tipo =  var_declarada_globalmente(expr->value);
-		printf("%s %s\n",expr->value,tipo);
+
 		if( tipo != NULL ){
 			//estava declarada
 			expr->tipo = tipo;
@@ -66,29 +65,12 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	}
 
 
+
 	//mesmo raciocionio do call e dos operadores, so tratamos disto depois dos filhos
-	if(strcmp(expr->operation, "Length" ) == 0 || strcmp(expr->operation, "ParseArgs" ) == 0 ){ 
-		expr->tipo = "int"; 
 
-		return expr->tipo;
-	}
-
-
-	if(strcmp(expr->operation, "Call" ) == 0 || strcmp(expr->operation, "CallMore" ) == 0){
-
-		//averiguar se o metodo foi declarado globalmente
-		tipo =  metodo_declarado_globalmente(expr->value);
-
-		if( tipo != NULL ){
-			//estava declarada
-			expr->tipo = tipo;
-			return expr->tipo;
-		}
-	}
-
-
-	if(strcmp(expr->operation, "Assign" ) == 0){
-		//averiguar se a var foi declarado no metodo //serve para saber o tipo da var....
+	//vai atribuir o tipo ao ID que esta associado a estes statment, no print depois resolve-se o tipo
+	if(strcmp(expr->operation, "Length" ) == 0 || strcmp(expr->operation, "ParseArgs" ) == 0 || strcmp(expr->operation, "Assign" ) == 0){ 
+		
 		tipo =  var_declarada(lista_do_metodo, expr->value);
 
 		if( tipo != NULL ){
@@ -100,6 +82,23 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 		//averiguar se a var foi declarado globalmente
 		tipo =  var_declarada_globalmente(expr->value);
+		if( tipo != NULL ){
+			//estava declarada
+			expr->tipo = tipo;
+			return expr->tipo;
+		}
+
+		expr->tipo = tipo; 
+
+		return expr->tipo;
+	}
+
+
+	if(strcmp(expr->operation, "Call" ) == 0 || strcmp(expr->operation, "CallMore" ) == 0){
+
+		//averiguar se o metodo foi declarado globalmente
+		tipo =  metodo_declarado_globalmente(expr->value);
+
 		if( tipo != NULL ){
 			//estava declarada
 			expr->tipo = tipo;
@@ -346,10 +345,10 @@ void tenta_inserir_na_tail_local(table_element_local * new_method){
 		
 		//Procura cauda da lista e verifica se simbolo ja existe (NOTA: assume-se uma tabela de simbolos local)
 		for(aux = symtab_local; aux != NULL ; previous = aux, aux = aux->next){
-			if(strcmp(aux->name, new_method->name) == 0){
+			/*if(strcmp(aux->name, new_method->name) == 0){
 				//TODO-controlo se ja foi declarado
 				return;
-			}
+			}*/
 		}
 		
 		previous->next = new_method;	//adiciona ao final da lista
@@ -689,7 +688,14 @@ void show_tabela_global(){
 	
 			}
 			printf(")\t");
-			printf("%s\n", lowerCase(aux->declarations->type_return) );
+
+			//devido ao bool
+			if( strcmp(lowerCase(aux->declarations->type_return),"bool") == 0 ){
+				printf("boolean\n");
+			}else{
+				printf("%s\n", lowerCase(aux->declarations->type_return) );
+			}
+			
 
 
 		}else{
@@ -808,20 +814,3 @@ void show_table(){
 	show_tabela_local();
 
 }
-
-//Procura um identificador, devolve 0 caso nao exista
-/*table_element *search_el(char *str)
-{
-table_element *aux;
-
-for(aux=symtab_global; aux; aux=aux->next)
-	if(strcmp(aux->name, str)==0)
-		return aux;
-
-return NULL;
-}*/
-
-
-
-
-

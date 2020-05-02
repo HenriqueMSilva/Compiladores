@@ -337,7 +337,9 @@ void print_expr(is_expression_list* expr, int n){
         }
         printf("%s",expr->value);
         
+        //evita variaveis como o shift e se estiverem vazias
         if( (expr->tipo != NULL) && strcmp(expr->tipo,"") != 0 ){
+
             //havia variaveis que estavam como bool nao podiamos mudar na raiz
             if( strcmp(expr->tipo,"bool") == 0){
                 printf(" - boolean");
@@ -355,37 +357,43 @@ void print_expr(is_expression_list* expr, int n){
         printf("%s",expr->operation);
 
         if( (expr->tipo != NULL) && strcmp(expr->tipo,"") != 0 ){
-            //havia variaveis que estavam como bool nao podiamos mudar na raiz
+
             if( strcmp(expr->tipo,"bool") == 0){
                 printf(" - boolean");
+            //para o caso do parse args, length , o call e o assign nao afeta 
+            }else if(strcmp(expr->tipo,"stringarray") == 0){
+                printf(" - int");
             }else{
                 printf(" - %s",expr->tipo);
             }
         }
 
         printf("\n");
-
         for(i=0;i<n+2;i++){
             printf(".");
         }
         printf("Id(%s)",expr->value);
         
+
         if( (expr->tipo != NULL) && strcmp(expr->tipo,"") != 0 ){
-            //havia variaveis que estavam como bool nao podiamos mudar na raiz
+
+
             if( strcmp(expr->tipo,"bool") == 0){
                 printf(" - (boolean)");
+            }else if(strcmp(expr->tipo,"stringarray") == 0){
+                printf(" - String[]");
             }else{
-                //se for void apenas da print dos parentesis
+                //se for void apenas da print dos parentesis, no caso do call
                 if(strcmp("Call",expr->operation) == 0){
-                    if(strcmp(expr->tipo,"void") != 0 ){
-                        printf(" - (%s)",expr->tipo);
-                    }else if(strcmp(expr->tipo,"undef") == 0 ){
+                    if(strcmp(expr->tipo,"void") == 0 ){
+                        printf(" - ()"); //No caso de ser igual a void
+                    }else if(strcmp(expr->tipo,"undef") == 0 ){ //o undef nao é dentro de parenteses
                         printf(" - %s",expr->tipo);
                     }else{
-                        printf(" - ()");
+                        printf(" - (%s)",expr->tipo); //restantes casos
                     }
                 }else{
-                    printf(" - %s",expr->tipo);
+                    printf(" - %s",expr->tipo); //caso sejam outro tipo de operacoes print normal
                 }
             }
         }
@@ -401,7 +409,7 @@ void print_expr(is_expression_list* expr, int n){
         printf("%s(%s)",expr->operation,expr->value);
 
         if( (expr->tipo != NULL) && strcmp(expr->tipo,"") != 0 ){
-            //havia variaveis que estavam como bool nao podiamos mudar na raiz
+
             if( strcmp(expr->tipo,"bool") == 0){
                 printf(" - boolean");
             }else{
