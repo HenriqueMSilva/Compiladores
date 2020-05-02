@@ -7,28 +7,108 @@
 extern 	header_global 	*symtab_global;
 extern	table_element_local 	*symtab_local;
 
-/*char * recursao_expr(is_expression_list* expr){
+char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
+	char * tipo;
 
 	//se for ID verificar se ja foi declarado
 	if( strcmp(expr->operation, "Id" ) == 0 ){
+	
+		//averiguar se a var foi declarado no metodo
+		tipo =  var_declarada(lista_do_metodo, expr->value);
+		
+		if( tipo != NULL ){
+			//estava declarada
+			expr->tipo = tipo;
+			//printf("\n%s %s\n",expr->value,tipo);
+			return expr->tipo;
+		}
 
+
+		//averiguar se a var foi declarado globalmente
+		tipo =  var_declarada_globalmente(expr->value);
+		if( tipo != NULL ){
+			//estava declarada
+			expr->tipo = tipo;
+			return expr->tipo;
+		}
 	}
 
 
 	//se for realint intlot ou bool-> return
+	if(strcmp(expr->operation, "RealLit" ) == 0 ){
+		expr->tipo = "double";
+		return expr->tipo; 
+	}
+
+	if(strcmp(expr->operation, "BoolLit" ) == 0 ){
+		expr->tipo = "boolean";
+		return expr->tipo; 
+	}
+
+	if(strcmp(expr->operation, "DecLit" ) == 0 || strcmp(expr->operation, "Length" ) == 0 || strcmp(expr->operation, "ParseArgs" ) == 0 ){ 
+		expr->tipo = "int"; 
+		return expr->tipo;
+	}
+
+
+
+
+	//TODO estes do comentarios + prints da tabela ast
+	if(expr->expr1 != NULL ){
+		recursao_expr(expr->expr1, lista_do_metodo);
+	}
+
+	if(expr->expr2 != NULL ){
+		recursao_expr(expr->expr2, lista_do_metodo);
+	}
+
+
+
 	//se for expr-> fazer a logica
 
-}*/
-int var_declarada(method_var * lista, method_var* var_metodo){
+
+	expr->tipo = "undef";
+	return "undef"; 
+
+
+}
+
+char * var_declarada_globalmente(char* str){
+	table_element_global * tabela_global = symtab_global->declarations;
+
+	while(tabela_global != NULL){
+		
+		//sera um field dec ou um metodo?
+		if(tabela_global->type_return == NULL){
+		//e um field dec
+			
+			if(strcmp(tabela_global->name, str) == 0){
+				// estava declarada
+				return tabela_global->param_list->type_param;
+			}
+
+		}
+
+		tabela_global = tabela_global->next;
+	}
+
+	return NULL;
+}
+
+
+
+char * var_declarada(method_var * lista, char* str){
 	while(lista != NULL){
-		if(strcmp(lista->name, var_metodo->name) == 0){
-			return 1;
+		if(strcmp(lista->name, str) == 0){
+
+			
+			return lista->type;
 		}
 
 		lista = lista->next;
 	}
 
-	return 0;
+	return NULL;
 
 }
 
@@ -241,8 +321,8 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 			if(ast_var_dec_or_statment->statment != NULL){
 				
 				//percorrer as expr
-				//is_expression_list* expr = ast_var_dec_or_statment->statment->expr;
-				//recursao_expr(expr);
+				is_expression_list* expr = ast_var_dec_or_statment->statment->expr;
+				recursao_expr(expr, new_method->tel);
 
 				//ir para statmet1
 				//ir para statmet2
@@ -272,8 +352,9 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 					var_metodo->next = NULL;
 
 
-					if( var_declarada(new_method->tel, var_metodo) == 1  ){
-
+					if( var_declarada(new_method->tel, var_metodo->name) != NULL  ){
+						printf("\nTODO VD: Symbol %s already defined\n",var_metodo->name);
+						//estava declarada
 						free(var_metodo);
 						ast_var_dec_list = ast_var_dec_list->next;
 

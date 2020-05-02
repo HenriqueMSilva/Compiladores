@@ -5,6 +5,7 @@
 typedef struct _s10 {
 	char *operation;
     char *value;
+	char *tipo;
     struct _s10* expr1;
     struct _s10* expr2;
 } is_expression_list;

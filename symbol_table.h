@@ -53,6 +53,11 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl,is_method
 
 void tenta_inserir_na_tail_local(	table_element_local * new_method);
 
+
+char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo);
+char * var_declarada(method_var * lista, char* str);
+char * var_declarada_globalmente(char* str);
+
 void show_tabela_global();
 void show_table();
 

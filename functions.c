@@ -319,8 +319,9 @@ is_expression_list* insert_expr(char *operation, char *value, is_expression_list
 
         isl->operation=(char*)strdup(operation);
         isl->value = (char*)strdup(value);
-        isl->expr1=expr1;
-        isl->expr2=expr2;
+        isl->tipo = NULL;
+        isl->expr1 = expr1;
+        isl->expr2 = expr2;
 
         return isl;
 }
