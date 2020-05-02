@@ -9,23 +9,26 @@ extern	table_element_local 	*symtab_local;
 
 char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	char * tipo;
+	char * str1;
+	char * str2;
 
 	//se for ID verificar se ja foi declarado
 	if( strcmp(expr->operation, "Id" ) == 0 ){
 	
-		//averiguar se a var foi declarado no metodo
+		//averiguar se a var foi declarado no metodo //serve para saber o tipo da var....
 		tipo =  var_declarada(lista_do_metodo, expr->value);
-		
+
+		printf("%s %s\n",expr->value,tipo);
 		if( tipo != NULL ){
 			//estava declarada
 			expr->tipo = tipo;
-			//printf("\n%s %s\n",expr->value,tipo);
 			return expr->tipo;
 		}
 
 
 		//averiguar se a var foi declarado globalmente
 		tipo =  var_declarada_globalmente(expr->value);
+		printf("%s %s\n",expr->value,tipo);
 		if( tipo != NULL ){
 			//estava declarada
 			expr->tipo = tipo;
@@ -45,7 +48,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		return expr->tipo; 
 	}
 
-	if(strcmp(expr->operation, "DecLit" ) == 0 || strcmp(expr->operation, "Length" ) == 0 || strcmp(expr->operation, "ParseArgs" ) == 0 ){ 
+	if(strcmp(expr->operation, "DecLit" ) == 0){ 
 		expr->tipo = "int"; 
 		return expr->tipo;
 	}
@@ -63,9 +66,85 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	}
 
 
+	//mesmo raciocionio do call e dos operadores, so tratamos disto depois dos filhos
+	if(strcmp(expr->operation, "Length" ) == 0 || strcmp(expr->operation, "ParseArgs" ) == 0 ){ 
+		expr->tipo = "int"; 
 
-	//se for expr-> fazer a logica
-	//add - or not...
+		return expr->tipo;
+	}
+
+
+	if(strcmp(expr->operation, "Call" ) == 0 || strcmp(expr->operation, "CallMore" ) == 0){
+
+		//averiguar se o metodo foi declarado globalmente
+		tipo =  metodo_declarado_globalmente(expr->value);
+
+		if( tipo != NULL ){
+			//estava declarada
+			expr->tipo = tipo;
+			return expr->tipo;
+		}
+	}
+
+
+	if(strcmp(expr->operation, "Assign" ) == 0){
+		//averiguar se a var foi declarado no metodo //serve para saber o tipo da var....
+		tipo =  var_declarada(lista_do_metodo, expr->value);
+
+		if( tipo != NULL ){
+			//estava declarada
+			expr->tipo = tipo;
+			return expr->tipo;
+		}
+
+
+		//averiguar se a var foi declarado globalmente
+		tipo =  var_declarada_globalmente(expr->value);
+		if( tipo != NULL ){
+			//estava declarada
+			expr->tipo = tipo;
+			return expr->tipo;
+		}
+	}
+
+
+
+	if(strcmp(expr->operation, "Operacao" ) == 0){
+
+		//tevesse que usar o lower case porque o Id dava sempre em maisculo
+		if(expr->expr1 != NULL){
+			str1 = lowerCase(expr->expr1->tipo);
+		}
+		if(expr->expr2 != NULL){
+			str2 = lowerCase(expr->expr2->tipo);
+		}
+		
+
+		if(strcmp(expr->value,"Add") == 0 || strcmp(expr->value,"Sub") == 0 || strcmp(expr->value,"Mul") == 0 || strcmp(expr->value,"Div") == 0 || strcmp(expr->value,"Mod") == 0){
+			if(strcmp(str1,str2) == 0){
+				expr->tipo = str1; 
+				return expr->tipo;
+			}else if(strcmp(str1,"int")  == 0  && strcmp(str2,"double") == 0){
+				expr->tipo = "double";
+				return expr->tipo;
+			}else if(strcmp(str1,"double")  == 0 && strcmp(str2,"int") == 0){
+				expr->tipo = "double";
+				return expr->tipo;
+			}
+		}else if(strcmp(expr->value,"Eq") == 0 || strcmp(expr->value,"Ge") == 0 || strcmp(expr->value,"Gt") == 0 || strcmp(expr->value,"Le") == 0 || strcmp(expr->value,"Lt") == 0 || strcmp(expr->value,"Ne") == 0 || strcmp(expr->value,"And") == 0 || strcmp(expr->value,"Or") == 0 || strcmp(expr->value,"Not") == 0 || strcmp(expr->value,"Xor") == 0){
+			expr->tipo = "boolean";
+			return expr->tipo;
+		}else if(strcmp(expr->value,"Lshift") == 0 || strcmp(expr->value,"Rshift") == 0){
+			expr->tipo = "";
+			if(expr->expr1 != NULL){
+				expr->expr1->tipo = "";
+			}
+			if(expr->expr2 != NULL){
+				expr->expr2->tipo = "";
+			}
+			return expr->tipo;
+		}
+	}
 
 
 	expr->tipo = "undef";
@@ -100,7 +179,26 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 
 
 
+char * metodo_declarado_globalmente(char* str){
+	table_element_global * tabela_global = symtab_global->declarations;
+	
+	while(tabela_global != NULL){
+		
+		//verifica se e um metodo
+		if(tabela_global->type_return != NULL){
+			
+			if(strcmp(tabela_global->name, str) == 0){
+				// estava declarada
+				return tabela_global->type_return;
+			}
 
+		}
+
+		tabela_global = tabela_global->next;
+	}
+
+	return NULL;
+}
 
 
 
@@ -198,7 +296,7 @@ void tenta_inserir_fieldDec_na_tail_global(table_element_global * newSymbol){
 
 			if(strcmp(aux->name, newSymbol->name) == 0 && aux->type_return == NULL ){
 				//encontramos um field dec declarado aj com este nome
-				printf("\nTODO FD: Symbol %s already defined\n",aux->name);
+				//printf("\nTODO FD: Symbol %s already defined\n",aux->name);
 				//TODO-controlo se ja foi declarado
 				return;
 			}
@@ -223,7 +321,7 @@ void tenta_inserir_metodo_na_tail_global(table_element_global * newSymbol){
 		for(aux = symtab_global->declarations; aux != NULL ; previous = aux, aux = aux->next){
 			if(strcmp(aux->name, newSymbol->name) == 0 && aux->type_return != NULL && assinatutas_iguais(newSymbol, aux) == 1){
 
-				printf("\nTODO M: Symbol %s already defined\n",aux->name);
+				//printf("\nTODO M: Symbol %s already defined\n",aux->name);
 
 				//TODO-controlo se ja foi declarado
 				return;
@@ -381,7 +479,7 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 
 
 					if( var_declarada(new_method->tel, var_metodo->name) != NULL  ){
-						printf("\nTODO VD: Symbol %s already defined\n",var_metodo->name);
+						//printf("\nTODO VD: Symbol %s already defined\n",var_metodo->name);
 						//estava declarada
 						free(var_metodo);
 						ast_var_dec_list = ast_var_dec_list->next;
@@ -442,6 +540,7 @@ table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char *
 		newSymbol->param_list->type_param = (char*)strdup(var_type);
 		newSymbol->param_list->next = NULL;
 
+		//SERVE PARA ADICIONAR E VERIFICAR SE JA EXISTE
 		tenta_inserir_fieldDec_na_tail_global(newSymbol);
 
 

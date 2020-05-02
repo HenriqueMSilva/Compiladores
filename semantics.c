@@ -5,7 +5,7 @@
 
 int check_program(is_program* p) {
     int errorcount=0;
-
+    
     insert_classname(p->classname);
     errorcount = check_metodos(p->metodos);
     return errorcount;
