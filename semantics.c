@@ -23,6 +23,15 @@ int check_metodos(is_metodos* metodos){
             errorcount+=check_method_list(tmp->imdl);
         }
     }
+
+    for(tmp=metodos; tmp; tmp=tmp->next){
+        if(tmp->imdl != NULL){
+            //errorcount+=check_method_list(tmp->imdl);
+            //Se o body for NULL queremos criar um node na simb com poucas variaveis
+            errorcount+=check_methodbody_list(tmp->imdl->imhl, tmp->imdl->imbl);
+        }
+    }
+
     return errorcount;
 }
 
@@ -47,9 +56,6 @@ int check_method_list(is_methoddecl_list* imdl) {
     if(tmp->imhl != NULL){
         errorcount+=check_methodheader_list(tmp->imhl);
     }    
-
-    //Se o body for NULL queremos criar um node na simb com poucas variaveis
-    errorcount+=check_methodbody_list(tmp->imhl, tmp->imbl);
     
 
     return errorcount;
@@ -72,42 +78,6 @@ int check_methodbody_list(is_methodheader_list* imhl, is_methodbody_list* imbl){
     
     return 0;
 }
-
-/*int check_double_dec(is_double_dec* idd) {
-    table_element* newel=insert_el(idd->id, doub);
-
-    if(newel==NULL) {
-        printf("Symbol %s already defined!\n", idd->id);
-        return 1;
-    }
-    return 0;
-}
-
-int check_statement_list(is_statement_list* isl) {
-    int errorcount=0;
-    is_statement_list* tmp;
-
-    for(tmp=isl; tmp; tmp=tmp->next)
-        errorcount+=check_statement(tmp->val);
-    return errorcount;
-}
-
-
-int check_statement(is_statement* is) {
-    switch(is->disc_d) {
-        case d_write: return check_write_statement(is->data_statement.u_write_statement);    
-    }
-}
-
-int check_write_statement(is_write_statement* iws) {
-    table_element* aux=search_el(iws->id);
-
-    if(aux==NULL) {
-        printf("Symbol %s not declared!\n", iws->id);
-        return 1;
-    }
-    return 0;
-}*/
 
 
 

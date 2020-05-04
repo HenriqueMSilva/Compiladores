@@ -1,6 +1,7 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 #include "structures.h"
+
 //VARIAVEIS DO METODO
 typedef struct _tel{
 	char *name;
@@ -56,7 +57,8 @@ void tenta_inserir_na_tail_local(	table_element_local * new_method);
 
 char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo);
 char * var_declarada(method_var * lista, char* str);
-char * metodo_declarado_globalmente(char* str);
+int metodo_retorna_tipo_param (is_expression_list* expr, method_var* lista_do_metodo,  param_node * param_list);
+char * type_call_verification(is_expression_list* expr, method_var* lista_do_metodo);
 char * var_declarada_globalmente(char* str);
 
 char * lowerCase(char * str);

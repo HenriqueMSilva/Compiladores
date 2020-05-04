@@ -7,12 +7,12 @@ class Call_Me_Maybe {
         boolean b;
 
         // Exact match
-        f();
-        f(true);
-        f(0e0);
-        f(123);
-        f(args);
-        f(i, d);
+        //f();
+        //f(true);
+        //f(0e0);
+        //f(123);
+        //f(args);
+        //f(i, d);
         f(i, d, b);
         f(i, d, b, i);
         f(0., 1, 2., 3);

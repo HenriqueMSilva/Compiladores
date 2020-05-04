@@ -97,8 +97,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	if(strcmp(expr->operation, "Call" ) == 0 || strcmp(expr->operation, "CallMore" ) == 0){
 
 		//averiguar se o metodo foi declarado globalmente
-		tipo =  metodo_declarado_globalmente(expr->value);
-
+		tipo = type_call_verification(expr,lista_do_metodo);
 		if( tipo != NULL ){
 			//estava declarada
 			expr->tipo = tipo;
@@ -134,12 +133,12 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			expr->tipo = "boolean";
 			return expr->tipo;
 		}else if(strcmp(expr->value,"Lshift") == 0 || strcmp(expr->value,"Rshift") == 0){
-			expr->tipo = "";
+			expr->tipo = NULL;
 			if(expr->expr1 != NULL){
-				expr->expr1->tipo = "";
+				expr->expr1->tipo = NULL;
 			}
 			if(expr->expr2 != NULL){
-				expr->expr2->tipo = "";
+				expr->expr2->tipo = NULL;
 			}
 			return expr->tipo;
 		}
@@ -175,29 +174,96 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 }
  
 
+int metodo_retorna_tipo_param (is_expression_list* expr, method_var* lista_do_metodo,  param_node * param_list){
+	//EXPR E O PRIMEIRO CALLMORE
+	char *str;
+	char *str2;
+	int verification; // 1 e true , 0 e false
 
-
-
-char * metodo_declarado_globalmente(char* str){
-	table_element_global * tabela_global = symtab_global->declarations;
+	//verifica tipo do parametro
+	if(expr->expr1 != NULL){
+		str = lowerCase(recursao_expr(expr->expr1, lista_do_metodo));
+	}
 	
-	while(tabela_global != NULL){
+	//passa para o proximo parametro
+	if(expr->expr2 != NULL && param_list->next != NULL){
 		
-		//verifica se e um metodo
-		if(tabela_global->type_return != NULL){
-			
-			if(strcmp(tabela_global->name, str) == 0){
-				// estava declarada
-				return tabela_global->type_return;
-			}
-
+		verification = metodo_retorna_tipo_param(expr->expr2, lista_do_metodo, param_list->next);
+	
+	}else if(expr->expr2 == NULL && param_list->next == NULL){
+		
+		str2 = lowerCase(param_list->type_param);
+		if(strcmp(str2,"bool") == 0){
+			str2 = "boolean";
 		}
 
-		tabela_global = tabela_global->next;
+		if(strcmp(str,str2) == 0){
+			expr->tipo = str;
+			return 1;
+		}
+
+	}else if(expr->expr2 == NULL || param_list->next == NULL){
+		return 0;
 	}
 
+	if(verification == 1){
+		str2 = lowerCase(param_list->type_param);
+		if(strcmp(str2,"bool") == 0){
+			str2 = "boolean";
+		}
+
+		if(strcmp(str,str2) == 0){
+			expr->tipo = str;
+			return 1;
+		}
+	}
+	
+	return 0;
+}	
+
+
+char * type_call_verification(is_expression_list* expr, method_var* lista_do_metodo){
+	table_element_global * tabela_global = symtab_global->declarations;
+
+	char * str;
+	int verification;
+
+
+	while(tabela_global != NULL){
+
+		//ERA UM FIELD DECLARATION
+		if(tabela_global->type_return == NULL){
+			tabela_global = tabela_global->next;
+			continue;
+		}
+
+		if( strcmp(expr->value,tabela_global->name) == 0  ){
+
+			//TEM PARAMETROS DE ENTRADA? NAO
+			if(expr->expr1 == NULL && tabela_global->param_list == NULL){
+				return tabela_global->type_return;
+
+			//TEM PARAMAETROS DE ENTRADA
+			}else{
+				
+				if(expr->expr1 != NULL && tabela_global->param_list != NULL ){
+					verification = metodo_retorna_tipo_param(expr->expr1,lista_do_metodo,tabela_global->param_list);
+					if(verification == 1){
+						return tabela_global->type_return;
+					}
+				}
+
+			}
+		}
+
+		
+		tabela_global = tabela_global->next;
+	}
+	
 	return NULL;
+
 }
+
 
 
 
