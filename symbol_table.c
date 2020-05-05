@@ -52,6 +52,10 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		return expr->tipo;
 	}
 
+	if(strcmp(expr->operation, "StrLit" ) == 0){ 
+		expr->tipo = "String"; 
+		return expr->tipo;
+	}
 
 
 
@@ -69,8 +73,42 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	//mesmo raciocionio do call e dos operadores, so tratamos disto depois dos filhos
 
 	//vai atribuir o tipo ao ID que esta associado a estes statment, no print depois resolve-se o tipo
-	if(strcmp(expr->operation, "Length" ) == 0 || strcmp(expr->operation, "ParseArgs" ) == 0 || strcmp(expr->operation, "Assign" ) == 0){ 
+	if(strcmp(expr->operation, "Length" ) == 0 || strcmp(expr->operation, "ParseArgs" ) == 0){ 
 		
+		tipo =  var_declarada(lista_do_metodo, expr->value);
+
+		if( tipo != NULL){
+			if(strcmp(tipo, "StringArray" ) == 0){
+				//estava declarada
+				expr->tipo = "String[]";
+				return expr->tipo;
+			}else{
+				expr->tipo = tipo;
+				return expr->tipo;
+			}
+		}
+
+
+		//averiguar se a var foi declarado globalmente
+		tipo =  var_declarada_globalmente(expr->value);
+
+		if( tipo != NULL){
+			if(strcmp(tipo, "StringArray" ) == 0){
+				//estava declarada
+				expr->tipo = "String[]";
+				return expr->tipo;
+			}else{
+				expr->tipo = tipo;
+				return expr->tipo;
+			}
+		}
+	}
+
+
+
+	if( strcmp(expr->operation, "Assign" ) == 0 ){
+	
+		//averiguar se a var foi declarado no metodo //serve para saber o tipo da var
 		tipo =  var_declarada(lista_do_metodo, expr->value);
 
 		if( tipo != NULL ){
@@ -82,20 +120,18 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 		//averiguar se a var foi declarado globalmente
 		tipo =  var_declarada_globalmente(expr->value);
+
 		if( tipo != NULL ){
 			//estava declarada
 			expr->tipo = tipo;
 			return expr->tipo;
 		}
-
-		expr->tipo = tipo; 
-
-		return expr->tipo;
 	}
 
 
 	if(strcmp(expr->operation, "Call" ) == 0 || strcmp(expr->operation, "CallMore" ) == 0){
 
+	
 		//averiguar se o metodo foi declarado globalmente
 		tipo = type_call_verification(expr,lista_do_metodo);
 		if( tipo != NULL ){
@@ -103,6 +139,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			expr->tipo = tipo;
 			return expr->tipo;
 		}
+
 	}
 
 
@@ -129,18 +166,23 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				expr->tipo = "double";
 				return expr->tipo;
 			}
+		}else if(strcmp(expr->value,"Minus") == 0 || strcmp(expr->value,"Plus") == 0 ){
+			expr->tipo = str1; 
+			return expr->tipo;
 		}else if(strcmp(expr->value,"Eq") == 0 || strcmp(expr->value,"Ge") == 0 || strcmp(expr->value,"Gt") == 0 || strcmp(expr->value,"Le") == 0 || strcmp(expr->value,"Lt") == 0 || strcmp(expr->value,"Ne") == 0 || strcmp(expr->value,"And") == 0 || strcmp(expr->value,"Or") == 0 || strcmp(expr->value,"Not") == 0 || strcmp(expr->value,"Xor") == 0){
-			expr->tipo = "boolean";
-			return expr->tipo;
-		}else if(strcmp(expr->value,"Lshift") == 0 || strcmp(expr->value,"Rshift") == 0){
-			expr->tipo = NULL;
-			if(expr->expr1 != NULL){
-				expr->expr1->tipo = NULL;
+			if(strcmp(str1,str2) == 0){
+				expr->tipo = "boolean";
+				return expr->tipo;
+			}else if(strcmp(str1,"int")  == 0  && strcmp(str2,"double") == 0){
+				expr->tipo = "boolean";
+				return expr->tipo;
+			}else if(strcmp(str1,"double")  == 0 && strcmp(str2,"int") == 0){
+				expr->tipo = "boolean";
+				return expr->tipo;
+			}else{
+				expr->tipo = str1; 
+				return expr->tipo;
 			}
-			if(expr->expr2 != NULL){
-				expr->expr2->tipo = NULL;
-			}
-			return expr->tipo;
 		}
 	}
 
@@ -178,42 +220,72 @@ int metodo_retorna_tipo_param (is_expression_list* expr, method_var* lista_do_me
 	//EXPR E O PRIMEIRO CALLMORE
 	char *str;
 	char *str2;
-	int verification; // 1 e true , 0 e false
+	int verification = 0; // 1 e true , 0 e false
 
 	//verifica tipo do parametro
 	if(expr->expr1 != NULL){
 		str = lowerCase(recursao_expr(expr->expr1, lista_do_metodo));
 	}
 	
+	str2 = lowerCase(param_list->type_param);
+	
+
+
 	//passa para o proximo parametro
 	if(expr->expr2 != NULL && param_list->next != NULL){
-		
+		if(strcmp(str,str2) != 0 && (strcmp(str,"int") != 0 &&  strcmp(str2,"double") != 0) ){
+			return 0;
+		}
 		verification = metodo_retorna_tipo_param(expr->expr2, lista_do_metodo, param_list->next);
 	
 	}else if(expr->expr2 == NULL && param_list->next == NULL){
 		
-		str2 = lowerCase(param_list->type_param);
 		if(strcmp(str2,"bool") == 0){
 			str2 = "boolean";
 		}
+		if(strcmp(str,"bool") == 0){
+			str = "boolean";
+		}
+		
 
-		if(strcmp(str,str2) == 0){
+		if(strcmp(str,str2) == 0 ){
 			expr->tipo = str;
+		
+			return 2;
+		}else if( strcmp(str,"int") == 0 &&  strcmp(str2,"double") == 0){
+			expr->tipo = str2;
+	
 			return 1;
+		}else{
+			return 0;
 		}
 
-	}else if(expr->expr2 == NULL || param_list->next == NULL){
+	}else if( (expr->expr2 == NULL && param_list->next != NULL) || (expr->expr2 != NULL && param_list->next == NULL) ){
+
 		return 0;
 	}
 
-	if(verification == 1){
-		str2 = lowerCase(param_list->type_param);
+
+	if(verification == 1 || verification == 2){
+
 		if(strcmp(str2,"bool") == 0){
 			str2 = "boolean";
 		}
+		if(strcmp(str,"bool") == 0){
+			str = "boolean";
+		}
 
-		if(strcmp(str,str2) == 0){
+		if(strcmp(str,str2) == 0 ){
 			expr->tipo = str;
+			if(verification == 1){
+
+				return 1;
+			}
+
+			return 2;
+		}else if( strcmp(str,"int") == 0 &&  strcmp(str2,"double") == 0){
+			expr->tipo = str2;
+
 			return 1;
 		}
 	}
@@ -224,9 +296,10 @@ int metodo_retorna_tipo_param (is_expression_list* expr, method_var* lista_do_me
 
 char * type_call_verification(is_expression_list* expr, method_var* lista_do_metodo){
 	table_element_global * tabela_global = symtab_global->declarations;
+	is_expression_list* expr_aux;
 
-	char * str;
-	int verification;
+	char * str = NULL;
+	int verification = 0;
 
 
 	while(tabela_global != NULL){
@@ -248,8 +321,16 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 				
 				if(expr->expr1 != NULL && tabela_global->param_list != NULL ){
 					verification = metodo_retorna_tipo_param(expr->expr1,lista_do_metodo,tabela_global->param_list);
-					if(verification == 1){
+					if(verification == 2){
 						return tabela_global->type_return;
+					}else if(verification == 1){
+						str = tabela_global->type_return;
+					}else{
+						expr_aux = expr;
+						while(expr_aux != NULL){
+							expr_aux->tipo = NULL;
+							expr_aux = expr_aux->expr2;
+						}
 					}
 				}
 
@@ -259,9 +340,8 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 		
 		tabela_global = tabela_global->next;
 	}
-	
-	return NULL;
 
+	return str;
 }
 
 
@@ -450,18 +530,31 @@ header_global* insert_classname(char *str){
 	symtab_global = stg;
 
 	return stg;
-
+	free(stg);
 }
 
+int verfica_param_name(is_methodparams_list* ast_param_list , method_var* inicio_param_metodo){
 
+	while(inicio_param_metodo != NULL){
+		//printf("%s %s\n",ast_param_list->name,inicio_param_metodo->name);
+		if(strcmp(inicio_param_metodo->name,ast_param_list->name) == 0){
+			return 0;
+		}
+		inicio_param_metodo = inicio_param_metodo->next;
+	}
+	return 1;
+}
 
 table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_methodbody_list* imbl){
 	char * tipo;
+	//int verifica_param_repetido;
 
 	method_var *simb_last_param;
 	method_var *var_metodo;
-
+	//method_var* inicio_param_metodo;
+	
 	is_methodparams_list* ast_param_list = imhl->impl;
+
 
 
 	table_element_local * new_method = (table_element_local*) malloc(sizeof(table_element_local));
@@ -479,20 +572,27 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 	var_metodo->next = NULL;
 
 	simb_last_param = var_metodo;
-
+	//inicio_param_metodo = simb_last_param;
 
 	//parametros de entrada
 	while(ast_param_list != NULL){
 
-		var_metodo = (method_var*) malloc(sizeof(method_var));
+		//verifica se existe parametros com o mesmo nome
+		
+		//verifica_param_repetido = verfica_param_name(ast_param_list,inicio_param_metodo);
 
-		var_metodo->name = (char*)strdup(ast_param_list->name);
-		var_metodo->type = (char*)strdup(ast_param_list->type);
-		var_metodo->is_param = 1;
-		var_metodo->next = NULL;
+		//if(verifica_param_repetido == 1){
+			var_metodo = (method_var*) malloc(sizeof(method_var));
 
-		simb_last_param->next = var_metodo;
-		simb_last_param = var_metodo;  
+			var_metodo->name = (char*)strdup(ast_param_list->name);
+			var_metodo->type = (char*)strdup(ast_param_list->type);
+			var_metodo->is_param = 1;
+			var_metodo->next = NULL;
+
+			simb_last_param->next = var_metodo;
+			simb_last_param = var_metodo;  
+		//}
+
 		
 		//avançamos para o proximo parametro da AST
 		ast_param_list = ast_param_list->next;
@@ -573,9 +673,9 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 
 
 
-
-
 	return new_method;
+	free(var_metodo);
+	free(new_method);
 }
 
 
@@ -634,10 +734,8 @@ table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char *
 		ifdl = ifdl->next;
 	}
 
-
-
 	return para_dar_return;
-
+	free(newSymbol);
 }
 
 
@@ -701,11 +799,11 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 		ast_param_list = ast_param_list->next;
 	}
 
-
 	tenta_inserir_metodo_na_tail_global(newSymbol);
 	
-	return newSymbol; 
 
+	return newSymbol; 
+	free(newSymbol);
 }
 
 

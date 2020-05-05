@@ -65,7 +65,7 @@ int check_method_list(is_methoddecl_list* imdl) {
 
 int check_methodheader_list(is_methodheader_list* imhl) {
     table_element_global* newel = insert_el_metodo_global(imhl);
-
+    
     if(newel==NULL) {
         printf("Symbol %s already defined!\n", imhl->name);
         return 1;

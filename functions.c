@@ -371,8 +371,12 @@ void print_expr(is_expression_list* expr, int n){
 
         if((expr->tipo != NULL)){
 
-            if(strcmp("ParseArgs",expr->operation) == 0 && strcmp(expr->tipo,"stringarray") == 0){
-                printf(" - int");
+            if((strcmp("Length",expr->operation) == 0 || strcmp("ParseArgs",expr->operation) == 0)){
+                if(strcmp(expr->tipo,"String[]") == 0){
+                    printf(" - int");
+                }else{
+                    printf(" - undef");
+                }
             }else if(strcmp(expr->tipo,"stringarray") == 0){
                 printf(" - String[]");
             }else if(strcmp(expr->tipo,"bool") == 0){
@@ -389,13 +393,50 @@ void print_expr(is_expression_list* expr, int n){
         }
         printf("Id(%s)",expr->value);
         
-        //pintar parametros da funcao
-        printf(" - (");
-        if(expr->expr1 != NULL){
-            printCallMore(expr->expr1);
+
+        //printar a frente do ID os parametros, a funcao tem de ser call
+        if(strcmp("Call",expr->operation) == 0){
+            if(expr->expr1 != NULL){
+                if(strcmp(expr->tipo,"undef") == 0){
+                
+                    printf(" - undef");
+                
+                }else{
+                    printf(" - (");
+                    printCallMore(expr->expr1);
+                    printf(")");
+                }
+                
+            }else{
+                if(strcmp(expr->tipo,"undef") == 0){
+                
+                    printf(" - undef");
+                
+                }else{
+                    printf(" - ()");
+                }
+                
+            }
+        //caso nao seja call e um ID normal 
+        }else{
+            if((expr->tipo != NULL)){
+
+                //necessario devido a problemas de definicao
+                if(strcmp(expr->tipo,"stringarray") == 0){
+                    printf(" - String[]");
+                }else if(strcmp(expr->tipo,"bool") == 0){
+                    printf(" - boolean");
+                }else if(strcmp(expr->tipo,"undef") == 0){
+                    printf(" - undef");
+                }else{
+                    printf(" - %s",expr->tipo);
+                }
+            
+            }
+
         }
 
-        printf(")\n");
+        printf("\n");
 
     }else if(strcmp("CallMore",expr->operation) == 0){
         apply = 1;
@@ -407,13 +448,13 @@ void print_expr(is_expression_list* expr, int n){
 
         if( (expr->tipo != NULL)  ){
 
-            if( strcmp(expr->tipo,"bool") == 0){
-                printf(" - boolean");
-            }else if(strcmp(expr->tipo,"stringarray") == 0){
-                printf(" - String[]");
-            }else{
-                printf(" - %s",expr->tipo);
-            }
+                if(strcmp(expr->tipo,"stringarray") == 0){
+                    printf(" - String[]");
+                }else if(strcmp(expr->tipo,"bool") == 0){
+                    printf(" - boolean");
+                }else{
+                    printf(" - %s",expr->tipo);
+                }
         }
         
         printf("\n");
