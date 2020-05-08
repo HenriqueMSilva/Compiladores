@@ -154,6 +154,8 @@ union YYSTYPE
 {
 #line 69 "jucompiler.y" /* yacc.c:1909  */
 
+    char * num_linha;
+    char * num_coluna;
     char *id;
     is_program* ip;
     is_metodos* im;
@@ -167,7 +169,7 @@ union YYSTYPE
     is_statment_list* state;
     is_expression_list* iel;
 
-#line 171 "y.tab.h" /* yacc.c:1909  */
+#line 173 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

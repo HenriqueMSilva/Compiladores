@@ -351,7 +351,7 @@ void print_expr(is_expression_list* expr, int n){
         printf("%s",expr->value);
         
         //evita variaveis como o shift e se estiverem vazias
-        if( (expr->tipo != NULL) && strcmp(expr->tipo,"") != 0 ){
+        if( (expr->tipo != NULL)  ){
 
             //havia variaveis que estavam como bool nao podiamos mudar na raiz
             if( strcmp(expr->tipo,"bool") == 0){
@@ -391,31 +391,43 @@ void print_expr(is_expression_list* expr, int n){
         for(i=0;i<n+2;i++){
             printf(".");
         }
+
         printf("Id(%s)",expr->value);
+
         
 
         //printar a frente do ID os parametros, a funcao tem de ser call
         if(strcmp("Call",expr->operation) == 0){
+            
             if(expr->expr1 != NULL){
-                if(strcmp(expr->tipo,"undef") == 0){
+        
+                //RTE 
+                if(expr->tipo != NULL){
+        
+                    if(strcmp(expr->tipo,"undef") == 0){
+                    
+                        printf(" - undef");
+                    
+                    }else{
+                        printf(" - (");
+                        printCallMore(expr->expr1);
+                        printf(")");
+                    }
                 
-                    printf(" - undef");
-                
-                }else{
-                    printf(" - (");
-                    printCallMore(expr->expr1);
-                    printf(")");
-                }
-                
+                }   
+
             }else{
-                if(strcmp(expr->tipo,"undef") == 0){
-                
-                    printf(" - undef");
-                
-                }else{
-                    printf(" - ()");
+                 //RTE 
+                if(expr->tipo != NULL){
+                    if(strcmp(expr->tipo,"undef") == 0){
+                    
+                        printf(" - undef");
+                    
+                    }else{
+                        printf(" - ()");
+                    }
+                    
                 }
-                
             }
         //caso nao seja call e um ID normal 
         }else{
@@ -444,7 +456,7 @@ void print_expr(is_expression_list* expr, int n){
         for(i=0;i<n;i++){
             printf(".");
         }
-        printf("%s(%s)",expr->operation,expr->value);
+        printf("%s(%s)",expr->operation, expr->value);
 
         if( (expr->tipo != NULL)  ){
 

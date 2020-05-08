@@ -166,10 +166,10 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				expr->tipo = "double";
 				return expr->tipo;
 			}
-		}else if(strcmp(expr->value,"Minus") == 0 || strcmp(expr->value,"Plus") == 0 ){
+		}else if(strcmp(expr->value,"Minus") == 0 || strcmp(expr->value,"Plus") == 0 || strcmp(expr->value,"Not") == 0 ){
 			expr->tipo = str1; 
 			return expr->tipo;
-		}else if(strcmp(expr->value,"Eq") == 0 || strcmp(expr->value,"Ge") == 0 || strcmp(expr->value,"Gt") == 0 || strcmp(expr->value,"Le") == 0 || strcmp(expr->value,"Lt") == 0 || strcmp(expr->value,"Ne") == 0 || strcmp(expr->value,"And") == 0 || strcmp(expr->value,"Or") == 0 || strcmp(expr->value,"Not") == 0 || strcmp(expr->value,"Xor") == 0){
+		}else if(strcmp(expr->value,"Eq") == 0 || strcmp(expr->value,"Ge") == 0 || strcmp(expr->value,"Gt") == 0 || strcmp(expr->value,"Le") == 0 || strcmp(expr->value,"Lt") == 0 || strcmp(expr->value,"Ne") == 0 || strcmp(expr->value,"And") == 0 || strcmp(expr->value,"Or") == 0 ||  strcmp(expr->value,"Xor") == 0){
 			if(strcmp(str1,str2) == 0){
 				expr->tipo = "boolean";
 				return expr->tipo;

@@ -67,6 +67,8 @@ is_program* myprogram;
 */
 
 %union{
+    char * num_linha;
+    char * num_coluna;
     char *id;
     is_program* ip;
     is_metodos* im;

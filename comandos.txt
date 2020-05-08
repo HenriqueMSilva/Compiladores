@@ -87,3 +87,7 @@ param de entrada com o mesmo nome? o que se faz??
 Atençao:
 variaveis com nome return podem estragar as minhas comp (averiguar)
 
+
+
+
+sem flag so imprime erros
