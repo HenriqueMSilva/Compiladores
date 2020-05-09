@@ -43,7 +43,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	}
 
 	if(strcmp(expr->operation, "BoolLit" ) == 0 ){
-		expr->tipo = "boolean";
+		expr->tipo = "bool";
 		return expr->tipo; 
 	}
 
@@ -78,7 +78,9 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		tipo =  var_declarada(lista_do_metodo, expr->value);
 
 		if( tipo != NULL){
-			if(strcmp(tipo, "StringArray" ) == 0){
+			
+
+			if(strcmp( lowerCase(tipo), "stringarray" ) == 0){
 				//estava declarada
 				expr->tipo = "String[]";
 				return expr->tipo;
@@ -93,7 +95,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		tipo =  var_declarada_globalmente(expr->value);
 
 		if( tipo != NULL){
-			if(strcmp(tipo, "StringArray" ) == 0){
+			if(strcmp(lowerCase(tipo), "stringarray" ) == 0){
 				//estava declarada
 				expr->tipo = "String[]";
 				return expr->tipo;
@@ -156,31 +158,67 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		
 
 		if(strcmp(expr->value,"Add") == 0 || strcmp(expr->value,"Sub") == 0 || strcmp(expr->value,"Mul") == 0 || strcmp(expr->value,"Div") == 0 || strcmp(expr->value,"Mod") == 0){
-			if(strcmp(str1,str2) == 0){
-				expr->tipo = str1; 
+
+			if(strcmp(str1,"bool") == 0 || strcmp(str2,"bool") == 0 || strcmp(str1,"undef") == 0 || strcmp(str2,"undef") == 0){
+				expr->tipo = "undef";
 				return expr->tipo;
+
 			}else if(strcmp(str1,"int")  == 0  && strcmp(str2,"double") == 0){
 				expr->tipo = "double";
 				return expr->tipo;
 			}else if(strcmp(str1,"double")  == 0 && strcmp(str2,"int") == 0){
 				expr->tipo = "double";
-				return expr->tipo;
-			}
-		}else if(strcmp(expr->value,"Minus") == 0 || strcmp(expr->value,"Plus") == 0 || strcmp(expr->value,"Not") == 0 ){
-			expr->tipo = str1; 
-			return expr->tipo;
-		}else if(strcmp(expr->value,"Eq") == 0 || strcmp(expr->value,"Ge") == 0 || strcmp(expr->value,"Gt") == 0 || strcmp(expr->value,"Le") == 0 || strcmp(expr->value,"Lt") == 0 || strcmp(expr->value,"Ne") == 0 || strcmp(expr->value,"And") == 0 || strcmp(expr->value,"Or") == 0 ||  strcmp(expr->value,"Xor") == 0){
-			if(strcmp(str1,str2) == 0){
-				expr->tipo = "boolean";
-				return expr->tipo;
-			}else if(strcmp(str1,"int")  == 0  && strcmp(str2,"double") == 0){
-				expr->tipo = "boolean";
-				return expr->tipo;
-			}else if(strcmp(str1,"double")  == 0 && strcmp(str2,"int") == 0){
-				expr->tipo = "boolean";
 				return expr->tipo;
 			}else{
+				//double double ou int int
 				expr->tipo = str1; 
+				return expr->tipo;
+			}
+
+		}else if(strcmp(expr->value,"Minus") == 0 || strcmp(expr->value,"Plus") == 0 ){
+
+			if(strcmp(str1,"bool") == 0  || strcmp(str1,"undef") == 0 ){
+				expr->tipo = "undef"; 
+				return expr->tipo;			
+			}else{
+				expr->tipo = str1; 
+				return expr->tipo;
+			}
+
+		}else if(strcmp(expr->value,"Not") == 0 ){
+
+
+			if(strcmp(str1,"bool") != 0  || strcmp(str1,"undef") == 0 ){
+				expr->tipo = "undef"; 
+				return expr->tipo;			
+			}else{
+				expr->tipo = "bool"; 
+				return expr->tipo;
+			}
+
+			expr->tipo = str1; 
+			return expr->tipo;
+
+
+
+
+		}else if(strcmp(expr->value,"Eq") == 0 || strcmp(expr->value,"Ge") == 0 || strcmp(expr->value,"Gt") == 0 || strcmp(expr->value,"Le") == 0 || strcmp(expr->value,"Lt") == 0 || strcmp(expr->value,"Ne") == 0 || strcmp(expr->value,"And") == 0 || strcmp(expr->value,"Or") == 0 ||  strcmp(expr->value,"Xor") == 0){
+			
+
+			if( strcmp(str1,"undef") == 0 || strcmp(str2,"undef") == 0){
+				expr->tipo = "undef";
+				return expr->tipo;
+
+			}else if(strcmp(str1,str2) == 0){
+				// bool bool ou int int ou double double
+				expr->tipo = "bool";
+				return expr->tipo;
+			
+			}else if(strcmp(str1,"int")  == 0  && strcmp(str2,"double") == 0){
+				expr->tipo = "bool";
+				return expr->tipo;
+			}else if(strcmp(str1,"double")  == 0 && strcmp(str2,"int") == 0){
+				expr->tipo = "bool";
 				return expr->tipo;
 			}
 		}

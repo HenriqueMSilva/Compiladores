@@ -372,11 +372,21 @@ void print_expr(is_expression_list* expr, int n){
         if((expr->tipo != NULL)){
 
             if((strcmp("Length",expr->operation) == 0 || strcmp("ParseArgs",expr->operation) == 0)){
-                if(strcmp(expr->tipo,"String[]") == 0){
+                
+                if(strcmp(expr->tipo,"undef") == 0){
+                    printf(" - undef");
+                }else{
+                    printf(" - int");
+
+                }
+
+
+                /*if(strcmp(expr->tipo,"String[]") == 0){
                     printf(" - int");
                 }else{
                     printf(" - undef");
-                }
+                }*/
+
             }else if(strcmp(expr->tipo,"stringarray") == 0){
                 printf(" - String[]");
             }else if(strcmp(expr->tipo,"bool") == 0){
@@ -426,7 +436,7 @@ void print_expr(is_expression_list* expr, int n){
                     }else{
                         printf(" - ()");
                     }
-                    
+
                 }
             }
         //caso nao seja call e um ID normal 
