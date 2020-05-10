@@ -439,6 +439,7 @@ int assinatutas_iguais(table_element_global *newSymbol, table_element_global *au
 		return 0;
 	}
 
+
 	while(param_newSymbol != NULL && param_aux != NULL){
 
 
@@ -458,6 +459,7 @@ int assinatutas_iguais(table_element_global *newSymbol, table_element_global *au
 
 	//todos os param era iguais-> assinatura igual
 	if(param_newSymbol == NULL && param_aux == NULL){
+
 		return 1;
 	}
 
@@ -497,6 +499,7 @@ void tenta_inserir_metodo_na_tail_global(table_element_global * newSymbol){
 	table_element_global *aux;
 	table_element_global* previous;
 
+	
 	//Vou inserir o node na Tabela de Simbolos Global
 	if(symtab_global->declarations != NULL){	//Se table ja tem elementos
 		
@@ -510,7 +513,7 @@ void tenta_inserir_metodo_na_tail_global(table_element_global * newSymbol){
 				return;
 			}
 		}
-		
+		//printf("passou");
 		previous->next = newSymbol;	//adiciona ao final da lista
 	}else{
 		symtab_global->declarations = newSymbol;	
@@ -522,20 +525,74 @@ void tenta_inserir_metodo_na_tail_global(table_element_global * newSymbol){
 void tenta_inserir_na_tail_local(table_element_local * new_method){
 	table_element_local* aux;
 	table_element_local* previous;
-
+	table_element_local * aux_method = new_method;
+	method_var * aux_aux_tel;
+	method_var * aux_new_method_tel;
+	int verifica = 0, counter = 0;
 
 	//Vou inserir o node na Tabela de Simbolos Local
 	if(symtab_local != NULL){	//Se table ja tem elementos
 		
 		//Procura cauda da lista e verifica se simbolo ja existe (NOTA: assume-se uma tabela de simbolos local)
 		for(aux = symtab_local; aux != NULL ; previous = aux, aux = aux->next){
-			/*if(strcmp(aux->name, new_method->name) == 0){
-				//TODO-controlo se ja foi declarado
-				return;
-			}*/
+
+			verifica = 0;
+			counter = 0;
+			
+			//printf("%s %s\n",aux->name,aux_method->name);
+			if(strcmp(aux->name, aux_method->name) == 0){
+
+				//TEMOS QUE VERIFICAR A PARTIR DO SEGUNDO ELEMENTO PORQUE O PRIMEIRO É O TIPO DO RETURN
+				//SE AMBOS DA TABELA LOCAL E DO NOVO SIMBOLO FOREM DIFERENTES NULL PODEMOS VERIFICAS
+				if(aux_method->tel->next != NULL && aux->tel->next != NULL){
+					
+
+					aux_new_method_tel = aux_method->tel->next;
+					aux_aux_tel = aux->tel->next;
+					//printf("%s %s\n",aux_new_method_tel->type,aux_aux_tel->type);
+
+					//VERIFICAR A LISTA DE PARAMETROS
+					while(aux_aux_tel != NULL && aux_new_method_tel != NULL){
+					
+						if(aux_aux_tel->is_param == 1 && aux_new_method_tel->is_param == 1 ){
+
+							counter++;
+
+							if(strcmp(aux_aux_tel->type,aux_new_method_tel->type) == 0){
+								verifica++;
+							}
+						}
+
+						if(aux_aux_tel->next == NULL && aux_new_method_tel->next != NULL && aux_new_method_tel->next->is_param == 1){
+							//esta adicao serve para casos do genero (int,double) (int,double,boolean) em que os dois primeiros param sao iguais
+							counter++;
+							break;
+						}else if(aux_aux_tel->next != NULL && aux_new_method_tel->next == NULL && aux_aux_tel->next->is_param == 1){
+							//esta adicao serve para casos do genero (int,double) (int,double,boolean) em que os dois primeiros param sao iguais
+							counter++;
+							break;
+						}
+
+						//printf("%d %d %s\n",counter,verifica,aux_method->name);
+						aux_aux_tel = aux_aux_tel->next;
+						aux_new_method_tel = aux_new_method_tel->next;
+					}
+					
+					//CONDIÇAO DE PARAGEM SE ENCONTRAMOS UM METODO PARECIDO COM O QUE QUERIAMOS ADICIONAR PARAMOS
+					if(verifica == counter){
+						return;
+					}
+				//SE AMBOS SAO NULL ENTAO SAO IGUAIS LOGO NAO ADICIONAMOS
+				}else if(aux_method->tel->next == NULL && aux->tel->next == NULL){
+					return;
+				}
+				//OUTROS CASOS VERIFICAM E ACABAM POR ADICIONAR NO FIM
+				
+			}
 		}
-		
+
 		previous->next = new_method;	//adiciona ao final da lista
+		
 	}else{
 		symtab_local = new_method;	
 	}
@@ -571,25 +628,14 @@ header_global* insert_classname(char *str){
 	free(stg);
 }
 
-int verfica_param_name(is_methodparams_list* ast_param_list , method_var* inicio_param_metodo){
-
-	while(inicio_param_metodo != NULL){
-		//printf("%s %s\n",ast_param_list->name,inicio_param_metodo->name);
-		if(strcmp(inicio_param_metodo->name,ast_param_list->name) == 0){
-			return 0;
-		}
-		inicio_param_metodo = inicio_param_metodo->next;
-	}
-	return 1;
-}
-
 table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_methodbody_list* imbl){
 	char * tipo;
-	//int verifica_param_repetido;
+	int verifica_param_repetido = 1;
 
 	method_var *simb_last_param;
 	method_var *var_metodo;
-	//method_var* inicio_param_metodo;
+	method_var* inicio_param_metodo;
+	method_var* aux;
 	
 	is_methodparams_list* ast_param_list = imhl->impl;
 
@@ -610,26 +656,45 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 	var_metodo->next = NULL;
 
 	simb_last_param = var_metodo;
-	//inicio_param_metodo = simb_last_param;
+	inicio_param_metodo = var_metodo;
 
 	//parametros de entrada
 	while(ast_param_list != NULL){
 
-		//verifica se existe parametros com o mesmo nome
+		printf("%s %s\n",ast_param_list->name,ast_param_list->type);
+		aux = inicio_param_metodo;
+
+		while(aux != NULL){
+
+			if(strcmp(aux->name,ast_param_list->name) == 0 ){
+				verifica_param_repetido = 0;
+			}
+
+			aux = aux->next;
+		}
+
 		
-		//verifica_param_repetido = verfica_param_name(ast_param_list,inicio_param_metodo);
+		
 
-		//if(verifica_param_repetido == 1){
-			var_metodo = (method_var*) malloc(sizeof(method_var));
+		
+		var_metodo = (method_var*) malloc(sizeof(method_var));
 
-			var_metodo->name = (char*)strdup(ast_param_list->name);
-			var_metodo->type = (char*)strdup(ast_param_list->type);
+		var_metodo->name = (char*)strdup(ast_param_list->name);
+		var_metodo->type = (char*)strdup(ast_param_list->type);
+		printf("%d\n",verifica_param_repetido);
+		if(verifica_param_repetido == 1){
+			printf("aqui\n");
 			var_metodo->is_param = 1;
-			var_metodo->next = NULL;
+		}else if(verifica_param_repetido == 0){
+			printf("entrou\n");
+			var_metodo->is_param = 2;
+		}
 
-			simb_last_param->next = var_metodo;
-			simb_last_param = var_metodo;  
-		//}
+		var_metodo->next = NULL;
+
+		simb_last_param->next = var_metodo;
+		simb_last_param = var_metodo;  
+		
 
 		
 		//avançamos para o proximo parametro da AST
@@ -712,8 +777,6 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 
 
 	return new_method;
-	free(var_metodo);
-	free(new_method);
 }
 
 
@@ -840,8 +903,7 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 	tenta_inserir_metodo_na_tail_global(newSymbol);
 	
 
-	return newSymbol; 
-	free(newSymbol);
+	return newSymbol;
 }
 
 
@@ -966,7 +1028,7 @@ void show_tabela_local(){
 
 			printf("%s", str);
 		
-			if(variavel->next != NULL && variavel->next->is_param == 1){
+			if(variavel->next != NULL && (variavel->next->is_param == 1 || variavel->next->is_param == 2 )){
 				printf(",");
 			}
 
@@ -990,12 +1052,18 @@ void show_tabela_local(){
 				str = "boolean";
 			}
 
-			printf("%s\t\t%s", variavel->name, str );
-		
+
+			if(variavel->is_param != 2){
+				printf("%s\t\t%s", variavel->name, str );
+			}
+
 			if(variavel->is_param == 1){
 				printf("\tparam" );
 			}
-			printf("\n");
+
+			if(variavel->is_param != 2){
+				printf("\n");
+			}
 
 			variavel = variavel->next;
 		}
