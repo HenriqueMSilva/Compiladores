@@ -1,28 +1,44 @@
-/* Juc implementation of integer division */
-/** and verification **/
+class operator_single {
+   // nota nao tenho a certeza dos erros nem da ordem, é so para ver se estou a pensar bem
+   public static void main(String[] args){
+      int i;
+      double d;
+      boolean b;
+      b = false;
 
-class divide {
-  public static int num, den;
-  public static void main(String[] args) {
-    int quo, q, r;
+      // logica de baixo tambem se aplicas ao minus
+      // possivel
+      i = + 5;
+      // nao é possivel? pelo menos em java nao é
+      i = +2.0; 
 
-    num = Integer.parseInt(args[0]);
-    den = Integer.parseInt(args[1]);
-    q = num / den;
-    r = num % den;
-    quo = 0;
-    while (den <= num) {
-      num = num-den;
-      quo = quo+1;
-    }
+      // ambos possiveisç
+      d = + 1;
+      d = + 2.0;
 
-    boolean check;
-    check = quo==q && num==r;
-    if (check) {
-        System.out.print(quo);
-        System.out.print(num); // the remainder
-    } else
-        // Never reached
-        System.out.print(check);
-  }
+      // ambos nao possiveis
+      b = + false;
+      b = + true;
+
+      // possivel
+      int tamanho;
+      tamanho = args.length;
+
+      // nao possivel
+      i = i.length;
+      i = d.length;
+
+
+      // not só da para boolean
+      i = !i;
+      d = !d;
+      b = !b;
+
+      // referencias ambiguas
+      f(1,1);
+      }
+      public static void f(int a, double b){}
+      public static void f(double a, int b){}
+
+
 }

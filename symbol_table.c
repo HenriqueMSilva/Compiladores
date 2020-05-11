@@ -554,7 +554,7 @@ void tenta_inserir_na_tail_local(table_element_local * new_method){
 					//VERIFICAR A LISTA DE PARAMETROS
 					while(aux_aux_tel != NULL && aux_new_method_tel != NULL){
 					
-						if(aux_aux_tel->is_param == 1 && aux_new_method_tel->is_param == 1 ){
+						if( (aux_aux_tel->is_param == 1 || aux_aux_tel->is_param == 2) && (aux_new_method_tel->is_param == 1 || aux_new_method_tel->is_param == 2)){
 
 							counter++;
 
@@ -563,11 +563,11 @@ void tenta_inserir_na_tail_local(table_element_local * new_method){
 							}
 						}
 
-						if(aux_aux_tel->next == NULL && aux_new_method_tel->next != NULL && aux_new_method_tel->next->is_param == 1){
+						if(aux_aux_tel->next == NULL && aux_new_method_tel->next != NULL && ( aux_new_method_tel->next->is_param == 1 || aux_new_method_tel->next->is_param == 2)){
 							//esta adicao serve para casos do genero (int,double) (int,double,boolean) em que os dois primeiros param sao iguais
 							counter++;
 							break;
-						}else if(aux_aux_tel->next != NULL && aux_new_method_tel->next == NULL && aux_aux_tel->next->is_param == 1){
+						}else if(aux_aux_tel->next != NULL && aux_new_method_tel->next == NULL && (aux_aux_tel->next->is_param == 1 || aux_aux_tel->next->is_param == 2)){
 							//esta adicao serve para casos do genero (int,double) (int,double,boolean) em que os dois primeiros param sao iguais
 							counter++;
 							break;
@@ -661,7 +661,6 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 	//parametros de entrada
 	while(ast_param_list != NULL){
 
-		printf("%s %s\n",ast_param_list->name,ast_param_list->type);
 		aux = inicio_param_metodo;
 
 		while(aux != NULL){
@@ -681,12 +680,12 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 
 		var_metodo->name = (char*)strdup(ast_param_list->name);
 		var_metodo->type = (char*)strdup(ast_param_list->type);
-		printf("%d\n",verifica_param_repetido);
 		if(verifica_param_repetido == 1){
-			printf("aqui\n");
+
 			var_metodo->is_param = 1;
+
 		}else if(verifica_param_repetido == 0){
-			printf("entrou\n");
+
 			var_metodo->is_param = 2;
 		}
 
@@ -997,7 +996,7 @@ void show_tabela_local(){
 
 	while(tabela_local != NULL){
 		str = tabela_local->name; 
-
+		
 
 		printf("===== Method %s(",str);
 
