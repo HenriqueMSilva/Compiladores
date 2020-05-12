@@ -1,14 +1,18 @@
 class Factorial {
 
-    public static void main(String[] args) {
-        int argument;
-        int x;
+
+       public static int funcao(int i, int i){ 
+        }
+
+        public static double funcao(double i, double funcao){
+            int m;
+            int e;
         
-        x = x.length;
-        x = Integer.parseInt(args[0]);
-        x = Integer.parseInt(x[0]);
+        if( m == 1){m = 3;}
+            
+            funcao(m,m);
+        }
 
-        //argument = Integer.parseInt(args[0]);
+ 
 
-    }
 }

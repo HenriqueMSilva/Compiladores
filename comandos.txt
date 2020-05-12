@@ -24,6 +24,11 @@ git ignore: https://stackoverflow.com/questions/43380622/github-desktop-is-commi
 
 
 
+valgrind --leak-check=full          --show-leak-kinds=all          --track-origins=yes          --verbose          ./jucompiler -s < Call_me_maybe.java
+
+--verbose          --log-file=valgrind-out.txt
+coloca a flag log-file
+
 
 
 
@@ -91,3 +96,42 @@ variaveis com nome return podem estragar as minhas comp (averiguar)
 
 
 sem flag so imprime erros
+
+
+
+
+
+
+
+none aparece quando???
+
+anotar o interior de um metodo repetido?
+
+var global nome, metodo nome, var local nome podem ser iguals?
+
+
+Eq devolve SEMPRE bool
+Parse int e .leng devolve SEMPRE int
+
+
+add conot be alpierd to sting[] array
+
+
+
+
+
+
+
+f(int)
+
+apanha o f (int a); 
+
+
+De João Ribeiro para Todos:  06:04 PM
+f(int,double) e f(double,int) também dá ambiguo
+f(1,1)
+
+é ambiguo
+
+
+.length(int)-> operador imcompativel

@@ -70,6 +70,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 
 
+
 	//mesmo raciocionio do call e dos operadores, so tratamos disto depois dos filhos
 
 	//vai atribuir o tipo ao ID que esta associado a estes statment, no print depois resolve-se o tipo
@@ -130,12 +131,19 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		}
 	}
 
+	if(strcmp(expr->operation, "CallMore" ) == 0){
 
-	if(strcmp(expr->operation, "Call" ) == 0 || strcmp(expr->operation, "CallMore" ) == 0){
+		return expr->tipo;
+
+
+	}
+
+	if(strcmp(expr->operation, "Call" ) == 0){
 
 	
 		//averiguar se o metodo foi declarado globalmente
 		tipo = type_call_verification(expr,lista_do_metodo);
+		
 		if( tipo != NULL ){
 			//estava declarada
 			expr->tipo = tipo;
@@ -146,18 +154,35 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 
 
-	if(strcmp(expr->operation, "Operacao" ) == 0){
+if(strcmp(expr->operation, "Operacao" ) == 0){
 
-		//tevesse que usar o lower case porque o Id dava sempre em maisculo
+		//FOi preciso fazer estes ifs porque se nao dava run time error ao passar os tipos para minusculo
 		if(expr->expr1 != NULL){
-			str1 = lowerCase(expr->expr1->tipo);
+			if(strcmp(expr->expr1->tipo,"Int") == 0 ){
+				str1 = "int";
+			}else if(strcmp(expr->expr1->tipo,"Double") == 0 ){
+				str1 = "double";
+			}else if(strcmp(expr->expr1->tipo,"Bool") == 0 ){
+				str1 = "bool";
+			}else{
+				str1 = expr->expr1->tipo;
+			}
 		}
 		if(expr->expr2 != NULL){
-			str2 = lowerCase(expr->expr2->tipo);
-		}
-		
+			if(strcmp(expr->expr2->tipo,"Int") == 0 ){
+				str2 = "int";
+			}else if(strcmp(expr->expr2->tipo,"Double") == 0 ){
+				str2 = "double";
+			}else if(strcmp(expr->expr2->tipo,"Bool") == 0 ){
+				str2 = "bool";
+			}else{
+				str2 = expr->expr2->tipo;
+			}
 
-		if(strcmp(expr->value,"Add") == 0 || strcmp(expr->value,"Sub") == 0 || strcmp(expr->value,"Mul") == 0 || strcmp(expr->value,"Div") == 0 || strcmp(expr->value,"Mod") == 0){
+		}
+
+
+		if((strcmp(expr->value,"Add") == 0 || strcmp(expr->value,"Sub") == 0 || strcmp(expr->value,"Mul") == 0 || strcmp(expr->value,"Div") == 0 || strcmp(expr->value,"Mod") == 0)){
 
 			if(strcmp(str1,"bool") == 0 || strcmp(str2,"bool") == 0 || strcmp(str1,"undef") == 0 || strcmp(str2,"undef") == 0){
 				expr->tipo = "undef";
@@ -175,7 +200,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				return expr->tipo;
 			}
 
-		}else if(strcmp(expr->value,"Minus") == 0 || strcmp(expr->value,"Plus") == 0 ){
+		}else if((strcmp(expr->value,"Minus") == 0 || strcmp(expr->value,"Plus") == 0)){
 
 			if(strcmp(str1,"bool") == 0  || strcmp(str1,"undef") == 0 ){
 				expr->tipo = "undef"; 
@@ -185,24 +210,17 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				return expr->tipo;
 			}
 
-		}else if(strcmp(expr->value,"Not") == 0 ){
+		}else if(strcmp(expr->value,"Not") == 0){
 
-
-			if(strcmp(str1,"bool") != 0  || strcmp(str1,"undef") == 0 ){
-				expr->tipo = "undef"; 
-				return expr->tipo;			
-			}else{
 				expr->tipo = "bool"; 
 				return expr->tipo;
-			}
 
-			expr->tipo = str1; 
+
+		}else if(strcmp(expr->value,"Eq") == 0 ){
+			expr->tipo = "bool";
 			return expr->tipo;
 
-
-
-
-		}else if(strcmp(expr->value,"Eq") == 0 || strcmp(expr->value,"Ge") == 0 || strcmp(expr->value,"Gt") == 0 || strcmp(expr->value,"Le") == 0 || strcmp(expr->value,"Lt") == 0 || strcmp(expr->value,"Ne") == 0 || strcmp(expr->value,"And") == 0 || strcmp(expr->value,"Or") == 0 ||  strcmp(expr->value,"Xor") == 0){
+		}else if((strcmp(expr->value,"Ge") == 0 || strcmp(expr->value,"Gt") == 0 || strcmp(expr->value,"Le") == 0 || strcmp(expr->value,"Lt") == 0 || strcmp(expr->value,"Ne") == 0 || strcmp(expr->value,"And") == 0 || strcmp(expr->value,"Or") == 0 ||  strcmp(expr->value,"Xor") == 0)){
 			
 
 			if( strcmp(str1,"undef") == 0 || strcmp(str2,"undef") == 0){
@@ -332,12 +350,10 @@ int metodo_retorna_tipo_param (is_expression_list* expr, method_var* lista_do_me
 }	
 
 
-char * type_call_verification(is_expression_list* expr, method_var* lista_do_metodo){
-	table_element_global * tabela_global = symtab_global->declarations;
-	is_expression_list* expr_aux;
 
-	char * str = NULL;
-	int verification = 0;
+
+int ha_metodo_igual_declarado(is_expression_list* expr, method_var* lista_do_metodo){
+	table_element_global * tabela_global = symtab_global->declarations;
 
 
 	while(tabela_global != NULL){
@@ -348,7 +364,172 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 			continue;
 		}
 
+
+		//printf("%s %s\n",expr->value, tabela_global->name);
+
+		//metodo
+		// mesmo nome e memos param entrada
+		if( strcmp(expr->value, tabela_global->name) == 0 && assinatutas_iguais_call(expr->expr1 ,tabela_global->param_list, lista_do_metodo) == 1 ){
+			return 1;
+		}
+
+		tabela_global = tabela_global->next;
+
+	}
+
+	return 0;
+}
+
+
+
+char*  get_metodo_igual_return_type(is_expression_list* expr, method_var* lista_do_metodo){
+
+	table_element_global * tabela_global = symtab_global->declarations;
+
+
+	while(tabela_global != NULL){
+
+		//ERA UM FIELD DECLARATION
+		if(tabela_global->type_return == NULL){
+			tabela_global = tabela_global->next;
+			continue;
+		}
+
+
+		//metodo
+		// mesmo nome e memos param entrada
+		if( strcmp(expr->value, tabela_global->name) == 0 && assinatutas_iguais_call(expr->expr1 ,tabela_global->param_list, lista_do_metodo) == 1 ){
+			return tabela_global->type_return;
+		}
+
+		tabela_global = tabela_global->next;
+
+	}
+
+	//nunca deve aqui chegar
+	return "ERROR";
+
+
+
+
+}
+
+
+
+int num_metodo_parecido_declarado(is_expression_list* expr, method_var* lista_do_metodo){
+
+
+	table_element_global * tabela_global = symtab_global->declarations;
+
+	int num_assinaturas_parecidas = 0;
+
+	while(tabela_global != NULL){
+
+		//ERA UM FIELD DECLARATION
+		if(tabela_global->type_return == NULL){
+			tabela_global = tabela_global->next;
+			continue;
+		}
+
+
+		//metodo
+		// mesmo nome e memos param entrada
+		if( strcmp(expr->value, tabela_global->name) == 0 && assinatutas_parecidas_call(expr->expr1 ,tabela_global->param_list, lista_do_metodo) == 1 ){
+			num_assinaturas_parecidas += 1;
+		}
+
+		tabela_global = tabela_global->next;
+
+	}
+
+	return num_assinaturas_parecidas;
+
+}
+
+char*  get_metodo_parecido_return_type(is_expression_list* expr, method_var* lista_do_metodo){
+	table_element_global * tabela_global = symtab_global->declarations;
+
+
+
+	while(tabela_global != NULL){
+
+		//ERA UM FIELD DECLARATION
+		if(tabela_global->type_return == NULL){
+			tabela_global = tabela_global->next;
+			continue;
+		}
+
+
+		//metodo
+		// mesmo nome e memos param entrada
+		if( strcmp(expr->value, tabela_global->name) == 0 && assinatutas_parecidas_call(expr->expr1 ,tabela_global->param_list, lista_do_metodo) == 1 ){
+			return tabela_global->type_return;
+		}
+
+		tabela_global = tabela_global->next;
+
+	}
+
+	//nunca deve aqui chegar
+	return "ERROR";
+
+}
+
+
+//verificar se a funcao esta declarada 
+char * type_call_verification(is_expression_list* expr, method_var* lista_do_metodo){
+	//table_element_global * tabela_global = symtab_global->declarations;
+	//is_expression_list* expr_aux;
+
+	//char * str = NULL;
+	//int verification = 0;
+
+
+//printf("qq %d q\n\n\n\n",ha_metodo_igual_declarado(expr,lista_do_metodo));
+
+	if(ha_metodo_igual_declarado(expr,lista_do_metodo) == 1){
+		//vou procurar um metodo igual
+
+		//return "TESTE";
+
+		return  get_metodo_igual_return_type(expr,lista_do_metodo);
+
+	}
+	//nao ha um metodo exatamente igual, vamos ver se ha algum parecido
+
+
+	int num_metodos = num_metodo_parecido_declarado(expr,lista_do_metodo);
+
+	if(  num_metodos == 1) {
+		//vou procurar o 1 metodo paracido
+		return get_metodo_parecido_return_type(expr,lista_do_metodo);
+
+	}else if(num_metodos > 1){
+		//ambig
+		return "undef";
+
+	}else if(num_metodos == 0){
+		//nao declarado
+		return "undef";
+	}
+
+	//nunca deve chagar aqui
+	return "ERROR1";
+
+
+/*
+	while(tabela_global != NULL){
+
+		//ERA UM FIELD DECLARATION
+		if(tabela_global->type_return == NULL){
+			tabela_global = tabela_global->next;
+			continue;
+		}
+
+		//ERA METODO DECLARADO
 		if( strcmp(expr->value,tabela_global->name) == 0  ){
+			//
+
 
 			//TEM PARAMETROS DE ENTRADA? NAO
 			if(expr->expr1 == NULL && tabela_global->param_list == NULL){
@@ -358,7 +539,9 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 			}else{
 				
 				if(expr->expr1 != NULL && tabela_global->param_list != NULL ){
+
 					verification = metodo_retorna_tipo_param(expr->expr1,lista_do_metodo,tabela_global->param_list);
+					
 					if(verification == 2){
 						return tabela_global->type_return;
 					}else if(verification == 1){
@@ -379,7 +562,7 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 		tabela_global = tabela_global->next;
 	}
 
-	return str;
+	return str;*/
 }
 
 
@@ -428,7 +611,104 @@ char * var_declarada(method_var * lista, char* str){
 }
 
 
-int assinatutas_iguais(table_element_global *newSymbol, table_element_global *aux){
+int assinatutas_parecidas_call(is_expression_list* expr, param_node* param_list, method_var* lista_do_metodo){
+	//expr e o 1 call more <=> 1 parametro chamado 
+	//param_list e o 1 parametros declarado
+	char * str1;
+	char * str2;
+
+
+
+	if(expr != NULL){
+		//h apelo menos 1 parametro de entrada
+		//vai meter tipos na ast
+		recursao_expr(expr, lista_do_metodo);
+	}
+	
+
+
+	while(expr != NULL && param_list != NULL){
+
+
+		str1 = lowerCase(expr->expr1->tipo);
+		str2 = lowerCase(param_list->type_param);
+
+		//testo os parametros de entrada
+		//NOT (parametros aceitaves)
+		if( !(strcmp(str1, str2) == 0  || (strcmp(str1, "int") == 0 && strcmp(str2, "double") == 0 )     )  ){
+			//parametro diff
+			return 0;
+		}
+
+		expr->tipo = param_list->type_param;
+
+		expr = expr->expr2;
+		param_list = param_list->next;
+	
+	}
+
+
+	//todos os param era iguais-> assinatura igual
+	if(expr == NULL && param_list == NULL){
+
+		return 1;
+	}
+
+	return 0;
+
+}
+
+
+
+int assinatutas_iguais_call(is_expression_list* expr, param_node* param_list, method_var* lista_do_metodo){
+	//expr e o 1 call more <=> 1 parametro chamado 
+	//param_list e o 1 parametros declarado
+	char * str1;
+	char * str2;
+
+
+
+	if(expr != NULL){
+		//h apelo menos 1 parametro de entrada
+		//vai meter tipos na ast
+		recursao_expr(expr, lista_do_metodo);
+	}
+	
+
+
+	while(expr != NULL && param_list != NULL){
+
+
+		str1 = lowerCase(expr->expr1->tipo);
+		str2 = lowerCase(param_list->type_param);
+
+		//testo os parametros de entrada
+		if( strcmp(str1, str2) != 0){
+			//parametro diff
+			return 0;
+		}
+
+		expr->tipo = param_list->type_param;
+
+
+		expr = expr->expr2;
+		param_list = param_list->next;
+	
+	}
+
+
+	//todos os param era iguais-> assinatura igual
+	if(expr == NULL && param_list == NULL){
+
+		return 1;
+	}
+
+	return 0;
+
+}
+
+
+int assinatutas_iguais_global(table_element_global *newSymbol, table_element_global *aux){
 
 	param_node * param_newSymbol = newSymbol->param_list;
 	param_node * param_aux = aux->param_list;
@@ -505,7 +785,7 @@ void tenta_inserir_metodo_na_tail_global(table_element_global * newSymbol){
 		
 		//Procura cauda da lista e verifica se simbolo ja existe 
 		for(aux = symtab_global->declarations; aux != NULL ; previous = aux, aux = aux->next){
-			if(strcmp(aux->name, newSymbol->name) == 0 && aux->type_return != NULL && assinatutas_iguais(newSymbol, aux) == 1){
+			if(strcmp(aux->name, newSymbol->name) == 0 && aux->type_return != NULL && assinatutas_iguais_global(newSymbol, aux) == 1){
 
 				//printf("\nTODO M: Symbol %s already defined\n",aux->name);
 
@@ -711,7 +991,8 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 
 
 		//percorrer o body entre statments e var decs
-		while(ast_var_dec_or_statment != NULL && ( ast_var_dec_or_statment->ivdl != NULL || ast_var_dec_or_statment->statment != NULL) ){
+		//&& ( ast_var_dec_or_statment->ivdl != NULL || ast_var_dec_or_statment->statment != NULL)
+		while(ast_var_dec_or_statment != NULL  ){
 		//while(ast_var_dec_or_statment != NULL ){  ACHO QUE O WHILE PODIA SER SO ISTO
 
 			//e um statment e nao um var dec

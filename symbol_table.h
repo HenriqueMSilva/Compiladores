@@ -47,7 +47,6 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl);
 
 void tenta_inserir_fieldDec_na_tail_global(	table_element_global * newSymbol);
 void tenta_inserir_metodo_na_tail_global(	table_element_global * newSymbol);
-int assinatutas_iguais(table_element_global *newSymbol, table_element_global *aux);
 
 
 table_element_local *insert_el_metodo_local(is_methodheader_list* imhl,is_methodbody_list* imbl);
@@ -60,6 +59,17 @@ char * var_declarada(method_var * lista, char* str);
 int metodo_retorna_tipo_param (is_expression_list* expr, method_var* lista_do_metodo,  param_node * param_list);
 char * type_call_verification(is_expression_list* expr, method_var* lista_do_metodo);
 char * var_declarada_globalmente(char* str);
+
+
+int ha_metodo_igual_declarado(is_expression_list* expr, method_var* lista_do_metodo);
+char*  get_metodo_igual_return_type(is_expression_list* expr, method_var* lista_do_metodo);
+int num_metodo_parecido_declarado(is_expression_list* expr, method_var* lista_do_metodo);
+char*  get_metodo_parecido_return_type(is_expression_list* expr, method_var* lista_do_metodo);
+
+int assinatutas_parecidas_call(is_expression_list* expr, param_node* param_list, method_var* lista_do_metodo);
+int assinatutas_iguais_call(is_expression_list* expr, param_node* param_list, method_var* lista_do_metodo);
+int assinatutas_iguais_global(table_element_global *newSymbol, table_element_global *aux);
+
 
 char * lowerCase(char * str);
 void show_tabela_global();
