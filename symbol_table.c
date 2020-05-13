@@ -860,6 +860,14 @@ void tenta_inserir_fieldDec_na_tail_global(table_element_global * newSymbol, is_
 	table_element_global *aux;
 	table_element_global* previous;
 
+	if(strcmp(newSymbol->name,"_") == 0 ){
+
+		printf("Line %d, col %d: Symbol %s is reserved\n",ifdl->linha, ifdl->coluna, newSymbol->name);
+		return;
+	}
+
+
+
 	//Vou inserir o node na Tabela de Simbolos Global
 	if(symtab_global->declarations != NULL){	//Se table ja tem elementos
 		
@@ -870,7 +878,6 @@ void tenta_inserir_fieldDec_na_tail_global(table_element_global * newSymbol, is_
 			if(strcmp(aux->name, newSymbol->name) == 0 && aux->type_return == NULL ){
 				//encontramos um field dec declarado aj com este nome
 				printf("Line %d, col %d: Symbol %s already defined\n",ifdl->linha, ifdl->coluna, newSymbol->name);
-				//TODO-controlo se ja foi declarado
 				return;
 			}
 		}
@@ -1058,7 +1065,7 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 		while(aux != NULL){
 
 			if(strcmp(aux->name,ast_param_list->name) == 0 ){
-				printf("Line %d, col %d: Symbol %s already defined\n",imhl->linha,imhl->coluna,aux->name);
+				printf("Line %d, col %d: Symbol %s already defined\n",ast_param_list->linha, ast_param_list->coluna, aux->name);
 				verifica_param_repetido = 0;
 			}
 
@@ -1297,13 +1304,18 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 		//a assinatura deste metodo era repetida
 
 		printf("Line %d, col %d: Symbol %s(",imhl->linha,imhl->coluna,imhl->name);
-		while(imhl->impl != NULL){
-			printf("%s",imhl->impl->name);
-			if(imhl->impl->next != NULL){
+		
+		param_node * param = newSymbol->param_list;
+
+		//is_methodparams_list * param = imhl->impl;
+
+		while(param!= NULL){
+			printf("%s",type_print_error(param->type_param));
+			if(param->next != NULL){
 				printf(",");
 			}
 
-			imhl->impl = imhl->impl->next;
+			param = param->next;
 		}
 
 		printf(") already defined\n");
@@ -1315,6 +1327,20 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 
 	return newSymbol;
 }
+
+char * type_print_error(char * str){
+	str = lowerCase(str);
+
+	if(strcmp(str,"bool") == 0 ){
+		str = "boolean";
+	}
+	else if(strcmp(str,"stringarray") == 0 ){
+		str = "String[]";
+	}
+
+	return str;
+}
+
 
 
 
