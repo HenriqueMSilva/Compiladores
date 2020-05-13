@@ -64,35 +64,35 @@ extern int yydebug;
     NE = 274,
     NOT = 275,
     OR = 276,
-    PLUS = 277,
-    RBRACE = 278,
-    RSQ = 279,
-    SEMICOLON = 280,
-    ARROW = 281,
-    LSHIFT = 282,
-    RSHIFT = 283,
-    XOR = 284,
-    BOOL = 285,
-    CLASS = 286,
-    DOTLENGTH = 287,
-    DOUBLE = 288,
-    ELSE = 289,
-    IF = 290,
-    INT = 291,
-    PRINT = 292,
-    PARSEINT = 293,
-    PUBLIC = 294,
-    RETURN = 295,
-    STATIC = 296,
-    STRING = 297,
-    VOID = 298,
-    WHILE = 299,
-    RESERVED = 300,
-    ID = 301,
-    INTLIT = 302,
-    STRLIT = 303,
-    REALLIT = 304,
-    BOOLLIT = 305,
+    RBRACE = 277,
+    RSQ = 278,
+    SEMICOLON = 279,
+    ARROW = 280,
+    LSHIFT = 281,
+    RSHIFT = 282,
+    XOR = 283,
+    BOOL = 284,
+    CLASS = 285,
+    DOTLENGTH = 286,
+    DOUBLE = 287,
+    ELSE = 288,
+    IF = 289,
+    INT = 290,
+    PRINT = 291,
+    PARSEINT = 292,
+    PUBLIC = 293,
+    RETURN = 294,
+    STATIC = 295,
+    STRING = 296,
+    VOID = 297,
+    WHILE = 298,
+    RESERVED = 299,
+    ID = 300,
+    INTLIT = 301,
+    STRLIT = 302,
+    REALLIT = 303,
+    BOOLLIT = 304,
+    PLUS = 305,
     REDUCE = 306
   };
 #endif
@@ -116,35 +116,35 @@ extern int yydebug;
 #define NE 274
 #define NOT 275
 #define OR 276
-#define PLUS 277
-#define RBRACE 278
-#define RSQ 279
-#define SEMICOLON 280
-#define ARROW 281
-#define LSHIFT 282
-#define RSHIFT 283
-#define XOR 284
-#define BOOL 285
-#define CLASS 286
-#define DOTLENGTH 287
-#define DOUBLE 288
-#define ELSE 289
-#define IF 290
-#define INT 291
-#define PRINT 292
-#define PARSEINT 293
-#define PUBLIC 294
-#define RETURN 295
-#define STATIC 296
-#define STRING 297
-#define VOID 298
-#define WHILE 299
-#define RESERVED 300
-#define ID 301
-#define INTLIT 302
-#define STRLIT 303
-#define REALLIT 304
-#define BOOLLIT 305
+#define RBRACE 277
+#define RSQ 278
+#define SEMICOLON 279
+#define ARROW 280
+#define LSHIFT 281
+#define RSHIFT 282
+#define XOR 283
+#define BOOL 284
+#define CLASS 285
+#define DOTLENGTH 286
+#define DOUBLE 287
+#define ELSE 288
+#define IF 289
+#define INT 290
+#define PRINT 291
+#define PARSEINT 292
+#define PUBLIC 293
+#define RETURN 294
+#define STATIC 295
+#define STRING 296
+#define VOID 297
+#define WHILE 298
+#define RESERVED 299
+#define ID 300
+#define INTLIT 301
+#define STRLIT 302
+#define REALLIT 303
+#define BOOLLIT 304
+#define PLUS 305
 #define REDUCE 306
 
 /* Value type.  */
@@ -152,11 +152,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 69 "jucompiler.y" /* yacc.c:1909  */
+#line 68 "jucompiler.y" /* yacc.c:1909  */
 
-    char * num_linha;
-    char * num_coluna;
-    char *id;
+    char * str;
+
+    id_lin_col *id;
+
     is_program* ip;
     is_metodos* im;
     is_fielddecl_list* ifl;
@@ -169,7 +170,7 @@ union YYSTYPE
     is_statment_list* state;
     is_expression_list* iel;
 
-#line 173 "y.tab.h" /* yacc.c:1909  */
+#line 174 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
