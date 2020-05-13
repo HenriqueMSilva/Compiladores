@@ -4,11 +4,15 @@
 #include <string.h>
 #include <stdio.h>
 
-is_program* insert_program(char *id, is_metodos* metodos){
+is_program* insert_program(char *id, is_metodos* metodos, int linha, int coluna){
 
 	is_program* ip=(is_program*)malloc(sizeof(is_program));
 
-	ip->metodos=metodos;
+    ip->metodos=metodos;
+    
+    ip->linha=linha;
+	ip->coluna=coluna;
+
 	ip->classname=(char*)strdup(id);
 
 	return ip;
@@ -38,12 +42,16 @@ is_metodos* insert_metodos(char *evocation, is_fielddecl_list* ifl, is_methoddec
 
 
 
-is_fielddecl_list* insert_field(char *type , char *name, is_fielddecl_list* head){
+is_fielddecl_list* insert_field(char *type , char *name, is_fielddecl_list* head, int linha , int coluna){
 
 		is_fielddecl_list* ifl=(is_fielddecl_list*)malloc(sizeof(is_fielddecl_list));
 
         ifl->type=(char*)strdup(type);
         ifl->name=(char*)strdup(name);
+
+        ifl->linha=linha;
+        ifl->coluna=coluna;
+
         ifl->next=head;
 
         return ifl;
@@ -65,24 +73,33 @@ is_methoddecl_list* insert_methoddecl(is_methodheader_list* header,is_methodbody
 
 
 
-is_methodheader_list* insert_methodheader(char *type , char *id, is_methodparams_list* impl){
+is_methodheader_list* insert_methodheader(char *type , char *id, is_methodparams_list* impl, int linha, int coluna){
 
 		is_methodheader_list* imhl=(is_methodheader_list*)malloc(sizeof(is_methodheader_list));
 
         imhl->type=(char*)strdup(type);
         imhl->name=(char*)strdup(id);
+        imhl->anotar_body = 1;
+
+        imhl->linha = linha;
+        imhl->coluna = coluna;
+
         imhl->impl=impl;
 
         return imhl;
 }
 
 
-is_methodparams_list* insert_methodparams(char *type , char *name, is_methodparams_list* head){
+is_methodparams_list* insert_methodparams(char *type , char *name, is_methodparams_list* head, int linha, int coluna){
 
 		is_methodparams_list* impl=(is_methodparams_list*)malloc(sizeof(is_methodparams_list));
 
         impl->type=(char*)strdup(type);
         impl->name=(char*)strdup(name);
+        
+        impl->linha=linha;
+        impl->coluna=coluna;
+
         impl->next=head;
 
         return impl;
@@ -144,13 +161,18 @@ is_methodbody_list* insert_methodbody(char *type, is_vardecl_list* vardecl , is_
 }
 
 
-is_vardecl_list* insert_vardecl(char *type , char *id, is_vardecl_list* vardecl){
+is_vardecl_list* insert_vardecl(char *type , char *id, is_vardecl_list* vardecl,int linha, int coluna){
 
 		is_vardecl_list* ivdl=(is_vardecl_list*)malloc(sizeof(is_vardecl_list));
 
         ivdl->type=(char*)strdup(type);
         ivdl->name=(char*)strdup(id);
+
+        ivdl->linha=linha;
+        ivdl->coluna=coluna;
+
         ivdl->next=vardecl;
+
 
         return ivdl;
 }
@@ -311,7 +333,7 @@ is_statment_list* insert_statment( char *name_function, is_statment_list* statme
 }
 
 
-is_expression_list* insert_expr(char *operation, char *value, is_expression_list* expr1,  is_expression_list* expr2){
+is_expression_list* insert_expr(char *operation, char *value, is_expression_list* expr1,  is_expression_list* expr2, int linha, int coluna){
 
 		is_expression_list* isl=(is_expression_list*)malloc(sizeof(is_expression_list));
 
@@ -320,6 +342,10 @@ is_expression_list* insert_expr(char *operation, char *value, is_expression_list
         isl->operation=(char*)strdup(operation);
         isl->value = (char*)strdup(value);
         isl->tipo = NULL;
+
+        isl->linha = linha;
+        isl->coluna = coluna;
+
         isl->expr1 = expr1;
         isl->expr2 = expr2;
 

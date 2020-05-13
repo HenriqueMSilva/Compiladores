@@ -115,6 +115,13 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		tipo =  var_declarada(lista_do_metodo, expr->value);
 
 		if( tipo != NULL ){
+
+
+			//TODO A logica nao esta correta, eu estava a fazer debug
+			if(strcmp( lowerCase(tipo) ,expr->expr1->tipo) != 0){
+				printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n",expr->linha,expr->coluna, lowerCase(tipo), expr->expr1->tipo);
+			}
+
 			//estava declarada
 			expr->tipo = tipo;
 			return expr->tipo;
@@ -221,8 +228,10 @@ if(strcmp(expr->operation, "Operacao" ) == 0){
 			return expr->tipo;
 
 		}else if((strcmp(expr->value,"Ge") == 0 || strcmp(expr->value,"Gt") == 0 || strcmp(expr->value,"Le") == 0 || strcmp(expr->value,"Lt") == 0 || strcmp(expr->value,"Ne") == 0 || strcmp(expr->value,"And") == 0 || strcmp(expr->value,"Or") == 0 ||  strcmp(expr->value,"Xor") == 0)){
-			
+			expr->tipo = "bool";
+			return expr->tipo;
 
+/*
 			if( strcmp(str1,"undef") == 0 || strcmp(str2,"undef") == 0){
 				expr->tipo = "undef";
 				return expr->tipo;
@@ -238,7 +247,7 @@ if(strcmp(expr->operation, "Operacao" ) == 0){
 			}else if(strcmp(str1,"double")  == 0 && strcmp(str2,"int") == 0){
 				expr->tipo = "bool";
 				return expr->tipo;
-			}
+			}*/
 		}
 	}
 
@@ -775,7 +784,7 @@ void tenta_inserir_fieldDec_na_tail_global(table_element_global * newSymbol){
 }
 
 
-void tenta_inserir_metodo_na_tail_global(table_element_global * newSymbol){
+int tenta_inserir_metodo_na_tail_global(table_element_global * newSymbol){
 	table_element_global *aux;
 	table_element_global* previous;
 
@@ -790,7 +799,7 @@ void tenta_inserir_metodo_na_tail_global(table_element_global * newSymbol){
 				//printf("\nTODO M: Symbol %s already defined\n",aux->name);
 
 				//TODO-controlo se ja foi declarado
-				return;
+				return 0;
 			}
 		}
 		//printf("passou");
@@ -798,6 +807,8 @@ void tenta_inserir_metodo_na_tail_global(table_element_global * newSymbol){
 	}else{
 		symtab_global->declarations = newSymbol;	
 	}
+
+	return 1;
 
 }
 
@@ -943,6 +954,8 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 
 		aux = inicio_param_metodo;
 
+
+		//verificar se o parametro da ast que queremos inserir tem o mesmo nome que um param ja inserido antes
 		while(aux != NULL){
 
 			if(strcmp(aux->name,ast_param_list->name) == 0 ){
@@ -961,11 +974,11 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 		var_metodo->name = (char*)strdup(ast_param_list->name);
 		var_metodo->type = (char*)strdup(ast_param_list->type);
 		if(verifica_param_repetido == 1){
-
+			//param de entrada valido 
 			var_metodo->is_param = 1;
 
 		}else if(verifica_param_repetido == 0){
-
+			//param de entrada ja declarado antes
 			var_metodo->is_param = 2;
 		}
 
@@ -1180,7 +1193,12 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 		ast_param_list = ast_param_list->next;
 	}
 
-	tenta_inserir_metodo_na_tail_global(newSymbol);
+	if( tenta_inserir_metodo_na_tail_global(newSymbol) == 0 ) {
+		//a assinatura deste metodo era repetida
+
+		//nao vamos anotar o body deste metodo
+		imhl->anotar_body = 0;
+	}
 	
 
 	return newSymbol;

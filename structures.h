@@ -2,10 +2,21 @@
 #define STRUCTURES_H
 
 // EXPR
+typedef struct _s11 {
+    char *id;
+    int linha;
+    int coluna;
+} id_lin_col;
+
+// EXPR
 typedef struct _s10 {
 	char *operation;
     char *value;
 	char * tipo;
+
+    int linha;
+    int coluna;
+
     struct _s10* expr1;
     struct _s10* expr2;
 } is_expression_list;
@@ -25,6 +36,10 @@ typedef struct _s9 {
 typedef struct _s8 {
     char* type;
     char* name;
+
+    int linha;
+    int coluna;
+    
     struct _s8* next;
 } is_vardecl_list;
 
@@ -42,6 +57,10 @@ typedef struct _s7 {
 typedef struct _s6 {
     char* type;
     char* name;
+    
+    int linha;
+    int coluna;
+
     struct _s6* next;
 } is_methodparams_list;
 
@@ -49,6 +68,11 @@ typedef struct _s6 {
 typedef struct _s5 {
     char* type;
     char* name;
+    int anotar_body;
+    
+    int linha;
+    int coluna;
+
     is_methodparams_list* impl;
 } is_methodheader_list;
 
@@ -65,6 +89,10 @@ typedef struct _s4 {
 typedef struct _s3 {
     char* type;
     char* name;
+
+    int linha;
+    int coluna;
+
     struct _s3* next;
 } is_fielddecl_list;
 
@@ -80,6 +108,10 @@ typedef struct _s2 {
 typedef struct _s1 {
     is_metodos* metodos;
     char* classname;
+
+    int linha;
+    int coluna;
+
 } is_program;
 
 #endif
