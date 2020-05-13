@@ -380,13 +380,6 @@ void print_expr(is_expression_list* expr, int n){
 
                 }
 
-
-                /*if(strcmp(expr->tipo,"String[]") == 0){
-                    printf(" - int");
-                }else{
-                    printf(" - undef");
-                }*/
-
             }else if(strcmp(expr->tipo,"stringarray") == 0){
                 printf(" - String[]");
             }else if(strcmp(expr->tipo,"bool") == 0){

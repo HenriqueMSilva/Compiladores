@@ -1,5 +1,0 @@
-class assign_error {
-
-	public static void c(float w){};;;; // float is not known to Ja as a type!
-	
-}

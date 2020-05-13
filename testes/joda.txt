@@ -1,4 +1,0 @@
-class teste{
-public static int a,b;
-public static boolean c;
-}
