@@ -147,7 +147,7 @@ Statement:  IF LPAR  ExprA RPAR   Statement  %prec REDUCE   {$$ = insert_multipl
         |   LBRACE StatementZrOuMais RBRACE                 {$$ = insert_multiple_statement("Block", NULL, $2, NULL);}
         |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = insert_multiple_statement("Print", $3, NULL, NULL);}
         |   MethodInvocation SEMICOLON                      {$$ = insert_multiple_statement("Call", $1, NULL, NULL);}
-        |   ID ASSIGN ExprA  SEMICOLON                      {$$ = insert_multiple_statement("AssignStatment", insert_expr("Assign",$1->id,$3,NULL, $1->linha,$1->coluna), NULL, NULL );free($1->id);}
+        |   ID ASSIGN ExprA  SEMICOLON                      {$$ = insert_multiple_statement("AssignStatment", insert_expr("Assign",$1->id,$3,NULL, $2->linha,$2->coluna), NULL, NULL );free($1->id);}
         |   ParseArgs SEMICOLON                             {$$ = insert_multiple_statement("ParseArgsStatment", $1,NULL, NULL);}
         |   SEMICOLON                                       {$$ = NULL;}
     ; 
@@ -186,8 +186,8 @@ ParseArgs:  PARSEINT LPAR ID LSQ  ExprA RSQ RPAR             {$$ = insert_expr("
 
 
 ExprA: Expr                                     {$$ = $1;}
-    |  ID ASSIGN ExprA                          {$$ = insert_expr("Assign",$1->id,$3,NULL,$1->linha,$1->coluna );free($1->id);}
-    |  LPAR ID ASSIGN ExprA RPAR                {$$ = insert_expr("Assign",$2->id,$4,NULL,$2->linha,$2->coluna);free($2->id);}
+    |  ID ASSIGN ExprA                          {$$ = insert_expr("Assign",$1->id,$3,NULL,$2->linha,$2->coluna );free($1->id);}
+    |  LPAR ID ASSIGN ExprA RPAR                {$$ = insert_expr("Assign",$2->id,$4,NULL,$3->linha,$3->coluna);free($2->id);}
     ;
 
 

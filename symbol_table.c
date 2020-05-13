@@ -115,6 +115,13 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		tipo =  var_declarada(lista_do_metodo, expr->value);
 
 		if( tipo != NULL ){
+
+
+			//TODO A logica nao esta correta, eu estava a fazer debug
+			if(strcmp( lowerCase(tipo) ,expr->expr1->tipo) != 0){
+				printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n",expr->linha,expr->coluna, lowerCase(tipo), expr->expr1->tipo);
+			}
+
 			//estava declarada
 			expr->tipo = tipo;
 			return expr->tipo;

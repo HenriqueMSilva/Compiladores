@@ -1700,7 +1700,7 @@ yyreduce:
 
   case 35:
 #line 150 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.state) = insert_multiple_statement("AssignStatment", insert_expr("Assign",(yyvsp[-3].id)->id,(yyvsp[-1].iel),NULL, (yyvsp[-3].id)->linha,(yyvsp[-3].id)->coluna), NULL, NULL );free((yyvsp[-3].id)->id);}
+    {(yyval.state) = insert_multiple_statement("AssignStatment", insert_expr("Assign",(yyvsp[-3].id)->id,(yyvsp[-1].iel),NULL, (yyvsp[-2].id)->linha,(yyvsp[-2].id)->coluna), NULL, NULL );free((yyvsp[-3].id)->id);}
 #line 1705 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1796,13 +1796,13 @@ yyreduce:
 
   case 51:
 #line 189 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Assign",(yyvsp[-2].id)->id,(yyvsp[0].iel),NULL,(yyvsp[-2].id)->linha,(yyvsp[-2].id)->coluna );free((yyvsp[-2].id)->id);}
+    {(yyval.iel) = insert_expr("Assign",(yyvsp[-2].id)->id,(yyvsp[0].iel),NULL,(yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna );free((yyvsp[-2].id)->id);}
 #line 1801 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
 #line 190 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Assign",(yyvsp[-3].id)->id,(yyvsp[-1].iel),NULL,(yyvsp[-3].id)->linha,(yyvsp[-3].id)->coluna);free((yyvsp[-3].id)->id);}
+    {(yyval.iel) = insert_expr("Assign",(yyvsp[-3].id)->id,(yyvsp[-1].iel),NULL,(yyvsp[-2].id)->linha,(yyvsp[-2].id)->coluna);free((yyvsp[-3].id)->id);}
 #line 1807 "y.tab.c" /* yacc.c:1646  */
     break;
 
