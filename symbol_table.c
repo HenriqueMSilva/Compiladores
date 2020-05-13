@@ -1028,6 +1028,14 @@ void tenta_inserir_fieldDec_na_tail_global(table_element_global * newSymbol, is_
 	table_element_global *aux;
 	table_element_global* previous;
 
+	if(strcmp(newSymbol->name,"_") == 0 ){
+
+		printf("Line %d, col %d: Symbol %s is reserved\n",ifdl->linha, ifdl->coluna, newSymbol->name);
+		return;
+	}
+
+
+
 	//Vou inserir o node na Tabela de Simbolos Global
 	if(symtab_global->declarations != NULL){	//Se table ja tem elementos
 		
@@ -1038,7 +1046,6 @@ void tenta_inserir_fieldDec_na_tail_global(table_element_global * newSymbol, is_
 			if(strcmp(aux->name, newSymbol->name) == 0 && aux->type_return == NULL ){
 				//encontramos um field dec declarado aj com este nome
 				printf("Line %d, col %d: Symbol %s already defined\n",ifdl->linha, ifdl->coluna, newSymbol->name);
-				//TODO-controlo se ja foi declarado
 				return;
 			}
 		}
@@ -1409,7 +1416,11 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 
 
 	table_element_global *newSymbol;
+	is_methodparams_list*  lista_param_entrada_aux;
 
+	//ajuda a detetar nomes repetidos
+	int num_param_entrada_percorridos = 0;
+	int num_aux;
 
 	//VARIAVEIS PARA AJUDAR A INSERIR NA TABELA OS PARAMETROS DO METEDO
 	is_methodparams_list* ast_param_list = imhl->impl;
@@ -1441,6 +1452,8 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 		
 		//avançamos para o proximo parametro da AST
 		ast_param_list = ast_param_list->next;
+
+		num_param_entrada_percorridos++;
 	}
 
 	//EXISTEM 2 PARAMETROS?
@@ -1457,9 +1470,32 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 		//atualizamos o ponteiro para o ultimo elemento da lista
 		simb_last_param = simb_input_param;
 		
+
+
+
+		//verificar se ja havia um param com esse nome na AST
+		for(lista_param_entrada_aux = imhl->impl, num_aux = 0 ; num_aux < num_param_entrada_percorridos ; num_aux++, lista_param_entrada_aux=lista_param_entrada_aux->next ){
+
+			if(strcmp(lista_param_entrada_aux->name, ast_param_list->name) == 0 ){
+				printf("Line %d, col %d: Symbol %s already defined\n",ast_param_list->linha, ast_param_list->coluna, ast_param_list->name);
+				break;
+			}
+		}
+		num_param_entrada_percorridos++;
+
+
+
+		if(strcmp(ast_param_list->name, "_") == 0 ){
+			printf("Line %d, col %d: Symbol %s is reserved\n", ast_param_list->linha, ast_param_list->coluna, ast_param_list->name);
+		}
+
 		//avançamos para o proximo parametro da AST
 		ast_param_list = ast_param_list->next;
+
+
+
 	}
+
 
 	if( tenta_inserir_metodo_na_tail_global(newSymbol) == 0 ) {
 		//a assinatura deste metodo era repetida
@@ -1489,6 +1525,20 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 
 	return newSymbol;
 }
+
+char * type_print_error(char * str){
+	str = lowerCase(str);
+
+	if(strcmp(str,"bool") == 0 ){
+		str = "boolean";
+	}
+	else if(strcmp(str,"stringarray") == 0 ){
+		str = "String[]";
+	}
+
+	return str;
+}
+
 
 
 
