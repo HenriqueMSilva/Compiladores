@@ -1784,7 +1784,7 @@ yyreduce:
 
   case 49:
 #line 183 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("ParseArgs",(yyvsp[-4].id)->id,(yyvsp[-2].iel),NULL, (yyvsp[-4].id)->linha,(yyvsp[-4].id)->coluna);free((yyvsp[-4].id)->id);}
+    {(yyval.iel) = insert_expr("ParseArgs",(yyvsp[-4].id)->id,(yyvsp[-2].iel),NULL, (yyvsp[-6].id)->linha,(yyvsp[-6].id)->coluna);free((yyvsp[-4].id)->id);}
 #line 1789 "y.tab.c" /* yacc.c:1646  */
     break;
 

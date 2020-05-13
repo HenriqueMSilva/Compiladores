@@ -71,6 +71,7 @@ int assinatutas_parecidas_call(is_expression_list* expr, param_node* param_list,
 int assinatutas_iguais_call(is_expression_list* expr, param_node* param_list, method_var* lista_do_metodo);
 int assinatutas_iguais_global(table_element_global *newSymbol, table_element_global *aux);
 
+void print_erro_assign(is_expression_list* expr, char * type);
 char * retorna_operador (char * value);
 char * lowerCase(char * str);
 void show_tabela_global();
