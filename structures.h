@@ -49,6 +49,7 @@ typedef struct _s6 {
 typedef struct _s5 {
     char* type;
     char* name;
+    int anotar_body;
     is_methodparams_list* impl;
 } is_methodheader_list;
 

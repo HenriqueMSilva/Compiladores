@@ -1,18 +1,27 @@
-class Factorial {
+class errors {
 
+    public static int a, b, c;
+    public static int c, a, b;
+    public static double _;
 
-       public static int funcao(int i, int i){ 
-        }
+    public static int underscore(int ola) {
+      if (ola) {
+        return ola;
+      }else{
+        return ola;
+      }
+      int ola;
+    }
+    public static void factorial(int i, int i) {
+        int argument;
+        int i;
+        int argument;
+        int a;
+        double i,_;
+    }
 
-        public static double funcao(double i, double funcao){
-            int m;
-            int e;
-        
-        if( m == 1){m = 3;}
-            
-            funcao(m,m);
-        }
-
- 
-
+    public static void factorial(int i, int i,int _){
+        int f;
+      f = f + 9;
+    }
 }
