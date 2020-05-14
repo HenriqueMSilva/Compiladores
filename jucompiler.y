@@ -181,6 +181,8 @@ CommaExprZrOuMais: /*empty*/                                 {$$ = NULL;}
 
 
 ParseArgs:  PARSEINT LPAR ID LSQ  ExprA RSQ RPAR             {$$ = insert_expr("ParseArgs",$3->id,$5,NULL, $1->linha,$1->coluna,$3->linha,$3->coluna);free($3->id);}
+
+
     ;
 
 

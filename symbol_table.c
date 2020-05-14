@@ -12,6 +12,8 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	char * str1;
 	char * str2;
 	char * operador = NULL;
+	char * aux;
+
 
 	//se for ID verificar se ja foi declarado
 	if( strcmp(expr->operation, "Id" ) == 0 ){
@@ -33,6 +35,8 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			//estava declarada
 			expr->tipo = tipo;
 			return expr->tipo;
+		}else{
+			printf("Line %d, col %d: Cannot find symbol %s\n",expr->linha,expr->coluna, expr->value);
 		}
 	}
 
@@ -81,12 +85,58 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 		if( tipo != NULL){
 
-
 			if(strcmp( lowerCase(tipo), "stringarray" ) == 0){
 				//estava declarada
 				expr->tipo = "String[]";
+
+
+				//se for parseargs verificar se dentro do array estao valores apropriados
+				if( strcmp(expr->operation, "ParseArgs" ) == 0 && strcmp( "int" , expr->expr1->tipo ) != 0 ){
+
+					if(strcmp( expr->expr1->tipo , "bool" ) == 0){
+
+						aux = "boolean";
+					}else{
+
+						aux = expr->expr1->tipo;
+					}
+
+					operador = retorna_operador(expr->operation);
+
+					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador , expr->tipo , aux);
+				
+				}
+
+
 				return expr->tipo;
 			}else{
+								
+				if(strcmp(tipo, "bool" ) == 0){
+					tipo = "boolean";
+				}
+
+				operador = retorna_operador(expr->operation);
+
+				//se for length so da print ao valor que chama o length
+				if(strcmp(expr->operation, "Length" ) == 0){
+
+					//somar mais um na coluna para contar o ponto antes do length
+					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna+1, operador ,tipo);
+
+				}else{
+
+					if(strcmp( expr->expr1->tipo , "bool" ) == 0){
+
+						aux = "boolean";
+					}else{
+
+						aux = expr->expr1->tipo;
+					}
+
+					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,tipo, aux);
+
+				}
+				
 				expr->tipo = tipo;
 				return expr->tipo;
 			}
@@ -100,8 +150,52 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			if(strcmp(lowerCase(tipo), "stringarray" ) == 0){
 				//estava declarada
 				expr->tipo = "String[]";
+
+				if( strcmp(expr->operation, "ParseArgs" ) == 0 && strcmp( "int" , expr->expr1->tipo ) != 0 ){
+
+					if(strcmp( expr->expr1->tipo , "bool" ) == 0){
+
+						aux = "boolean";
+					}else{
+
+						aux = expr->expr1->tipo;
+					}
+
+					operador = retorna_operador(expr->operation);
+
+					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,tipo, aux);
+				
+				}
+
 				return expr->tipo;
 			}else{
+
+				if(strcmp(tipo, "bool" ) == 0){
+					tipo = "boolean";
+				}
+
+				operador = retorna_operador(expr->operation);
+
+				//se for length so da print ao valor que chama o length
+				if(strcmp(expr->operation, "Length" ) == 0){
+
+					//somar mais um na coluna para contar o ponto antes do length
+					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna+1, operador ,tipo);
+
+				}else{
+
+					if(strcmp( expr->expr1->tipo , "bool" ) == 0){
+
+						aux = "boolean";
+					}else{
+
+						aux = expr->expr1->tipo;
+					}
+
+					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,tipo, aux);
+
+				}
+				
 				expr->tipo = tipo;
 				return expr->tipo;
 			}
@@ -111,17 +205,13 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 
 	if( strcmp(expr->operation, "Assign" ) == 0 ){
-	
+		
 		//averiguar se a var foi declarado no metodo //serve para saber o tipo da var
 		tipo =  var_declarada(lista_do_metodo, expr->value);
 
 		if( tipo != NULL ){
 
-
-			//TODO A logica nao esta correta, eu estava a fazer debug
-			/*if(strcmp( lowerCase(tipo) ,expr->expr1->tipo) != 0){
-				printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n",expr->linha,expr->coluna, lowerCase(tipo), expr->expr1->tipo);
-			}*/
+			print_erro_assign(expr, tipo);
 
 			//estava declarada
 			expr->tipo = tipo;
@@ -133,6 +223,9 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		tipo =  var_declarada_globalmente(expr->value);
 
 		if( tipo != NULL ){
+
+			print_erro_assign(expr, tipo);
+
 			//estava declarada
 			expr->tipo = tipo;
 			return expr->tipo;
@@ -156,7 +249,6 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		if( tipo != NULL ){
 			//estava declarada
 			expr->tipo = tipo;
-
 			return expr->tipo;
 		}
 
@@ -174,10 +266,15 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				str1 = "double";
 			}else if(strcmp(expr->expr1->tipo,"Bool") == 0 ){
 				str1 = "bool";
+			}else if(strcmp(expr->expr1->tipo,"StringArray") == 0 ){
+				str1 = "stringarray";
+			}else if(strcmp(expr->expr1->tipo,"String[]") == 0 ){ // este caso é devido ao parseargs e ao length , eles tem de ser considerados int
+				str1 = "int";
 			}else{
 				str1 = expr->expr1->tipo;
 			}
 		}
+		
 		if(expr->expr2 != NULL){
 			if(strcmp(expr->expr2->tipo,"Int") == 0 ){
 				str2 = "int";
@@ -185,6 +282,10 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				str2 = "double";
 			}else if(strcmp(expr->expr2->tipo,"Bool") == 0 ){
 				str2 = "bool";
+			}else if(strcmp(expr->expr2->tipo,"StringArray") == 0 ){
+				str2 = "stringarray";
+			}else if(strcmp(expr->expr2->tipo,"String[]") == 0 ){ 
+				str2 = "int";
 			}else{
 				str2 = expr->expr2->tipo;
 			}
@@ -194,19 +295,12 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 		if((strcmp(expr->value,"Add") == 0 || strcmp(expr->value,"Sub") == 0 || strcmp(expr->value,"Mul") == 0 || strcmp(expr->value,"Div") == 0 || strcmp(expr->value,"Mod") == 0)){
 
-			if(strcmp(str1,"bool") == 0 || strcmp(str2,"bool") == 0 || strcmp(str1,"undef") == 0 || strcmp(str2,"undef") == 0){
+			if(strcmp(str1,"bool") == 0 || strcmp(str2,"bool") == 0 || strcmp(str1,"undef") == 0 || strcmp(str2,"undef") == 0 || strcmp(str1,"stringarray") == 0 || strcmp(str1,"stringarray") == 0){
 
 				//verifica operador a dar print
 				operador = retorna_operador(expr->value);
 
-				if(strcmp(str1,"bool") == 0){
-					str1 = "boolean";
-				}
-				if(strcmp(str2,"bool") == 0){
-					str2 = "boolean";
-				}
-
-				printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna,operador,str1,str2);
+				printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna,operador,retorna_operador(str1),retorna_operador(str2));
 
 				expr->tipo = "undef";
 				return expr->tipo;
@@ -229,7 +323,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 				operador = retorna_operador(expr->value);
 
-				printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna,operador,str1);
+				printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna,operador,retorna_operador(str1));
 
 				expr->tipo = "undef"; 
 				return expr->tipo;			
@@ -240,12 +334,16 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 		}else if(strcmp(expr->value,"Not") == 0){
 
-				if(strcmp(str1,"bool") != 0){
-					printf("Line %d, col %d: Operator ! cannot be applied to type %s\n",expr->linha,expr->coluna,str1);
-				}
-				expr->tipo = "bool"; 
-				return expr->tipo;
 
+			if(strcmp(str1,"bool") != 0){
+			
+				printf("Line %d, col %d: Operator ! cannot be applied to type %s\n",expr->linha,expr->coluna,str1);
+			
+			}
+
+
+			expr->tipo = "bool"; 
+			return expr->tipo;
 
 		}else if(strcmp(expr->value,"Eq") == 0 || strcmp(expr->value,"Ne") == 0 ){
             
@@ -295,6 +393,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	if(strcmp(expr->operation, "Emp_Return" ) == 0){
 		expr->tipo = "undef";
 		return expr->tipo; 
+
 	}
 
 
@@ -304,82 +403,125 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 }
 
-char * retorna_operador (char * value){
-    char * operador = NULL;
-    if(strcmp(value,"Add") == 0 || strcmp(value,"Plus") == 0){
-        operador = "+";
-    }else if(strcmp(value,"Sub") == 0 || strcmp(value,"Minus") == 0){
-        operador = "-";
-    }else if(strcmp(value,"Mul") == 0){
-        operador = "*";
-    }else if(strcmp(value,"Div") == 0){
-        operador = "/";
-    }else if(strcmp(value,"Mod") == 0){
-        operador = "%";
-    }else if(strcmp(value,"Eq") == 0){
-        operador = "==";
-    }else if(strcmp(value,"Ge") == 0){
-        operador = ">=";
-    }else if(strcmp(value,"Gt") == 0){
-        operador = ">";
-    }else if(strcmp(value,"Le") == 0){
-        operador = "<=";
-    }else if(strcmp(value,"Lt") == 0){
-        operador = "<";
-    }else if(strcmp(value,"Ne") == 0){
-        operador = "!=";
-    }else if(strcmp(value,"And") == 0){
-        operador = "&&";
-    }else if(strcmp(value,"Or") == 0){
-        operador = "||";
-    }else if(strcmp(value,"Xor") == 0){
-        operador = "^";
-    }else if(strcmp(value,"Length") == 0){
-        operador = ".length";
-    }else if(strcmp(value,"ParseArgs") == 0){
-        operador = "Integer.parseInt";
-    }else if(strcmp(value,"Assign") == 0){
-        operador = "=";
-    }else if(strcmp(value,"stringarray") == 0 || strcmp(value,"StringArray") == 0){
-        operador = "String[]";
-    }else if(strcmp(value,"undef") == 0){
-        operador = "undef";
-    }else if(strcmp(value,"int") == 0 || strcmp(value,"Int") == 0){
-        operador = "int";
-    }else if(strcmp(value,"double") == 0 || strcmp(value,"Double") == 0){
-        operador = "double";
-    }else if(strcmp(value,"bool") == 0 || strcmp(value,"Bool") == 0){
-        operador = "boolean";
-    }else if(strcmp(value,"boolean") == 0){
-        operador = "boolean";
-    }else if(strcmp(value,"String") == 0){
-        operador = "String";
-    }else if(strcmp(value,"Void") == 0){
-        operador = "void";
-    }
 
-    return operador;
+void print_erro_assign(is_expression_list* expr, char * type){
+	char * aux;
+	char * expr_tipo = expr->expr1->tipo;
+	char * tipo = lowerCase(type);
+	char * operation = NULL;
+
+
+	//verificar se a frente do assign esta um destes, se estiver queremos comparar com o valor int, no expr->tipo nao esta int que é o que deve retornar, esta o valor do ID
+	if(strcmp(expr->expr1->operation, "Length" ) == 0 || strcmp(expr->expr1->operation, "ParseArgs" ) == 0){ 
+		aux = "int";
+	}else{
+		//nao da para meter o expr->expr1->tipo logo para lower case , vai afetar coisas e da seg fault
+		aux = retorna_operador(expr_tipo);
+	}	
+
+	operation = retorna_operador(expr->operation);
+	tipo = retorna_operador(tipo);
+		
+	//nao podemos igualar strings e se forem diferentes sem contar com o caso double = int
+	if( strcmp( tipo , "String[]" ) == 0 || strcmp( aux , "String[]" ) == 0 || (!(strcmp(tipo,"double") == 0 && strcmp(aux,"int") == 0) && strcmp(tipo,aux) != 0)){
+
+		printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna,operation, tipo , aux);
+		
+	}
+	
 }
 
+
+char * retorna_operador (char * value){
+	char * operador = NULL;
+	if(strcmp(value,"Add") == 0 || strcmp(value,"Plus") == 0){
+		operador = "+";
+	}else if(strcmp(value,"Sub") == 0 || strcmp(value,"Minus") == 0){
+		operador = "-";
+	}else if(strcmp(value,"Mul") == 0){
+		operador = "*";
+	}else if(strcmp(value,"Div") == 0){
+		operador = "/";
+	}else if(strcmp(value,"Mod") == 0){
+		operador = "%";
+	}else if(strcmp(value,"Eq") == 0){
+		operador = "==";
+	}else if(strcmp(value,"Ge") == 0){
+		operador = ">=";
+	}else if(strcmp(value,"Gt") == 0){
+		operador = ">";
+	}else if(strcmp(value,"Le") == 0){
+		operador = "<=";
+	}else if(strcmp(value,"Lt") == 0){
+		operador = "<";
+	}else if(strcmp(value,"Ne") == 0){
+		operador = "!=";
+	}else if(strcmp(value,"And") == 0){
+		operador = "&&";
+	}else if(strcmp(value,"Or") == 0){
+		operador = "||";
+	}else if(strcmp(value,"Xor") == 0){
+		operador = "^";
+	}else if(strcmp(value,"Length") == 0){
+		operador = ".length";
+	}else if(strcmp(value,"ParseArgs") == 0){
+		operador = "Integer.parseInt";
+	}else if(strcmp(value,"Assign") == 0){
+		operador = "=";
+	}else if(strcmp(value,"stringarray") == 0 || strcmp(value,"StringArray") == 0){
+		operador = "String[]";
+	}else if(strcmp(value,"undef") == 0){
+		operador = "undef";
+	}else if(strcmp(value,"int") == 0 || strcmp(value,"Int") == 0){
+		operador = "int";
+	}else if(strcmp(value,"double") == 0 || strcmp(value,"Double") == 0){
+		operador = "double";
+	}else if(strcmp(value,"bool") == 0 || strcmp(value,"Bool") == 0){
+		operador = "boolean";
+	}else if(strcmp(value,"boolean") == 0){
+		operador = "boolean";
+	}else if(strcmp(value,"String") == 0){
+		operador = "String";
+	}else if(strcmp(value,"Void") == 0){
+		operador = "void";
+	}
+
+	return operador;
+
+}
+
+
+
 void recursao_statment(is_statment_list* statment, table_element_local * new_method ){
+
 		char * error_declaration;
 		int linha;
 		int coluna;
+		char * aux = NULL;
+
 
 		//percorrer as expr	
 		if( statment->expr != NULL){
 			recursao_expr(statment->expr, new_method->tel);
 		}
-		//DEBUG
- 		
+
 		if(strcmp(statment->name_function, "Print" ) == 0){
 
-			if(strcmp(statment->expr->tipo,"undef") == 0 ){
-				printf("Line %d, col %d: Incompatible type undef in System.out.print statement\n",statment->expr->linha,statment->expr->coluna);
+
+			if( strcmp(statment->expr->operation,"ParseArgs") == 0 || strcmp(statment->expr->operation,"Length") == 0 ){
+				aux = "int";
+			}else{
+				aux = statment->expr->tipo;
 			}
+
+			//printf("%s %s %s %s\n",statment->expr->operation,statment->expr->value,statment->expr->tipo,aux);
 			
+			if(strcmp(aux,"undef") == 0 || strcmp( aux , "StringArray") == 0 || strcmp( aux,"Void") == 0){
+				printf("Line %d, col %d: Incompatible type %s in System.out.print statement\n",statment->expr->linha,statment->expr->coluna,retorna_operador(aux));
+			}
 
 		}else if(strcmp(statment->name_function, "Return" ) == 0){
+
 			
 			error_declaration = assinatura_return_iguais(statment->expr,new_method);
 			if( error_declaration !=  NULL ){
@@ -388,12 +530,23 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 				coluna = statment->expr->coluna;
 
 				printf("Line %d, col %d: Incompatible type %s in return statement\n",linha, coluna, error_declaration);
+
+		}else if(strcmp(statment->name_function, "If" ) == 0 || strcmp(statment->name_function, "IfElse" ) == 0 ){
+
+			// verifica se a condiçao dentro do if é boolean se nao for printa erro
+			if( strcmp(statment->expr->tipo, "bool") != 0 ){
+
+				printf("Line %d, col %d: Incompatible type %s in if statement\n",statment->expr->linha,statment->expr->coluna,retorna_operador( lowerCase(statment->expr->tipo)));
+
 			}
+
 		}
 		
 
+
 		//ir para statmet1
 		if(statment->statment1 != NULL ){
+
 			recursao_statment(statment->statment1, new_method );
 		}
 
@@ -401,9 +554,8 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 		if(statment->statment2 != NULL ){
 			recursao_statment(statment->statment2, new_method );
 		}
-
-
 }
+
 
 
 // retun  NULL nao printa nada
@@ -428,8 +580,6 @@ char *  assinatura_return_iguais(is_expression_list* expr, table_element_local *
 		return_expr = "int";
 	} 
 	
-	//printf("\n------------f:%s r:%s r:%s\n", lowerCase(new_method->tel->type), lowerCase(expr->tipo), expr->value);
-
 
 	//void : "return ;"
 	//void : void, bool, int, double, stringarray, undef
@@ -725,7 +875,6 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 	//int verification = 0;
 
 
-
 	if(ha_metodo_igual_declarado(expr,lista_do_metodo) == 1){
 		//vou procurar um metodo igual
 		return  get_metodo_igual_return_type(expr,lista_do_metodo);
@@ -742,6 +891,21 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 
 	}else if(num_metodos > 1){
 		//ambig
+		printf("Line %d, col %d: Reference to method %s(",expr->linha,expr->coluna,expr->value);
+		if(expr->expr1 != NULL){
+			expr = expr->expr1;
+			while(expr != NULL){
+				if(expr->expr1 != NULL){
+					printf("%s",lowerCase(expr->expr1->tipo));
+				}
+				if(expr->expr2 != NULL){
+					printf(",");
+				}
+				expr = expr->expr2;
+			}
+
+		}
+		printf(") is ambiguous\n");
 		return "undef";
 
 	}else if(num_metodos == 0){
@@ -1060,7 +1224,6 @@ int tenta_inserir_metodo_na_tail_global(table_element_global * newSymbol){
 	}
 
 	return 1;
-
 }
 
 
@@ -1085,7 +1248,7 @@ void tenta_inserir_na_tail_local(table_element_local * new_method){
 			if(strcmp(aux->name, aux_method->name) == 0){
 
 				//TEMOS QUE VERIFICAR A PARTIR DO SEGUNDO ELEMENTO PORQUE O PRIMEIRO É O TIPO DO RETURN
-				//SE AMBOS DA TABELA LOCAL E DO NOVO SIMBOLO FOREM DIFERENTES NULL PODEMOS VERIFICAS
+				//SE AMBOS DA TABELA LOCAL E DO NOVO SIMBOLO FOREM DIFERENTES NULL PODEMOS VERIFICAR
 				if(aux_method->tel->next != NULL && aux->tel->next != NULL){
 					
 
@@ -1096,21 +1259,33 @@ void tenta_inserir_na_tail_local(table_element_local * new_method){
 					//VERIFICAR A LISTA DE PARAMETROS
 					while(aux_aux_tel != NULL && aux_new_method_tel != NULL){
 					
+						//verifica se sao parametros ou variaveis locais
 						if( (aux_aux_tel->is_param == 1 || aux_aux_tel->is_param == 2) && (aux_new_method_tel->is_param == 1 || aux_new_method_tel->is_param == 2)){
 
+							//contador para saber o numero de parametros da funçao
 							counter++;
 
+							//se forem iguais adicionamos
 							if(strcmp(aux_aux_tel->type,aux_new_method_tel->type) == 0){
+								//contador para saber o numero de parametros iguais
 								verifica++;
 							}
 						}
 
+						// if necessario caso um dos elementos ou da tabela local ou do novo simbolo a inserir seja null e o outro 
 						if(aux_aux_tel->next == NULL && aux_new_method_tel->next != NULL && ( aux_new_method_tel->next->is_param == 1 || aux_new_method_tel->next->is_param == 2)){
 							//esta adicao serve para casos do genero (int,double) (int,double,boolean) em que os dois primeiros param sao iguais
 							counter++;
 							break;
 						}else if(aux_aux_tel->next != NULL && aux_new_method_tel->next == NULL && (aux_aux_tel->next->is_param == 1 || aux_aux_tel->next->is_param == 2)){
-							//esta adicao serve para casos do genero (int,double) (int,double,boolean) em que os dois primeiros param sao iguais
+							counter++;
+							break;
+						}else if(aux_aux_tel->next != NULL && aux_aux_tel->next->is_param == 0 && aux_new_method_tel->next != NULL && aux_new_method_tel->next->is_param != 0){
+							// if necessario de quaso ambos os proximos elementos nao sejam null mas um deles e uma variavel e nao um parametro
+							counter++;
+							break;
+						}else if(aux_aux_tel->next != NULL && aux_aux_tel->next->is_param != 0 && aux_new_method_tel->next != NULL && aux_new_method_tel->next->is_param == 0){
+							// if necessario de quaso ambos os proximos elementos nao sejam null mas um deles e uma variavel e nao um parametro
 							counter++;
 							break;
 						}
@@ -1120,7 +1295,7 @@ void tenta_inserir_na_tail_local(table_element_local * new_method){
 						aux_new_method_tel = aux_new_method_tel->next;
 					}
 					
-					//CONDIÇAO DE PARAGEM SE ENCONTRAMOS UM METODO PARECIDO COM O QUE QUERIAMOS ADICIONAR PARAMOS
+					//CONDIÇAO DE PARAGEM SE ENCONTRAMOS UM METODO PARECIDO COM O QUE QUERIAMOS ADICIONAR , PARAMOS
 					if(verifica == counter){
 						return;
 					}
@@ -1132,13 +1307,12 @@ void tenta_inserir_na_tail_local(table_element_local * new_method){
 				
 			}
 		}
-
+		
 		previous->next = new_method;	//adiciona ao final da lista
 		
 	}else{
 		symtab_local = new_method;	
 	}
-
 }
 
 
@@ -1187,7 +1361,6 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 	is_methodparams_list* ast_param_list = imhl->impl;
 
 
-
 	table_element_local * new_method = (table_element_local*) malloc(sizeof(table_element_local));
 
 	new_method->name = (char*)strdup(imhl->name);
@@ -1214,8 +1387,10 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 		//verificar se o parametro da ast que queremos inserir tem o mesmo nome que um param ja inserido antes
 		while(aux != NULL){
 
-			if(strcmp(aux->name,ast_param_list->name) == 0 ){	
+
+			if(strcmp(aux->name,ast_param_list->name) == 0 ){
 				verifica_param_repetido = 0;
+			
 			}
 
 			aux = aux->next;
@@ -1307,17 +1482,16 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 						}
 
 						free(var_metodo);
-						ast_var_dec_list = ast_var_dec_list->next;
+
 
 					}else{
 
 						simb_last_param->next = var_metodo;
 						simb_last_param = var_metodo;  
-						
-
-						ast_var_dec_list = ast_var_dec_list->next;
-
 					}
+
+						
+						ast_var_dec_list = ast_var_dec_list->next;
 
 				}
 
@@ -1495,18 +1669,19 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 		//DEBUG
 
 		printf("Line %d, col %d: Symbol %s(",imhl->linha,imhl->coluna,imhl->name);
-		
-		param_node * param = newSymbol->param_list;
+		while(newSymbol->param_list != NULL){
 
-		//is_methodparams_list * param = imhl->impl;
+			if( strcmp(lowerCase(newSymbol->param_list->type_param),"stringarray") == 0 ){
+				printf("%s","String[]");
+			}else{
+				printf("%s",lowerCase(newSymbol->param_list->type_param) );
+			}
 
-		while(param!= NULL){
-			printf("%s",type_print_error(param->type_param));
-			if(param->next != NULL){
+			if(newSymbol->param_list ->next != NULL){
 				printf(",");
 			}
 
-			param = param->next;
+			newSymbol->param_list  = newSymbol->param_list ->next;
 		}
 
 		printf(") already defined\n");
