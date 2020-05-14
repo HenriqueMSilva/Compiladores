@@ -1,26 +1,33 @@
-class errors {
+class ThatsWhatSheSaid{
 
-    public static int a, b, c;
-    public static int c, a, b;
-    public static double _;
+  public static double main2(){
+      int a;
+      double b;
+      a = b;
 
-    public static int underscore(int ola) {
-      if (ola) {
-        return ola;
-      }else{
-        return ola;
+      if( a<=a ){}
+      if( a<a ){}
+      if( a>=a ){}
+      if( a>a ){}
+
+
+      if( b<=b ){}
+      if( b<b ){}
+      if( b>=b ){}
+      if( b>b ){}
+
+
+
+      if( a<=b ){}
+      if( a<b ){}
+      if( a>=b ){}
+      if( a>b ){}
+
+      if( b<=a ){}
+      if( b<a ){}
+      if( b>=a ){}
+      if( b>a ){}
+
       }
-      int ola;
-    }
-    public static void factorial(int i, int _) {
-        int argument;
-        int i;
-        int argument;
-        int a;
-        double i,_;
-    }
-
-    public static void factorial(int i, int i,int _) {
-      i = i + i;
-    }
+  
 }

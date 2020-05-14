@@ -1676,7 +1676,7 @@ yyreduce:
 
   case 31:
 #line 146 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.state) = insert_multiple_statement("Return", (yyvsp[-1].iel), NULL, NULL);}
+    {if((yyvsp[-1].iel)==NULL){(yyvsp[-1].iel)=insert_expr("Emp_Return","",NULL,NULL,(yyvsp[-2].id)->linha, (yyvsp[-2].id)->coluna,-1,-1);}     (yyval.state) = insert_multiple_statement("Return", (yyvsp[-1].iel), NULL, NULL);}
 #line 1681 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1700,7 +1700,7 @@ yyreduce:
 
   case 35:
 #line 150 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.state) = insert_multiple_statement("AssignStatment", insert_expr("Assign",(yyvsp[-3].id)->id,(yyvsp[-1].iel),NULL, (yyvsp[-2].id)->linha,(yyvsp[-2].id)->coluna), NULL, NULL );free((yyvsp[-3].id)->id);}
+    {(yyval.state) = insert_multiple_statement("AssignStatment", insert_expr("Assign",(yyvsp[-3].id)->id,(yyvsp[-1].iel),NULL, (yyvsp[-3].id)->linha,(yyvsp[-3].id)->coluna,(yyvsp[-2].id)->linha, (yyvsp[-2].id)->coluna), NULL, NULL );free((yyvsp[-3].id)->id);}
 #line 1705 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1742,7 +1742,7 @@ yyreduce:
 
   case 42:
 #line 164 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("StrLit",(yyvsp[0].id)->id,NULL,NULL, (yyvsp[0].id)->linha,(yyvsp[0].id)->coluna);free((yyvsp[0].id)->id);}
+    {(yyval.iel) = insert_expr("StrLit",(yyvsp[0].id)->id,NULL,NULL, (yyvsp[0].id)->linha,(yyvsp[0].id)->coluna,-1,-1);free((yyvsp[0].id)->id);}
 #line 1747 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1754,7 +1754,7 @@ yyreduce:
 
   case 44:
 #line 171 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Call",(yyvsp[-3].id)->id,(yyvsp[-1].iel),NULL, (yyvsp[-3].id)->linha,(yyvsp[-3].id)->coluna);free((yyvsp[-3].id)->id);}
+    {(yyval.iel) = insert_expr("Call",(yyvsp[-3].id)->id,(yyvsp[-1].iel),NULL, (yyvsp[-3].id)->linha,(yyvsp[-3].id)->coluna,-1,-1);free((yyvsp[-3].id)->id);}
 #line 1759 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1766,7 +1766,7 @@ yyreduce:
 
   case 46:
 #line 175 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("CallMore","",(yyvsp[-1].iel),(yyvsp[0].iel), -1,-1);}
+    {(yyval.iel) = insert_expr("CallMore","",(yyvsp[-1].iel),(yyvsp[0].iel), -1,-1,-1,-1);}
 #line 1771 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1778,13 +1778,13 @@ yyreduce:
 
   case 48:
 #line 179 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("CallMore","",(yyvsp[-1].iel),(yyvsp[0].iel), -1,-1);}
+    {(yyval.iel) = insert_expr("CallMore","",(yyvsp[-1].iel),(yyvsp[0].iel), -1,-1,-1,-1);}
 #line 1783 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
 #line 183 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("ParseArgs",(yyvsp[-4].id)->id,(yyvsp[-2].iel),NULL, (yyvsp[-4].id)->linha,(yyvsp[-4].id)->coluna);free((yyvsp[-4].id)->id);}
+    {(yyval.iel) = insert_expr("ParseArgs",(yyvsp[-4].id)->id,(yyvsp[-2].iel),NULL, (yyvsp[-6].id)->linha,(yyvsp[-6].id)->coluna,(yyvsp[-4].id)->linha,(yyvsp[-4].id)->coluna);free((yyvsp[-4].id)->id);}
 #line 1789 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1796,127 +1796,127 @@ yyreduce:
 
   case 51:
 #line 189 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Assign",(yyvsp[-2].id)->id,(yyvsp[0].iel),NULL,(yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna );free((yyvsp[-2].id)->id);}
+    {(yyval.iel) = insert_expr("Assign",(yyvsp[-2].id)->id,(yyvsp[0].iel),NULL,(yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1 );free((yyvsp[-2].id)->id);}
 #line 1801 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
 #line 190 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Assign",(yyvsp[-3].id)->id,(yyvsp[-1].iel),NULL,(yyvsp[-2].id)->linha,(yyvsp[-2].id)->coluna);free((yyvsp[-3].id)->id);}
+    {(yyval.iel) = insert_expr("Assign",(yyvsp[-3].id)->id,(yyvsp[-1].iel),NULL,(yyvsp[-2].id)->linha,(yyvsp[-2].id)->coluna,-1,-1);free((yyvsp[-3].id)->id);}
 #line 1807 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
 #line 194 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","And",(yyvsp[-2].iel),(yyvsp[0].iel),(yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","And",(yyvsp[-2].iel),(yyvsp[0].iel),(yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1813 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
 #line 195 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Or",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Or",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1819 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
 #line 196 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Eq",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Eq",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1825 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
 #line 197 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Ge",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Ge",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1831 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
 #line 198 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Gt",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Gt",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1837 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
 #line 199 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Le",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Le",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1843 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
 #line 200 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Lt",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Lt",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1849 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
 #line 201 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Ne",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Ne",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1855 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
 #line 202 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Add",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Add",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1861 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
 #line 203 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Sub",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Sub",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1867 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
 #line 204 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Mul",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Mul",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1873 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
 #line 205 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Div",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Div",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1879 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
 #line 206 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Mod",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Mod",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1885 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
 #line 207 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Xor",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Xor",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1891 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
 #line 208 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Lshift",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Lshift",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1897 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
 #line 209 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Rshift",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Rshift",(yyvsp[-2].iel),(yyvsp[0].iel), (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1903 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
 #line 210 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Not",(yyvsp[0].iel),NULL, (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Not",(yyvsp[0].iel),NULL, (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1909 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
 #line 211 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Minus",(yyvsp[0].iel),NULL, (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Minus",(yyvsp[0].iel),NULL, (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1915 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
 #line 212 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Operacao","Plus",(yyvsp[0].iel),NULL, (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);}
+    {(yyval.iel) = insert_expr("Operacao","Plus",(yyvsp[0].iel),NULL, (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);}
 #line 1921 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1940,31 +1940,31 @@ yyreduce:
 
   case 75:
 #line 216 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Id",(yyvsp[0].id)->id,NULL,NULL, (yyvsp[0].id)->linha,(yyvsp[0].id)->coluna);free((yyvsp[0].id)->id);}
+    {(yyval.iel) = insert_expr("Id",(yyvsp[0].id)->id,NULL,NULL, (yyvsp[0].id)->linha,(yyvsp[0].id)->coluna,-1,-1);free((yyvsp[0].id)->id);}
 #line 1945 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
 #line 217 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Length",(yyvsp[-1].id)->id,NULL,NULL, (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna);free((yyvsp[-1].id)->id);}
+    {(yyval.iel) = insert_expr("Length",(yyvsp[-1].id)->id,NULL,NULL, (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);free((yyvsp[-1].id)->id);}
 #line 1951 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 77:
 #line 218 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("RealLit",(yyvsp[0].id)->id,NULL,NULL, (yyvsp[0].id)->linha,(yyvsp[0].id)->coluna);free((yyvsp[0].id)->id);}
+    {(yyval.iel) = insert_expr("RealLit",(yyvsp[0].id)->id,NULL,NULL, (yyvsp[0].id)->linha,(yyvsp[0].id)->coluna,-1,-1);free((yyvsp[0].id)->id);}
 #line 1957 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 78:
 #line 219 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("BoolLit",(yyvsp[0].id)->id,NULL,NULL, (yyvsp[0].id)->linha,(yyvsp[0].id)->coluna);free((yyvsp[0].id)->id);}
+    {(yyval.iel) = insert_expr("BoolLit",(yyvsp[0].id)->id,NULL,NULL, (yyvsp[0].id)->linha,(yyvsp[0].id)->coluna,-1,-1);free((yyvsp[0].id)->id);}
 #line 1963 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 79:
 #line 220 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("DecLit",(yyvsp[0].id)->id,NULL,NULL, (yyvsp[0].id)->linha,(yyvsp[0].id)->coluna);free((yyvsp[0].id)->id);}
+    {(yyval.iel) = insert_expr("DecLit",(yyvsp[0].id)->id,NULL,NULL, (yyvsp[0].id)->linha,(yyvsp[0].id)->coluna,-1,-1);free((yyvsp[0].id)->id);}
 #line 1969 "y.tab.c" /* yacc.c:1646  */
     break;
 

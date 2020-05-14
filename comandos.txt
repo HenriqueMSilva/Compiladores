@@ -118,6 +118,11 @@ add conot be alpierd to sting[] array
 
 -----------------
 
+CallError Line 5, col 18: Incompatible type undef in return statement
+
+
+___________
+
 
 
 

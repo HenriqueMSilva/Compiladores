@@ -10,7 +10,7 @@ is_methodbody_list* insert_methodbody(char *type, is_vardecl_list* vardecl , is_
 is_vardecl_list* insert_vardecl(char *type , char *id, is_vardecl_list* vardecl, int linha, int coluna);
 is_statment_list*  insert_multiple_statement(char *name_function, is_expression_list* expr, is_statment_list* next_statment, is_statment_list* else_next_statment);
 is_statment_list* insert_statment( char *name_function, is_statment_list* statment, is_expression_list* expr);
-is_expression_list* insert_expr(char *operation, char *value, is_expression_list* expr1,  is_expression_list* expr2, int linha, int coluna);
+is_expression_list* insert_expr(char *operation, char *value, is_expression_list* expr1,  is_expression_list* expr2, int linha, int coluna, int linha2, int coluna2);
 void print_tree(is_program* myprogram);
 void free_tree(is_program* myprogram);
 void free_is_metodos(is_metodos* metodos);

@@ -143,11 +143,11 @@ Statement:  IF LPAR  ExprA RPAR   Statement  %prec REDUCE   {$$ = insert_multipl
 
 
         |   WHILE LPAR ExprA RPAR Statement                 {$$ = insert_multiple_statement("While", $3, $5, NULL);}
-        |   RETURN StatementExpOp SEMICOLON                 {$$ = insert_multiple_statement("Return", $2, NULL, NULL);}
+        |   RETURN StatementExpOp SEMICOLON                 {if($2==NULL){$2=insert_expr("Emp_Return","",NULL,NULL,$1->linha, $1->coluna,-1,-1);}     $$ = insert_multiple_statement("Return", $2, NULL, NULL);}
         |   LBRACE StatementZrOuMais RBRACE                 {$$ = insert_multiple_statement("Block", NULL, $2, NULL);}
         |   PRINT LPAR StatementPrint RPAR SEMICOLON        {$$ = insert_multiple_statement("Print", $3, NULL, NULL);}
         |   MethodInvocation SEMICOLON                      {$$ = insert_multiple_statement("Call", $1, NULL, NULL);}
-        |   ID ASSIGN ExprA  SEMICOLON                      {$$ = insert_multiple_statement("AssignStatment", insert_expr("Assign",$1->id,$3,NULL, $2->linha,$2->coluna), NULL, NULL );free($1->id);}
+        |   ID ASSIGN ExprA  SEMICOLON                      {$$ = insert_multiple_statement("AssignStatment", insert_expr("Assign",$1->id,$3,NULL, $1->linha,$1->coluna,$2->linha, $2->coluna), NULL, NULL );free($1->id);}
         |   ParseArgs SEMICOLON                             {$$ = insert_multiple_statement("ParseArgsStatment", $1,NULL, NULL);}
         |   SEMICOLON                                       {$$ = NULL;}
     ; 
@@ -161,63 +161,63 @@ StatementExpOp: /*empty*/                                   {$$ = NULL;}
             |     ExprA                                     {$$ = $1;}
     ;
 
-StatementPrint: STRLIT                                      {$$ = insert_expr("StrLit",$1->id,NULL,NULL, $1->linha,$1->coluna);free($1->id);}
+StatementPrint: STRLIT                                      {$$ = insert_expr("StrLit",$1->id,NULL,NULL, $1->linha,$1->coluna,-1,-1);free($1->id);}
         |     ExprA                                         {$$ = $1;}
     ;
 
 
 
 
-MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {$$ = insert_expr("Call",$1->id,$3,NULL, $1->linha,$1->coluna);free($1->id);}
+MethodInvocation: ID LPAR ExpCommaExpOP RPAR                 {$$ = insert_expr("Call",$1->id,$3,NULL, $1->linha,$1->coluna,-1,-1);free($1->id);}
     ;
 
 ExpCommaExpOP: /*empty*/                                     {$$ = NULL;} 
-            |  ExprA CommaExprZrOuMais                       {$$ = insert_expr("CallMore","",$1,$2, -1,-1);}
+            |  ExprA CommaExprZrOuMais                       {$$ = insert_expr("CallMore","",$1,$2, -1,-1,-1,-1);}
     ;
 
 CommaExprZrOuMais: /*empty*/                                 {$$ = NULL;}
-         | COMMA  ExprA CommaExprZrOuMais                    {$$ = insert_expr("CallMore","",$2,$3, -1,-1);}
+         | COMMA  ExprA CommaExprZrOuMais                    {$$ = insert_expr("CallMore","",$2,$3, -1,-1,-1,-1);}
     ;
 
 
-ParseArgs:  PARSEINT LPAR ID LSQ  ExprA RSQ RPAR             {$$ = insert_expr("ParseArgs",$3->id,$5,NULL, $3->linha,$3->coluna);free($3->id);}
+ParseArgs:  PARSEINT LPAR ID LSQ  ExprA RSQ RPAR             {$$ = insert_expr("ParseArgs",$3->id,$5,NULL, $1->linha,$1->coluna,$3->linha,$3->coluna);free($3->id);}
     ;
 
 
 
 ExprA: Expr                                     {$$ = $1;}
-    |  ID ASSIGN ExprA                          {$$ = insert_expr("Assign",$1->id,$3,NULL,$2->linha,$2->coluna );free($1->id);}
-    |  LPAR ID ASSIGN ExprA RPAR                {$$ = insert_expr("Assign",$2->id,$4,NULL,$3->linha,$3->coluna);free($2->id);}
+    |  ID ASSIGN ExprA                          {$$ = insert_expr("Assign",$1->id,$3,NULL,$2->linha,$2->coluna,-1,-1 );free($1->id);}
+    |  LPAR ID ASSIGN ExprA RPAR                {$$ = insert_expr("Assign",$2->id,$4,NULL,$3->linha,$3->coluna,-1,-1);free($2->id);}
     ;
 
 
-Expr: Expr AND Expr                             {$$ = insert_expr("Operacao","And",$1,$3,$2->linha,$2->coluna);}
-    | Expr OR Expr                              {$$ = insert_expr("Operacao","Or",$1,$3, $2->linha,$2->coluna);}
-    | Expr EQ Expr                              {$$ = insert_expr("Operacao","Eq",$1,$3, $2->linha,$2->coluna);}
-    | Expr GE Expr                              {$$ = insert_expr("Operacao","Ge",$1,$3, $2->linha,$2->coluna);}
-    | Expr GT Expr                              {$$ = insert_expr("Operacao","Gt",$1,$3, $2->linha,$2->coluna);}
-    | Expr LE Expr                              {$$ = insert_expr("Operacao","Le",$1,$3, $2->linha,$2->coluna);}
-    | Expr LT Expr                              {$$ = insert_expr("Operacao","Lt",$1,$3, $2->linha,$2->coluna);}
-    | Expr NE Expr                              {$$ = insert_expr("Operacao","Ne",$1,$3, $2->linha,$2->coluna);}
-    | Expr PLUS Expr                            {$$ = insert_expr("Operacao","Add",$1,$3, $2->linha,$2->coluna);}
-    | Expr MINUS Expr                           {$$ = insert_expr("Operacao","Sub",$1,$3, $2->linha,$2->coluna);}               
-    | Expr STAR Expr                            {$$ = insert_expr("Operacao","Mul",$1,$3, $2->linha,$2->coluna);}
-    | Expr DIV Expr                             {$$ = insert_expr("Operacao","Div",$1,$3, $2->linha,$2->coluna);}
-    | Expr MOD Expr                             {$$ = insert_expr("Operacao","Mod",$1,$3, $2->linha,$2->coluna);}
-    | Expr XOR Expr                             {$$ = insert_expr("Operacao","Xor",$1,$3, $2->linha,$2->coluna);}
-    | Expr LSHIFT Expr                          {$$ = insert_expr("Operacao","Lshift",$1,$3, $2->linha,$2->coluna);}
-    | Expr RSHIFT Expr                          {$$ = insert_expr("Operacao","Rshift",$1,$3, $2->linha,$2->coluna);}
-    | NOT Expr                                  {$$ = insert_expr("Operacao","Not",$2,NULL, $1->linha,$1->coluna);}
-    | MINUS Expr %prec NOT                      {$$ = insert_expr("Operacao","Minus",$2,NULL, $1->linha,$1->coluna);}
-    | PLUS Expr %prec NOT                       {$$ = insert_expr("Operacao","Plus",$2,NULL, $1->linha,$1->coluna);}
+Expr: Expr AND Expr                             {$$ = insert_expr("Operacao","And",$1,$3,$2->linha,$2->coluna,-1,-1);}
+    | Expr OR Expr                              {$$ = insert_expr("Operacao","Or",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr EQ Expr                              {$$ = insert_expr("Operacao","Eq",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr GE Expr                              {$$ = insert_expr("Operacao","Ge",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr GT Expr                              {$$ = insert_expr("Operacao","Gt",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr LE Expr                              {$$ = insert_expr("Operacao","Le",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr LT Expr                              {$$ = insert_expr("Operacao","Lt",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr NE Expr                              {$$ = insert_expr("Operacao","Ne",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr PLUS Expr                            {$$ = insert_expr("Operacao","Add",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr MINUS Expr                           {$$ = insert_expr("Operacao","Sub",$1,$3, $2->linha,$2->coluna,-1,-1);}               
+    | Expr STAR Expr                            {$$ = insert_expr("Operacao","Mul",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr DIV Expr                             {$$ = insert_expr("Operacao","Div",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr MOD Expr                             {$$ = insert_expr("Operacao","Mod",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr XOR Expr                             {$$ = insert_expr("Operacao","Xor",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr LSHIFT Expr                          {$$ = insert_expr("Operacao","Lshift",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | Expr RSHIFT Expr                          {$$ = insert_expr("Operacao","Rshift",$1,$3, $2->linha,$2->coluna,-1,-1);}
+    | NOT Expr                                  {$$ = insert_expr("Operacao","Not",$2,NULL, $1->linha,$1->coluna,-1,-1);}
+    | MINUS Expr %prec NOT                      {$$ = insert_expr("Operacao","Minus",$2,NULL, $1->linha,$1->coluna,-1,-1);}
+    | PLUS Expr %prec NOT                       {$$ = insert_expr("Operacao","Plus",$2,NULL, $1->linha,$1->coluna,-1,-1);}
     | LPAR ExprA RPAR                           {$$ = $2;}
     | MethodInvocation                          {$$ = $1;}
     | ParseArgs                                 {$$ = $1;} 
-    | ID                                        {$$ = insert_expr("Id",$1->id,NULL,NULL, $1->linha,$1->coluna);free($1->id);}
-    | ID DOTLENGTH                              {$$ = insert_expr("Length",$1->id,NULL,NULL, $1->linha,$1->coluna);free($1->id);}
-    | REALLIT                                   {$$ = insert_expr("RealLit",$1->id,NULL,NULL, $1->linha,$1->coluna);free($1->id);}
-    | BOOLLIT                                   {$$ = insert_expr("BoolLit",$1->id,NULL,NULL, $1->linha,$1->coluna);free($1->id);}
-    | INTLIT                                    {$$ = insert_expr("DecLit",$1->id,NULL,NULL, $1->linha,$1->coluna);free($1->id);}
+    | ID                                        {$$ = insert_expr("Id",$1->id,NULL,NULL, $1->linha,$1->coluna,-1,-1);free($1->id);}
+    | ID DOTLENGTH                              {$$ = insert_expr("Length",$1->id,NULL,NULL, $1->linha,$1->coluna,-1,-1);free($1->id);}
+    | REALLIT                                   {$$ = insert_expr("RealLit",$1->id,NULL,NULL, $1->linha,$1->coluna,-1,-1);free($1->id);}
+    | BOOLLIT                                   {$$ = insert_expr("BoolLit",$1->id,NULL,NULL, $1->linha,$1->coluna,-1,-1);free($1->id);}
+    | INTLIT                                    {$$ = insert_expr("DecLit",$1->id,NULL,NULL, $1->linha,$1->coluna,-1,-1);free($1->id);}
     ; 
 
 

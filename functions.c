@@ -333,7 +333,7 @@ is_statment_list* insert_statment( char *name_function, is_statment_list* statme
 }
 
 
-is_expression_list* insert_expr(char *operation, char *value, is_expression_list* expr1,  is_expression_list* expr2, int linha, int coluna){
+is_expression_list* insert_expr(char *operation, char *value, is_expression_list* expr1,  is_expression_list* expr2, int linha, int coluna, int linha2, int coluna2){
 
 		is_expression_list* isl=(is_expression_list*)malloc(sizeof(is_expression_list));
 
@@ -345,6 +345,9 @@ is_expression_list* insert_expr(char *operation, char *value, is_expression_list
 
         isl->linha = linha;
         isl->coluna = coluna;
+
+        isl->linha2 = linha2;
+        isl->coluna2 = coluna2;
 
         isl->expr1 = expr1;
         isl->expr2 = expr2;
@@ -480,6 +483,9 @@ void print_expr(is_expression_list* expr, int n){
         printf("\n");
 
     }else if(strcmp("CallMore",expr->operation) == 0){
+        apply = 1;
+
+    }else if(strcmp("Emp_Return",expr->operation) == 0){
         apply = 1;
     }else{
         for(i=0;i<n;i++){

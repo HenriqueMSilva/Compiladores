@@ -17,6 +17,9 @@ typedef struct _s10 {
     int linha;
     int coluna;
 
+    int linha2;
+    int coluna2;
+
     struct _s10* expr1;
     struct _s10* expr2;
 } is_expression_list;
@@ -39,7 +42,7 @@ typedef struct _s8 {
 
     int linha;
     int coluna;
-    
+
     struct _s8* next;
 } is_vardecl_list;
 

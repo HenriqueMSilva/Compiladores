@@ -66,7 +66,7 @@ char*  get_metodo_igual_return_type(is_expression_list* expr, method_var* lista_
 int num_metodo_parecido_declarado(is_expression_list* expr, method_var* lista_do_metodo);
 char*  get_metodo_parecido_return_type(is_expression_list* expr, method_var* lista_do_metodo);
 
-int assinatura_return_iguais(is_expression_list* expr, table_element_local * new_method );
+char *  assinatura_return_iguais(is_expression_list* expr, table_element_local * new_method );
 int assinatutas_parecidas_call(is_expression_list* expr, param_node* param_list, method_var* lista_do_metodo);
 int assinatutas_iguais_call(is_expression_list* expr, param_node* param_list, method_var* lista_do_metodo);
 int assinatutas_iguais_global(table_element_global *newSymbol, table_element_global *aux);
