@@ -53,6 +53,10 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	}
 
 	if(strcmp(expr->operation, "DecLit" ) == 0){ 
+
+		printf("%d\n",atoi(expr->value));
+		printf("%d\n",atoi(expr->value));
+
 		expr->tipo = "int"; 
 		return expr->tipo;
 	}
@@ -200,6 +204,18 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				return expr->tipo;
 			}
 		}
+
+		//aqui o tipo é obrigatoriamente null entao tem de dar dois erros
+		operador = retorna_operador(expr->operation);
+		// print do erro para o parse args
+		if(expr->expr1 != NULL){	
+			printf("Line %d, col %d: Cannot find symbol %s\n", expr->linha2 ,expr->coluna2 , expr->value);
+			printf("Line %d, col %d: Operator %s cannot be applied to types undef, %s\n",expr->linha,expr->coluna, operador , expr->expr1->tipo);
+		}else{ //print de erro para o length
+			printf("Line %d, col %d: Cannot find symbol %s\n", expr->linha ,expr->coluna , expr->value);
+			printf("Line %d, col %d: Operator %s cannot be applied to type undef\n",expr->linha,expr->coluna, operador);
+		}
+		
 	}
 
 
@@ -367,7 +383,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
             //double double
 
             if(  !( (strcmp(str1,"int") == 0 || strcmp(str1,"double") == 0) && (strcmp(str2,"int") == 0 || strcmp(str2,"double") == 0)) ){
-                //printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna,operador,retorna_operador(str1),retorna_operador(str2));
+                printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna,operador,retorna_operador(str1),retorna_operador(str2));
             }
 
             /*if( ( !( (strcmp(str1,"int") == 0 && strcmp(str2,"double") == 0) || (strcmp(str2,"int") == 0 && strcmp(str1,"double") == 0) ) && strcmp(str2,str1) != 0) || strcmp(str1,"undef") == 0 || strcmp(str2,"undef") == 0 || strcmp(str1,"stringarray") == 0 || strcmp(str2,"stringarray") == 0 || strcmp(str1,"bool") == 0 || strcmp(str2,"bool") == 0){
@@ -425,7 +441,7 @@ void print_erro_assign(is_expression_list* expr, char * type){
 	//nao podemos igualar strings e se forem diferentes sem contar com o caso double = int
 	if( strcmp( tipo , "String[]" ) == 0 || strcmp( aux , "String[]" ) == 0 || (!(strcmp(tipo,"double") == 0 && strcmp(aux,"int") == 0) && strcmp(tipo,aux) != 0)){
 
-		printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna,operation, tipo , aux);
+		printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha2,expr->coluna2,operation, tipo , aux);
 		
 	}
 	
@@ -530,6 +546,7 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 				coluna = statment->expr->coluna;
 
 				printf("Line %d, col %d: Incompatible type %s in return statement\n",linha, coluna, error_declaration);
+			}
 
 		}else if(strcmp(statment->name_function, "If" ) == 0 || strcmp(statment->name_function, "IfElse" ) == 0 ){
 
@@ -917,7 +934,7 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 			expr = expr->expr1;
 			while(expr != NULL){
 				if(expr->expr1 != NULL){
-					printf("%s",lowerCase(expr->expr1->tipo));
+					printf("%s",retorna_operador(expr->expr1->tipo));
 				}
 				if(expr->expr2 != NULL){
 					printf(",");
