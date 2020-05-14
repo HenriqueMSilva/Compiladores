@@ -188,8 +188,8 @@ ParseArgs:  PARSEINT LPAR ID LSQ  ExprA RSQ RPAR             {$$ = insert_expr("
 
 
 ExprA: Expr                                     {$$ = $1;}
-    |  ID ASSIGN ExprA                          {$$ = insert_expr("Assign",$1->id,$3,NULL,$2->linha,$2->coluna,-1,-1 );free($1->id);}
-    |  LPAR ID ASSIGN ExprA RPAR                {$$ = insert_expr("Assign",$2->id,$4,NULL,$3->linha,$3->coluna,-1,-1);free($2->id);}
+    |  ID ASSIGN ExprA                          {$$ = insert_expr("Assign",$1->id,$3,NULL,$1->linha,$1->coluna,$2->linha,$2->coluna );free($1->id);}
+    |  LPAR ID ASSIGN ExprA RPAR                {$$ = insert_expr("Assign",$2->id,$4,NULL,$2->linha,$2->coluna,$3->linha,$3->coluna  );free($2->id);}
     ;
 
 

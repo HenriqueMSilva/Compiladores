@@ -425,7 +425,7 @@ void print_erro_assign(is_expression_list* expr, char * type){
 	//nao podemos igualar strings e se forem diferentes sem contar com o caso double = int
 	if( strcmp( tipo , "String[]" ) == 0 || strcmp( aux , "String[]" ) == 0 || (!(strcmp(tipo,"double") == 0 && strcmp(aux,"int") == 0) && strcmp(tipo,aux) != 0)){
 
-		printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna,operation, tipo , aux);
+		printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha2, expr->coluna2, operation, tipo , aux);
 		
 	}
 	
@@ -530,6 +530,8 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 				coluna = statment->expr->coluna;
 
 				printf("Line %d, col %d: Incompatible type %s in return statement\n",linha, coluna, error_declaration);
+
+			}
 
 		}else if(strcmp(statment->name_function, "If" ) == 0 || strcmp(statment->name_function, "IfElse" ) == 0 ){
 
@@ -875,6 +877,13 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 	//int verification = 0;
 
 
+	if(expr->expr1 != NULL){
+		//h apelo menos 1 parametro de entrada
+		//vai meter tipos na ast
+		//recursao_expr(expr->expr1, lista_do_metodo);
+	}
+
+
 	if(ha_metodo_igual_declarado(expr,lista_do_metodo) == 1){
 		//vou procurar um metodo igual
 		return  get_metodo_igual_return_type(expr,lista_do_metodo);
@@ -1036,11 +1045,11 @@ int assinatutas_parecidas_call(is_expression_list* expr, param_node* param_list,
 
 
 
-	if(expr != NULL){
+	/*if(expr != NULL){
 		//h apelo menos 1 parametro de entrada
 		//vai meter tipos na ast
 		recursao_expr(expr, lista_do_metodo);
-	}
+	}*/
 	
 
 
@@ -1085,11 +1094,11 @@ int assinatutas_iguais_call(is_expression_list* expr, param_node* param_list, me
 
 
 
-	if(expr != NULL){
+	/*if(expr != NULL){
 		//h apelo menos 1 parametro de entrada
 		//vai meter tipos na ast
 		recursao_expr(expr, lista_do_metodo);
-	}
+	}*/
 	
 
 
