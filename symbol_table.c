@@ -54,8 +54,8 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 	if(strcmp(expr->operation, "DecLit" ) == 0){ 
 
-		printf("%d\n",atoi(expr->value));
-		printf("%d\n",atoi(expr->value));
+		//printf("%d\n",atoi(expr->value));
+		//printf("%d\n",atoi(expr->value));
 
 		expr->tipo = "int"; 
 		return expr->tipo;
@@ -498,7 +498,7 @@ char * retorna_operador (char * value){
 		operador = "boolean";
 	}else if(strcmp(value,"String") == 0){
 		operador = "String";
-	}else if(strcmp(value,"Void") == 0){
+	}else if(strcmp(value,"Void") == 0 || strcmp(value,"void") == 0){
 		operador = "void";
 	}
 
@@ -546,8 +546,6 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 				coluna = statment->expr->coluna;
 
 				printf("Line %d, col %d: Incompatible type %s in return statement\n",linha, coluna, error_declaration);
-			}
-
 			}
 
 		}else if(strcmp(statment->name_function, "If" ) == 0 || strcmp(statment->name_function, "IfElse" ) == 0 ){
