@@ -1,27 +1,32 @@
-class errors {
+class ifwhile {
 
-    public static int a, b, c;
-    public static int c, a, b;
-    public static double _;
+    public static boolean b;
+    public static int i;
+    public static double d;
 
-    public static int underscore(int ola) {
-      if (ola) {
-        return ola;
-      }else{
-        return ola;
-      }
-      int ola;
+    public static void main(String[] args) {
+        boolean bl;
+        boolean t;
+        boolean f;
+
+        if(t) {
+            while(b)
+            while(true) {
+                    System.out.print(i);
+                    System.out.print(b);
+                    System.out.print(d);
+                } ;
+            System.out.print("Gotcha!");
+            while(true) {
+                if (f)
+                    ;
+                else {
+                    while (f) System.out.print(d);
+                    System.out.print("Twice!");
+                }
+                System.out.print("Thrice!");
+            }
+        }
+        while(false) System.out.print(b);
     }
-
-    public static void factorial(int i, int i,int _) {
-      i = i + i;
-    }
-    public static void factorial(int i, int i) {
-        int argument;
-        int i;
-        int argument;
-        int a;
-        double i,_;
-    }
-
 }
