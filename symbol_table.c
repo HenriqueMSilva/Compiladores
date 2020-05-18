@@ -113,9 +113,6 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 
 
-
-	//mesmo raciocionio do call e dos operadores, so tratamos disto depois dos filhos
-
 	//vai atribuir o tipo ao ID que esta associado a estes statment, no print depois resolve-se o tipo
 	if(strcmp(expr->operation, "Length" ) == 0 || strcmp(expr->operation, "ParseArgs" ) == 0){ 
 		
@@ -320,13 +317,13 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				str1 = "stringarray";
 			}else if(strcmp(expr->expr1->tipo,"String[]") == 0 ){ // este caso é devido ao parseargs e ao length , eles tem de ser considerados int
 				str1 = "int";
-			}else{
+			}else if( strcmp(expr->expr1->operation,"Length") == 0 || strcmp(expr->expr1->operation,"ParseArgs") == 0 ){
+                str1 = "int";
+            }else{
 				str1 = expr->expr1->tipo;
 			}
 
-			if( strcmp(expr->expr1->operation,"Length") == 0 || strcmp(expr->expr1->operation,"ParseArgs") == 0 ){
-                str1 = "int";
-            }
+			
 		}
 		
 		if(expr->expr2 != NULL){
@@ -340,13 +337,13 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				str2 = "stringarray";
 			}else if(strcmp(expr->expr2->tipo,"String[]") == 0 ){ 
 				str2 = "int";
-			}else{
+			}else if( strcmp(expr->expr1->operation,"Length") == 0 || strcmp(expr->expr1->operation,"ParseArgs") == 0 ){
+                str2 = "int";
+            }else{
 				str2 = expr->expr2->tipo;
 			}
 
-			if( strcmp(expr->expr1->operation,"Length") == 0 || strcmp(expr->expr1->operation,"ParseArgs") == 0 ){
-                str1 = "int";
-            }
+			
 
 		}
 
@@ -394,11 +391,8 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 
 			if(strcmp(str1,"bool") != 0){
-			
-				printf("Line %d, col %d: Operator ! cannot be applied to type %s\n",expr->linha,expr->coluna,str1);
-			
+				printf("Line %d, col %d: Operator ! cannot be applied to type %s\n",expr->linha,expr->coluna,str1);	
 			}
-
 
 			expr->tipo = "bool"; 
 			return expr->tipo;
@@ -568,8 +562,6 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 				aux = statment->expr->tipo;
 			}
 
-			//printf("%s %s %s %s\n",statment->expr->operation,statment->expr->value,statment->expr->tipo,aux);
-			
 			if(strcmp(aux,"undef") == 0 || strcmp( aux , "StringArray") == 0 || strcmp( aux,"Void") == 0){
 				printf("Line %d, col %d: Incompatible type %s in System.out.print statement\n",statment->expr->linha,statment->expr->coluna,retorna_operador(aux));
 			}
@@ -716,87 +708,6 @@ char *  assinatura_return_iguais(is_expression_list* expr, table_element_local *
 
 
 
- 
-/*
-int metodo_retorna_tipo_param (is_expression_list* expr, method_var* lista_do_metodo,  param_node * param_list){
-	//EXPR E O PRIMEIRO CALLMORE
-	char *str;
-	char *str2;
-	int verification = 0; // 1 e true , 0 e false
-
-	//verifica tipo do parametro
-	if(expr->expr1 != NULL){
-		str = lowerCase(recursao_expr(expr->expr1, lista_do_metodo));
-	}
-	
-	str2 = lowerCase(param_list->type_param);
-	
-
-
-	//passa para o proximo parametro
-	if(expr->expr2 != NULL && param_list->next != NULL){
-		if(strcmp(str,str2) != 0 && (strcmp(str,"int") != 0 &&  strcmp(str2,"double") != 0) ){
-			return 0;
-		}
-		verification = metodo_retorna_tipo_param(expr->expr2, lista_do_metodo, param_list->next);
-	
-	}else if(expr->expr2 == NULL && param_list->next == NULL){
-		
-		if(strcmp(str2,"bool") == 0){
-			str2 = "boolean";
-		}
-		if(strcmp(str,"bool") == 0){
-			str = "boolean";
-		}
-		
-
-		if(strcmp(str,str2) == 0 ){
-			expr->tipo = str;
-		
-			return 2;
-		}else if( strcmp(str,"int") == 0 &&  strcmp(str2,"double") == 0){
-			expr->tipo = str2;
-	
-			return 1;
-		}else{
-			return 0;
-		}
-
-	}else if( (expr->expr2 == NULL && param_list->next != NULL) || (expr->expr2 != NULL && param_list->next == NULL) ){
-
-		return 0;
-	}
-
-
-	if(verification == 1 || verification == 2){
-
-		if(strcmp(str2,"bool") == 0){
-			str2 = "boolean";
-		}
-		if(strcmp(str,"bool") == 0){
-			str = "boolean";
-		}
-
-		if(strcmp(str,str2) == 0 ){
-			expr->tipo = str;
-			if(verification == 1){
-
-				return 1;
-			}
-
-			return 2;
-		}else if( strcmp(str,"int") == 0 &&  strcmp(str2,"double") == 0){
-			expr->tipo = str2;
-
-			return 1;
-		}
-	}
-	
-	return 0;
-}	
-*/
-
-
 
 int ha_metodo_igual_declarado(is_expression_list* expr, method_var* lista_do_metodo){
 	table_element_global * tabela_global = symtab_global->declarations;
@@ -810,8 +721,6 @@ int ha_metodo_igual_declarado(is_expression_list* expr, method_var* lista_do_met
 			continue;
 		}
 
-
-		//printf("%s %s\n",expr->value, tabela_global->name);
 
 		//metodo
 		// mesmo nome e memos param entrada
@@ -924,18 +833,6 @@ char*  get_metodo_parecido_return_type(is_expression_list* expr, method_var* lis
 
 //verificar se a funcao esta declarada 
 char * type_call_verification(is_expression_list* expr, method_var* lista_do_metodo){
-	//table_element_global * tabela_global = symtab_global->declarations;
-	//is_expression_list* expr_aux;
-
-	//char * str = NULL;
-	//int verification = 0;
-
-
-	if(expr->expr1 != NULL){
-		//h apelo menos 1 parametro de entrada
-		//vai meter tipos na ast
-		//recursao_expr(expr->expr1, lista_do_metodo);
-	}
 
 
 	if(ha_metodo_igual_declarado(expr,lista_do_metodo) == 1){
@@ -943,9 +840,8 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 		return  get_metodo_igual_return_type(expr,lista_do_metodo);
 
 	}
+
 	//nao ha um metodo exatamente igual, vamos ver se ha algum parecido
-
-
 	int num_metodos = num_metodo_parecido_declarado(expr,lista_do_metodo);
 
 	if(  num_metodos == 1) {
@@ -953,6 +849,7 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 		return get_metodo_parecido_return_type(expr,lista_do_metodo);
 
 	}else if(num_metodos > 1){
+
 		//ambig
 		printf("Line %d, col %d: Reference to method %s(",expr->linha,expr->coluna,expr->value);
 		if(expr->expr1 != NULL){
@@ -972,9 +869,8 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 		return "undef";
 
 	}else if(num_metodos == 0){
-		//nao declarado
-		//DEBUG
-		
+
+		//nao declarado		
 		printf("Line %d, col %d: Cannot find symbol %s(",expr->linha,expr->coluna,expr->value);
 		if(expr->expr1 != NULL){
 			expr = expr->expr1;
@@ -996,54 +892,6 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 
 	//nunca deve chagar aqui
 	return "ERROR1";
-
-
-/*
-	while(tabela_global != NULL){
-
-		//ERA UM FIELD DECLARATION
-		if(tabela_global->type_return == NULL){
-			tabela_global = tabela_global->next;
-			continue;
-		}
-
-		//ERA METODO DECLARADO
-		if( strcmp(expr->value,tabela_global->name) == 0  ){
-			//
-
-
-			//TEM PARAMETROS DE ENTRADA? NAO
-			if(expr->expr1 == NULL && tabela_global->param_list == NULL){
-				return tabela_global->type_return;
-
-			//TEM PARAMAETROS DE ENTRADA
-			}else{
-				
-				if(expr->expr1 != NULL && tabela_global->param_list != NULL ){
-
-					verification = metodo_retorna_tipo_param(expr->expr1,lista_do_metodo,tabela_global->param_list);
-					
-					if(verification == 2){
-						return tabela_global->type_return;
-					}else if(verification == 1){
-						str = tabela_global->type_return;
-					}else{
-						expr_aux = expr;
-						while(expr_aux != NULL){
-							expr_aux->tipo = NULL;
-							expr_aux = expr_aux->expr2;
-						}
-					}
-				}
-
-			}
-		}
-
-		
-		tabela_global = tabela_global->next;
-	}
-
-	return str;*/
 }
 
 
@@ -1099,13 +947,6 @@ int assinatutas_parecidas_call(is_expression_list* expr, param_node* param_list,
 
 
 
-	/*if(expr != NULL){
-		//h apelo menos 1 parametro de entrada
-		//vai meter tipos na ast
-		recursao_expr(expr, lista_do_metodo);
-	}*/
-	
-
 
 	while(expr != NULL && param_list != NULL){
 
@@ -1145,14 +986,6 @@ int assinatutas_iguais_call(is_expression_list* expr, param_node* param_list, me
 	//param_list e o 1 parametros declarado
 	char * str1;
 	char * str2;
-
-
-
-	/*if(expr != NULL){
-		//h apelo menos 1 parametro de entrada
-		//vai meter tipos na ast
-		recursao_expr(expr, lista_do_metodo);
-	}*/
 	
 
 
@@ -1194,10 +1027,10 @@ int assinatutas_iguais_global(table_element_global *newSymbol, table_element_glo
 	param_node * param_aux = aux->param_list;
 
 	//testo o return
-	if( strcmp(newSymbol->type_return, aux->type_return) != 0 ){
+	/*if( strcmp(newSymbol->type_return, aux->type_return) != 0 ){
 		//metodos diferente
 		return 0;
-	}
+	}*/
 
 
 	while(param_newSymbol != NULL && param_aux != NULL){
@@ -1273,10 +1106,6 @@ int tenta_inserir_metodo_na_tail_global(table_element_global * newSymbol){
 		//Procura cauda da lista e verifica se simbolo ja existe 
 		for(aux = symtab_global->declarations; aux != NULL ; previous = aux, aux = aux->next){
 			if(strcmp(aux->name, newSymbol->name) == 0 && aux->type_return != NULL && assinatutas_iguais_global(newSymbol, aux) == 1){
-
-				//printf("\nTODO M: Symbol %s already defined\n",aux->name);
-
-				//TODO-controlo se ja foi declarado
 				return 0;
 			}
 		}
@@ -1353,7 +1182,6 @@ void tenta_inserir_na_tail_local(table_element_local * new_method){
 							break;
 						}
 
-						//printf("%d %d %s\n",counter,verifica,aux_method->name);
 						aux_aux_tel = aux_aux_tel->next;
 						aux_new_method_tel = aux_new_method_tel->next;
 					}
@@ -1396,9 +1224,6 @@ char * lowerCase(char * str){
 
 
 
-
-
-
 header_global* insert_classname(char *str){
 
 	header_global *stg=(header_global*) malloc(sizeof(header_global));
@@ -1411,6 +1236,7 @@ header_global* insert_classname(char *str){
 	return stg;
 	free(stg);
 }
+
 
 table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_methodbody_list* imbl){
 	char * tipo;
@@ -1498,9 +1324,8 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 
 
 		//percorrer o body entre statments e var decs
-		//&& ( ast_var_dec_or_statment->ivdl != NULL || ast_var_dec_or_statment->statment != NULL)
 		while(ast_var_dec_or_statment != NULL  ){
-		//while(ast_var_dec_or_statment != NULL ){  ACHO QUE O WHILE PODIA SER SO ISTO
+
 
 			//e um statment e nao um var dec
 			//Statmente
@@ -1850,7 +1675,6 @@ void show_tabela_global(){
 		aux->declarations = aux->declarations->next;
 	}
 
-	//ATENTION..............................................nao sei se e preciso TODO
 	printf("\n");
 }
 
