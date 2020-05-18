@@ -1,28 +1,27 @@
-//Test using no flags!!! (./jucompiler < NoFlags.java)
-class NoFlags {
-  public static int a(int n) {
-          int a;
-      a = 2147483648;
-        }
+class errors {
 
-  public static int a(double n) {
-          int b;
-      b = 21474_8_3647;
-        }
+    public static int a, b, c;
+    public static int c, a, b;
+    public static double _;
 
-  public static int a(boolean n, int a, boolean c) {
-          int d;
-      d = 2147483649;
-      d = c;
-        }
-
-  public static int a(int n) {
-          int d;
-      d = 10_0000_00000;
-        }
-
-    public static void main(String[] args) {
-        Integer.parseInt(s[2.2]);
-        System.out.print(s.length);
+    public static int underscore(int ola) {
+      if (ola) {
+        return ola;
+      }else{
+        return ola;
+      }
+      int ola;
     }
+
+    public static void factorial(int i, int i,int _) {
+      i = i + i;
+    }
+    public static void factorial(int i, int i) {
+        int argument;
+        int i;
+        int argument;
+        int a;
+        double i,_;
+    }
+
 }

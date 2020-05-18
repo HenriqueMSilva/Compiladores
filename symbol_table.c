@@ -41,7 +41,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	}
 
 
-	//se for realint intlot ou bool-> return
+	//se for realint intlit ou bool-> return
 	if(strcmp(expr->operation, "RealLit" ) == 0 ){
 		expr->tipo = "double";
 		return expr->tipo; 
@@ -54,8 +54,42 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 	if(strcmp(expr->operation, "DecLit" ) == 0){ 
 
-		//printf("%d\n",atoi(expr->value));
-		//printf("%d\n",atoi(expr->value));
+		char * str = expr->value;
+		int i,k=0,tam_array=0;
+		int value=0;
+
+		for(i=0;i<strlen(str);i++){
+			if( str[i] != '_'){
+				tam_array = tam_array + 1;
+			}
+		}
+		
+		char new_str[tam_array];
+		
+		for(i=0;i<strlen(str);i++){
+			if( str[i] != '_'){
+				value += (int) str[i];
+				new_str[k] = str[i];
+				k++;
+			}
+		}
+		
+
+		char bound[10] = "2147483648";
+		if(tam_array > 10){
+			printf("Line %d, col %d: Number %s out of bounds\n",expr->linha,expr->coluna,expr->value);
+		}else if( tam_array == 10){
+			for(i=0;i< tam_array ;i++){
+				if(((int)new_str[9]) >= ((int) bound[9])){
+					printf("Line %d, col %d: Number %s out of bounds\n",expr->linha,expr->coluna,expr->value);
+					break;
+				}
+				if( ((int)new_str[i]) > ((int) bound[i])){
+					printf("Line %d, col %d: Number %s out of bounds\n",expr->linha,expr->coluna,expr->value);
+					break;
+				}
+			}
+		}
 
 		expr->tipo = "int"; 
 		return expr->tipo;
