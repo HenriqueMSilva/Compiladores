@@ -1,19 +1,15 @@
 class Alguns_Erros {
-  public static double f(int a, double b, double c, double d) {
-  }
-  public static double f(double b, double c, double d, int a) {
-  }
-  public static double f(double b) {
-  }
-  public static double f(int b) {
-  }
-  public static double f(double b,int c) {
-  }
-  public static double f(double b,double c) {
-  }
-  public static void main(String[] args) {
-    f(main(args), args,1, f(W));
-    f(1,1);
-  }
+  public static double f(int a, double b, double f) {}
+  public static double f(int w, double d, double d) {}
+  public static int    f(int w, double d, double d) {}
+  
+  public static int    fu(int w, double d, double d) {}
+  public static int    fu(int w, double d, double d) {}
+  public static double    fu(int w, double d, double d) {}
+
+  public static double    fu(int w, double d) {}
+  public static double    fu(double d, int w) {}
+  public static double    fu(int w, double d, double d) {}
+
 
 }

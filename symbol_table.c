@@ -1028,10 +1028,10 @@ int assinatutas_iguais_global(table_element_global *newSymbol, table_element_glo
 	param_node * param_aux = aux->param_list;
 
 	//testo o return
-	if( strcmp(newSymbol->type_return, aux->type_return) != 0 ){
+	/*if( strcmp(newSymbol->type_return, aux->type_return) != 0 ){
 		//metodos diferente
 		return 0;
-	}
+	}*/
 
 
 	while(param_newSymbol != NULL && param_aux != NULL){
