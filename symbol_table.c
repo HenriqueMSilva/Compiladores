@@ -15,6 +15,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	char * aux;
 
 
+
 	//se for ID verificar se ja foi declarado
 	if( strcmp(expr->operation, "Id" ) == 0 ){
 	
@@ -138,7 +139,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 					operador = retorna_operador(expr->operation);
 
-					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador , expr->tipo , aux);
+					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador , expr->tipo ,  retorna_operador(aux));
 				
 				}
 
@@ -146,9 +147,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				return expr->tipo;
 			}else{
 								
-				if(strcmp(tipo, "bool" ) == 0){
-					tipo = "boolean";
-				}
+
 
 				operador = retorna_operador(expr->operation);
 
@@ -156,7 +155,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				if(strcmp(expr->operation, "Length" ) == 0){
 
 					//somar mais um na coluna para contar o ponto antes do length
-					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna+1, operador ,tipo);
+					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna, operador , retorna_operador(tipo));
 
 				}else{
 
@@ -168,11 +167,11 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 						aux = expr->expr1->tipo;
 					}
 
-					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,tipo, aux);
+					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,retorna_operador(tipo),  retorna_operador(aux));
 
 				}
 				
-				expr->tipo = tipo;
+				expr->tipo = retorna_operador(tipo);
 				return expr->tipo;
 			}
 		}
@@ -198,16 +197,13 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 					operador = retorna_operador(expr->operation);
 
-					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,tipo, aux);
+					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,expr->tipo,  retorna_operador(aux));
 				
 				}
 
 				return expr->tipo;
 			}else{
 
-				if(strcmp(tipo, "bool" ) == 0){
-					tipo = "boolean";
-				}
 
 				operador = retorna_operador(expr->operation);
 
@@ -215,7 +211,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				if(strcmp(expr->operation, "Length" ) == 0){
 
 					//somar mais um na coluna para contar o ponto antes do length
-					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna+1, operador ,tipo);
+					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna, operador ,retorna_operador(tipo));
 
 				}else{
 
@@ -227,11 +223,11 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 						aux = expr->expr1->tipo;
 					}
 
-					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,tipo, aux);
+					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,retorna_operador(tipo), retorna_operador(aux));
 
 				}
 				
-				expr->tipo = tipo;
+				expr->tipo = retorna_operador(tipo);
 				return expr->tipo;
 			}
 		}
@@ -241,7 +237,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		// print do erro para o parse args
 		if(expr->expr1 != NULL){	
 			printf("Line %d, col %d: Cannot find symbol %s\n", expr->linha2 ,expr->coluna2 , expr->value);
-			printf("Line %d, col %d: Operator %s cannot be applied to types undef, %s\n",expr->linha,expr->coluna, operador , expr->expr1->tipo);
+			printf("Line %d, col %d: Operator %s cannot be applied to types undef, %s\n",expr->linha,expr->coluna, operador , retorna_operador(expr->expr1->tipo));
 		}else{ //print de erro para o length
 			printf("Line %d, col %d: Cannot find symbol %s\n", expr->linha ,expr->coluna , expr->value);
 			printf("Line %d, col %d: Operator %s cannot be applied to type undef\n",expr->linha,expr->coluna, operador);
@@ -578,13 +574,13 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 				printf("Line %d, col %d: Incompatible type %s in return statement\n",linha, coluna, error_declaration);
 			}
 
-		}else if(strcmp(statment->name_function, "If" ) == 0 || strcmp(statment->name_function, "IfElse" ) == 0 ){
+		}else if(strcmp(statment->name_function, "If" ) == 0 || strcmp(statment->name_function, "IfElse" ) == 0 || strcmp(statment->name_function, "While" ) == 0 ){
 
 			// verifica se a condiçao dentro do if é boolean se nao for printa erro
 			aux = retorna_operador(statment->expr->tipo);
 			if( strcmp(aux, "boolean") != 0 ){
 
-				printf("Line %d, col %d: Incompatible type %s in if statement\n",statment->expr->linha,statment->expr->coluna,retorna_operador( lowerCase(statment->expr->tipo)));
+				printf("Line %d, col %d: Incompatible type %s in if statement\n",statment->expr->linha,statment->expr->coluna,retorna_operador( statment->expr->tipo));
 
 			}
 
@@ -856,7 +852,7 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 			expr = expr->expr1;
 			while(expr != NULL){
 				if(expr->expr1 != NULL){
-					printf("%s",lowerCase(expr->expr1->tipo));
+					printf("%s",retorna_operador(expr->expr1->tipo));
 				}
 				if(expr->expr2 != NULL){
 					printf(",");
@@ -1561,11 +1557,8 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 		param_node* aux_param = newSymbol->param_list;
 		while(aux_param != NULL){
 
-			if( strcmp(lowerCase(aux_param->type_param),"stringarray") == 0 ){
-				printf("%s","String[]");
-			}else{
-				printf("%s",lowerCase(aux_param->type_param) );
-			}
+
+			printf("%s",retorna_operador(aux_param->type_param));
 
 			if(aux_param->next != NULL){
 				printf(",");
