@@ -12,7 +12,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	char * str1;
 	char * str2;
 	char * operador = NULL;
-	char * aux;
+	char * aux = NULL;
 
 
 
@@ -127,19 +127,14 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 
 				//se for parseargs verificar se dentro do array estao valores apropriados
-				if( strcmp(expr->operation, "ParseArgs" ) == 0 && strcmp( "int" , expr->expr1->tipo ) != 0 ){
+				if( strcmp(expr->operation, "ParseArgs" ) == 0 && strcmp( "ParseArgs" , expr->expr1->operation ) != 0 && strcmp( "int" , expr->expr1->tipo ) != 0 ){
 
-					if(strcmp( expr->expr1->tipo , "bool" ) == 0){
-
-						aux = "boolean";
-					}else{
-
-						aux = expr->expr1->tipo;
-					}
-
+					
+					aux = retorna_operador(expr->expr1->tipo);
 					operador = retorna_operador(expr->operation);
 
-					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador , expr->tipo ,  retorna_operador(aux));
+
+					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador , expr->tipo , aux);
 				
 				}
 
@@ -154,21 +149,14 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				//se for length so da print ao valor que chama o length
 				if(strcmp(expr->operation, "Length" ) == 0){
 
-					//somar mais um na coluna para contar o ponto antes do length
-					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna, operador , retorna_operador(tipo));
+					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha2,expr->coluna2, operador , retorna_operador(tipo));
 
 
 				}else{
 
-					if(strcmp( expr->expr1->tipo , "bool" ) == 0){
+					aux = retorna_operador(expr->expr1->tipo);
 
-						aux = "boolean";
-					}else{
-
-						aux = expr->expr1->tipo;
-					}
-
-					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,retorna_operador(tipo),  retorna_operador(aux));
+					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,retorna_operador(tipo),  aux);
 
 				}
 				
@@ -186,16 +174,9 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				//estava declarada
 				expr->tipo = "String[]";
 
-				if( strcmp(expr->operation, "ParseArgs" ) == 0 && strcmp( "int" , expr->expr1->tipo ) != 0 ){
+				if( strcmp(expr->operation, "ParseArgs" ) == 0 && strcmp( "ParseArgs" , expr->expr1->operation ) != 0 && strcmp( "int" , expr->expr1->tipo ) != 0 ){
 
-					if(strcmp( expr->expr1->tipo , "bool" ) == 0){
-
-						aux = "boolean";
-					}else{
-
-						aux = expr->expr1->tipo;
-					}
-
+					aux = retorna_operador(expr->expr1->tipo);
 					operador = retorna_operador(expr->operation);
 
 					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,expr->tipo,  retorna_operador(aux));
@@ -212,20 +193,15 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				if(strcmp(expr->operation, "Length" ) == 0){
 
 					//somar mais um na coluna para contar o ponto antes do length
-					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna, operador ,retorna_operador(tipo));
+					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha2,expr->coluna2, operador ,retorna_operador(tipo));
 
 
 				}else{
 
-					if(strcmp( expr->expr1->tipo , "bool" ) == 0){
+					aux = retorna_operador(expr->expr1->tipo);
 
-						aux = "boolean";
-					}else{
 
-						aux = expr->expr1->tipo;
-					}
-
-					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,retorna_operador(tipo), retorna_operador(aux));
+					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,retorna_operador(tipo), aux);
 
 				}
 				
@@ -234,6 +210,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			}
 		}
 
+		// entra aqui se o id nao for definido
 		//aqui o tipo é obrigatoriamente null entao tem de dar dois erros
 		operador = retorna_operador(expr->operation);
 		// print do erro para o parse args
@@ -242,7 +219,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			printf("Line %d, col %d: Operator %s cannot be applied to types undef, %s\n",expr->linha,expr->coluna, operador , retorna_operador(expr->expr1->tipo));
 		}else{ //print de erro para o length
 			printf("Line %d, col %d: Cannot find symbol %s\n", expr->linha ,expr->coluna , expr->value);
-			printf("Line %d, col %d: Operator %s cannot be applied to type undef\n",expr->linha,expr->coluna, operador);
+			printf("Line %d, col %d: Operator %s cannot be applied to type undef\n",expr->linha2,expr->coluna2, operador);
 		}
 		
 	}
@@ -263,7 +240,6 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			return expr->tipo;
 		}
 
-
 		//averiguar se a var foi declarado globalmente
 		tipo =  var_declarada_globalmente(expr->value);
 
@@ -275,6 +251,11 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			expr->tipo = tipo;
 			return expr->tipo;
 		}
+
+		// entra aqui se o id nao for definido
+		operador = retorna_operador(expr->operation);
+		printf("Line %d, col %d: Cannot find symbol %s\n", expr->linha ,expr->coluna , expr->value);
+		printf("Line %d, col %d: Operator %s cannot be applied to types undef, %s\n",expr->linha2,expr->coluna2, operador , retorna_operador(expr->expr1->tipo));
 	}
 
 
@@ -514,7 +495,7 @@ char * retorna_operador (char * value){
 		operador = "Integer.parseInt";
 	}else if(strcmp(value,"Assign") == 0){
 		operador = "=";
-	}else if(strcmp(value,"stringarray") == 0 || strcmp(value,"StringArray") == 0){
+	}else if(strcmp(value,"stringarray") == 0 || strcmp(value,"StringArray") == 0 || strcmp(value,"String[]") == 0 || strcmp(value,"string[]") == 0){
 		operador = "String[]";
 	}else if(strcmp(value,"undef") == 0){
 		operador = "undef";
@@ -524,12 +505,14 @@ char * retorna_operador (char * value){
 		operador = "double";
 	}else if(strcmp(value,"bool") == 0 || strcmp(value,"Bool") == 0 || strcmp(value,"boolean") == 0){
 		operador = "boolean";
-	}else if(strcmp(value,"boolean") == 0){
-		operador = "boolean";
-	}else if(strcmp(value,"String") == 0){
+	}else if(strcmp(value,"String") == 0 || strcmp(value,"string") == 0){
 		operador = "String";
 	}else if(strcmp(value,"Void") == 0 || strcmp(value,"void") == 0){
 		operador = "void";
+	}else if(strcmp(value,"If") == 0 || strcmp(value,"IfElse") == 0){
+		operador = "if";
+	}else if(strcmp(value,"While") == 0){
+		operador = "while";
 	}
 
 	return operador;
@@ -544,6 +527,7 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 		int linha;
 		int coluna;
 		char * aux = NULL;
+		char * operador = NULL;
 
 
 		//percorrer as expr	
@@ -580,9 +564,10 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 
 			// verifica se a condiçao dentro do if é boolean se nao for printa erro
 			aux = retorna_operador(statment->expr->tipo);
+			operador =  retorna_operador(statment->name_function);
 			if( strcmp(aux, "boolean") != 0 ){
 
-				printf("Line %d, col %d: Incompatible type %s in if statement\n",statment->expr->linha,statment->expr->coluna,retorna_operador( statment->expr->tipo));
+				printf("Line %d, col %d: Incompatible type %s in %s statement\n",statment->expr->linha,statment->expr->coluna,retorna_operador( statment->expr->tipo),operador);
 
 			}
 
