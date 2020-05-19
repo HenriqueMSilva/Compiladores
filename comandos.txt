@@ -148,3 +148,33 @@ impedir ir para o body de um metodo repetido;
 impedir meter id's repetidos ou _ na tabela na tabela
 
 problema problematesteE declarationError
+
+
+
+
+
+
+---------------------------------------------------META4
+print nao tem \n
+plus unario nao vai fazer nada
+
+Quando eu faço System.out.print("ola\nadeus")
+o programa faz 
+>>>ola\nadeus
+e nao
+>>>ola
+>>>
+>>>adeus
+De Pedro Tomás 2017249751 para Todos:  10:19 AM
+Tens que colocar o valor hexadecimal do '\n' @Miguel
+\0A -> Se não estou em erro
+
+
+SHIFT
+https://docs.oracle.com/javase/specs/jls/se9/html/jls-5.html#jls-5.6
+
+
+
+llvm id main tem de retornar sempre 0 
+
+ "echo $" usamos para saber o return code
