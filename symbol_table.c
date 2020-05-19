@@ -156,7 +156,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				if(strcmp(expr->operation, "Length" ) == 0){
 
 					//somar mais um na coluna para contar o ponto antes do length
-					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna+1, operador ,tipo);
+					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha2,expr->coluna2, operador ,tipo);
 
 				}else{
 
@@ -215,7 +215,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				if(strcmp(expr->operation, "Length" ) == 0){
 
 					//somar mais um na coluna para contar o ponto antes do length
-					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna+1, operador ,tipo);
+					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha2,expr->coluna2, operador ,tipo);
 
 				}else{
 
