@@ -1946,7 +1946,7 @@ yyreduce:
 
   case 76:
 #line 219 "jucompiler.y" /* yacc.c:1646  */
-    {(yyval.iel) = insert_expr("Length",(yyvsp[-1].id)->id,NULL,NULL, (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,-1,-1);free((yyvsp[-1].id)->id);}
+    {(yyval.iel) = insert_expr("Length",(yyvsp[-1].id)->id,NULL,NULL, (yyvsp[-1].id)->linha,(yyvsp[-1].id)->coluna,(yyvsp[0].id)->linha, (yyvsp[0].id)->coluna);free((yyvsp[-1].id)->id);}
 #line 1951 "y.tab.c" /* yacc.c:1646  */
     break;
 
