@@ -25,7 +25,7 @@ int check_metodos(is_metodos* metodos){
     }
 
     for(tmp=metodos; tmp; tmp=tmp->next){
-        if(tmp->imdl != NULL &&  tmp->imdl->imhl->anotar_body == 1){
+        if(tmp->imdl != NULL/* &&  tmp->imdl->imhl->anotar_body == 1*/){
             //errorcount+=check_method_list(tmp->imdl);
             //Se o body for NULL queremos criar um node na simb com poucas variaveis
             errorcount+=check_methodbody_list(tmp->imdl->imhl, tmp->imdl->imbl);

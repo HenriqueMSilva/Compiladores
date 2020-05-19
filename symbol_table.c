@@ -147,7 +147,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			}else{
 								
 				if(strcmp(tipo, "bool" ) == 0){
-					aux = "boolean";
+					tipo = "boolean";
 				}
 
 				operador = retorna_operador(expr->operation);
@@ -156,7 +156,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				if(strcmp(expr->operation, "Length" ) == 0){
 
 					//somar mais um na coluna para contar o ponto antes do length
-					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna+1, operador ,aux);
+					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna+1, operador ,tipo);
 
 				}else{
 
@@ -206,7 +206,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			}else{
 
 				if(strcmp(tipo, "bool" ) == 0){
-					aux = "boolean";
+					tipo = "boolean";
 				}
 
 				operador = retorna_operador(expr->operation);
@@ -215,7 +215,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				if(strcmp(expr->operation, "Length" ) == 0){
 
 					//somar mais um na coluna para contar o ponto antes do length
-					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna+1, operador ,aux);
+					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna+1, operador ,tipo);
 
 				}else{
 
@@ -421,7 +421,6 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
             if(  !( (strcmp(str1,"int") == 0 || strcmp(str1,"double") == 0) && (strcmp(str2,"int") == 0 || strcmp(str2,"double") == 0)) ){
                 printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna,operador,retorna_operador(str1),retorna_operador(str2));
             }
-
 
             expr->tipo = "bool";
             return expr->tipo;
