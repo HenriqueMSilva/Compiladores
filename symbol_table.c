@@ -618,13 +618,9 @@ char *  assinatura_return_iguais(is_expression_list* expr, table_element_local *
 
 		if(strcmp(return_expr, "nada") == 0){
 			return NULL; 
-		}else if(strcmp(return_expr,"bool") == 0){
-			return "boolean";
-		}else if(strcmp(return_expr,"stringarray") == 0){
-			return "String[]";
 		}else{
 			//void,int,undef,double
-			return return_expr;
+			return retorna_operador(return_expr);
 		}
 	}
 
@@ -636,13 +632,9 @@ char *  assinatura_return_iguais(is_expression_list* expr, table_element_local *
 			return NULL; 
 		}else if(strcmp(return_expr,"nada") == 0 || strcmp(return_expr,"void") == 0){
 			return "void";
-		}else if(strcmp(return_expr,"bool") == 0){
-			return "boolean";
-		}else if(strcmp(return_expr,"stringarray") == 0){
-			return "String[]";
 		}else{
 			//double, undef
-			return return_expr;
+			return retorna_operador(return_expr);
 		}
 	}
 
@@ -654,13 +646,9 @@ char *  assinatura_return_iguais(is_expression_list* expr, table_element_local *
 			return NULL; 
 		}else if(strcmp(return_expr,"nada") == 0 || strcmp(return_expr,"void") == 0){
 			return "void";
-		}else if(strcmp(return_expr,"bool") == 0){
-			return "boolean";
-		}else if(strcmp(return_expr,"stringarray") == 0){
-			return "String[]";
 		}else{
 			//undef
-			return return_expr;
+			return retorna_operador(return_expr);
 		}
 	}
 
@@ -673,11 +661,9 @@ char *  assinatura_return_iguais(is_expression_list* expr, table_element_local *
 			return NULL; 
 		}else if(strcmp(return_expr,"nada") == 0 || strcmp(return_expr,"void") == 0){
 			return "void";
-		}else if(strcmp(return_expr,"stringarray") == 0){
-			return "String[]";
 		}else{
 			//undef,double,int
-			return return_expr;
+			return retorna_operador(return_expr);
 		}
 	}
 
