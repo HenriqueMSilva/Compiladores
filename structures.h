@@ -10,7 +10,8 @@ typedef struct _s11 {
 
 // EXPR
 typedef struct _s10 {
-	char *operation;
+    char *generation_type;
+    char *operation;
     char *value;
 	char * tipo;
 
@@ -37,6 +38,7 @@ typedef struct _s9 {
 
 // VARDECL
 typedef struct _s8 {
+    char* generation_type;
     char* type;
     char* name;
 

@@ -4,6 +4,7 @@
 #include<stdio.h>
 
 int methodcounter = 0;
+int registocounter = 1;
 
 void generation(is_program* p){
 
@@ -21,10 +22,10 @@ void generation_metodos(is_metodos* metodos){
     }
 
 	//falta as aspas , nao as sei meter
-	printf("@.str.int = constant [3 x i8] c""""%%d\\00""""\n");
-	printf("@.str.double = constant [6 x i8] c""%%.16e\\00""\n");
-	printf("@.str.true = constant [5 x i8] c""true\\00""\n");
-	printf("@.str.false = constant [6 x i8] c""false\\00""\n");
+	printf("@.str.int = constant [3 x i8] c\"%%d\\00\"\n");
+	printf("@.str.double = constant [6 x i8] c\"%%.16e\\00\"\n");
+	printf("@.str.true = constant [5 x i8] c\"true\\00\"\n");
+	printf("@.str.false = constant [6 x i8] c\"false\\00\"\n");
 
 	// \n so se encontrar mos nas strings
 	//printf("@.str.0 = constant [2 x i8]\n");	
@@ -33,6 +34,7 @@ void generation_metodos(is_metodos* metodos){
         if(tmp->imdl != NULL){
             generation_method_list(tmp->imdl);
         }
+        registocounter = 1;
     }
 
 }
@@ -68,7 +70,9 @@ void generation_method_list(is_methoddecl_list* imdl){
     generation_methodheader_list(tmp->imhl);
  
  	//le body
- 	//TODO
+ 	generation_methodbody_list(tmp->imbl);
+
+ 
 }
 
 
@@ -131,10 +135,113 @@ void generation_param_list(is_methodparams_list* impl){
 }
 
 
+void generation_methodbody_list(is_methodbody_list* imbl){
+
+	is_methodbody_list* tmp;
+
+
+	for(tmp=imbl; tmp; tmp=tmp->next){
+        if(tmp->ivdl != NULL){
+        	generation_vardecl_list(tmp->ivdl);
+        }
+	    if(tmp->statment != NULL){
+	    	generation_statment_list(tmp->statment);
+	    }
+    }
+}
+
+
+void generation_vardecl_list(is_vardecl_list* ivdl){
+
+	is_vardecl_list* temp = ivdl;
+
+	while(temp != NULL){
+
+		if( strcmp(temp->type,"Double") == 0){
+			temp->generation_type = "double";
+		}else if( strcmp(temp->type,"Int") == 0){
+			temp->generation_type = "i32";
+		}else if( strcmp(temp->type,"Bool") == 0){
+			temp->generation_type = "i1";
+		}else if( strcmp(temp->type,"StringArray") == 0){
+			temp->generation_type = "i8**";
+		}
+
+		printf("%%%s = alloca %s\n",temp->name,temp->generation_type);
+		temp = temp->next;
+	}
+}
+
+
+
+void generation_statment_list(is_statment_list* statment){
+
+	if(statment->expr != NULL){
+		generation_expression(statment->expr);
+	}
+	
+
+	if(strcmp(statment->name_function,"Return") == 0){
+		//se for undef entao return; logo é void
+		if(strcmp(statment->expr->tipo,"undef") == 0){
+			printf("ret void\n}\n");
+		}else{
+			printf("ret %s %%.%d\n",statment->expr->generation_type,registocounter-1);
+			printf("ret 0\n}\n");
+		}
+
+	}
+
+
+	//ir para statmet1
+	if(statment->statment1 != NULL ){
+		generation_statment_list(statment->statment1);
+	}
+
+	//ir para statmet2
+	if(statment->statment2 != NULL ){
+		generation_statment_list(statment->statment2);
+	}
+
+
+}
 
 
 
 
+void generation_expression(is_expression_list* expr){
+
+	//se for ID retorna registo
+	if( strcmp(expr->operation, "Id" ) == 0 ){
+
+		expr->generation_type = generation_tipo(expr->tipo);
+
+		printf("%%.%d = load %s, %s* %%%s\n",registocounter,expr->generation_type,expr->generation_type,expr->value);
+
+	}
+
+	registocounter++;
+
+}
+
+
+
+
+char * generation_tipo(char * str){
+	char * aux;	
+
+	if( strcmp(lowerType(str),"double") == 0){
+		aux = "double";
+	}else if( strcmp(lowerType(str),"int") == 0){
+		aux = "i32";
+	}else if( strcmp(lowerType(str),"bool") == 0){
+		aux = "i1";
+	}else if( strcmp(lowerType(str),"stringarray") == 0){
+		aux = "i8**";
+	}
+
+	return aux;
+}
 
 
 
