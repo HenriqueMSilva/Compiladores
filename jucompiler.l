@@ -6,6 +6,7 @@
 	#include "functions.h"
 	#include "symbol_table.h"
 	#include "semantics.h"
+	#include "codegeneration.h"
 	#include "y.tab.h"
 	int num_linhas = 1;
 	int num_colunas = 1;
@@ -163,11 +164,14 @@ int main(int argc, char *argv[]){
 
 		    	errors=check_program(myprogram);
 
+
+
 			    if(errors>0){
 			        printf("The program has %d errors!\n", errors);
 			    }else{
-			    	show_table();
-			    	print_tree(myprogram);
+			    	//show_table();
+			    	//print_tree(myprogram);
+			    	generation(myprogram);
 			    }
 			}
 

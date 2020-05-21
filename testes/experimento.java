@@ -1,6 +1,6 @@
 class ifwhile {
 
-    public static void x(){}
+	public static int a;
 
     public static void main(String[] args) {
         //x = true;
@@ -10,8 +10,15 @@ class ifwhile {
         }*/
 
         //System.out.print(h.length);
-        Integer.parseInt(args[args]);
+        //Integer.parseInt(args[args]);
 
 
     }
+
+    public static boolean b;
+	public static double d;
+
+	public static int a (int input){
+		return input;
+	}
 }

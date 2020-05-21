@@ -58,6 +58,7 @@ typedef struct _s7 {
 
 //PARAMETROS HEADER
 typedef struct _s6 {
+    char* generation_type;
     char* type;
     char* name;
     

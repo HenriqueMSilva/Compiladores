@@ -700,6 +700,7 @@ char *yytext;
 	#include "functions.h"
 	#include "symbol_table.h"
 	#include "semantics.h"
+	#include "codegeneration.h"
 	#include "y.tab.h"
 	int num_linhas = 1;
 	int num_colunas = 1;
@@ -713,9 +714,9 @@ char *yytext;
 	extern is_program* myprogram;
 	header_global 	*symtab_global 	= NULL;
 	table_element_local 	*symtab_local 	= NULL;
-#line 717 "lex.yy.c"
+#line 718 "lex.yy.c"
 
-#line 719 "lex.yy.c"
+#line 720 "lex.yy.c"
 
 #define INITIAL 0
 #define COMEN_LINHA 1
@@ -935,11 +936,11 @@ YY_DECL
 		}
 
 	{
-#line 48 "jucompiler.l"
+#line 49 "jucompiler.l"
 
 
 
-#line 943 "lex.yy.c"
+#line 944 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -998,344 +999,344 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 51 "jucompiler.l"
+#line 52 "jucompiler.l"
 {BEGIN COMEN_LINHA;num_colunas += yyleng;}
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 52 "jucompiler.l"
+#line 53 "jucompiler.l"
 {BEGIN 0;num_colunas = 1;num_linhas++;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 53 "jucompiler.l"
+#line 54 "jucompiler.l"
 {num_colunas += yyleng;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 56 "jucompiler.l"
+#line 57 "jucompiler.l"
 {BEGIN COMEN; linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 57 "jucompiler.l"
+#line 58 "jucompiler.l"
 {num_colunas = 1;num_linhas++;}
 	YY_BREAK
 case YY_STATE_EOF(COMEN):
-#line 58 "jucompiler.l"
+#line 59 "jucompiler.l"
 {BEGIN 0;printf("Line %d, col %d: unterminated comment\n", linha_erro, coluna_erro);}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 59 "jucompiler.l"
+#line 60 "jucompiler.l"
 {BEGIN 0;num_colunas += yyleng;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 60 "jucompiler.l"
+#line 61 "jucompiler.l"
 {num_colunas += yyleng;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 64 "jucompiler.l"
+#line 65 "jucompiler.l"
 {BEGIN ASPAS;strcpy(strlit, "\"");error_sequence=0;linha_erro = num_linhas; coluna_erro = num_colunas; num_colunas += yyleng;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 65 "jucompiler.l"
+#line 66 "jucompiler.l"
 {if(error_sequence== 0){strcat(strlit, yytext);}num_colunas += yyleng;}
 	YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 66 "jucompiler.l"
+#line 67 "jucompiler.l"
 {BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);num_colunas = 1;num_linhas++;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 67 "jucompiler.l"
+#line 68 "jucompiler.l"
 {BEGIN 0; strcat(strlit, "\"");  if(flag == 0 && error_sequence== 0){ printf("STRLIT(%s)\n",strlit);} num_colunas += yyleng; yylval.id=(id_lin_col*) malloc(sizeof(id_lin_col)); yylval.id->id=strdup(strlit); yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); if(error_sequence == 0){return STRLIT;}else{ free(yylval.id->id); free(yylval.id); } }
 	YY_BREAK
 case YY_STATE_EOF(ASPAS):
-#line 68 "jucompiler.l"
+#line 69 "jucompiler.l"
 {BEGIN 0; printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro);}
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 69 "jucompiler.l"
+#line 70 "jucompiler.l"
 {BEGIN 0; error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (\\)\n", num_linhas, num_colunas);printf("Line %d, col %d: unterminated string literal\n", linha_erro, coluna_erro); num_linhas++ ; num_colunas = 1;}							
 	YY_BREAK
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 70 "jucompiler.l"
+#line 71 "jucompiler.l"
 {error_sequence = 1; printf("Line %d, col %d: invalid escape sequence (%s)\n", num_linhas, num_colunas, yytext);num_colunas += yyleng;}							
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 71 "jucompiler.l"
+#line 72 "jucompiler.l"
 {if(error_sequence == 0){strcat(strlit, yytext);}num_colunas += yyleng;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 75 "jucompiler.l"
+#line 76 "jucompiler.l"
 {if(flag==0){printf("BOOLLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id=(id_lin_col*) malloc(sizeof(id_lin_col)); yylval.id->id=strdup(yytext); yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id);  return BOOLLIT;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 76 "jucompiler.l"
+#line 77 "jucompiler.l"
 {if(flag==0){printf("AND\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return AND;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 77 "jucompiler.l"
+#line 78 "jucompiler.l"
 {if(flag==0){printf("ASSIGN\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return ASSIGN;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 78 "jucompiler.l"
+#line 79 "jucompiler.l"
 {if(flag==0){printf("STAR\n");}num_colunas+= yyleng;  yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return STAR;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 79 "jucompiler.l"
+#line 80 "jucompiler.l"
 {if(flag==0){printf("COMMA\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return COMMA;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 80 "jucompiler.l"
+#line 81 "jucompiler.l"
 {if(flag==0){printf("DIV\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return DIV;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 81 "jucompiler.l"
+#line 82 "jucompiler.l"
 {if(flag==0){printf("EQ\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return EQ;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 82 "jucompiler.l"
+#line 83 "jucompiler.l"
 {if(flag==0){printf("GE\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return GE;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 83 "jucompiler.l"
+#line 84 "jucompiler.l"
 {if(flag==0){printf("GT\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return GT;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 84 "jucompiler.l"
+#line 85 "jucompiler.l"
 {if(flag==0){printf("LBRACE\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return LBRACE;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 85 "jucompiler.l"
+#line 86 "jucompiler.l"
 {if(flag==0){printf("LE\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return LE;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 86 "jucompiler.l"
+#line 87 "jucompiler.l"
 {if(flag==0){printf("LPAR\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return LPAR;}	
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 87 "jucompiler.l"
+#line 88 "jucompiler.l"
 {if(flag==0){printf("RPAR\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return RPAR;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 88 "jucompiler.l"
+#line 89 "jucompiler.l"
 {if(flag==0){printf("LSQ\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return LSQ;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 89 "jucompiler.l"
+#line 90 "jucompiler.l"
 {if(flag==0){printf("LT\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return LT;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 90 "jucompiler.l"
+#line 91 "jucompiler.l"
 {if(flag==0){printf("MINUS\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return MINUS;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 91 "jucompiler.l"
+#line 92 "jucompiler.l"
 {if(flag==0){printf("MOD\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return MOD;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 92 "jucompiler.l"
+#line 93 "jucompiler.l"
 {if(flag==0){printf("NE\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return NE;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 93 "jucompiler.l"
+#line 94 "jucompiler.l"
 {if(flag==0){printf("NOT\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return NOT;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 94 "jucompiler.l"
+#line 95 "jucompiler.l"
 {if(flag==0){printf("OR\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return OR;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 95 "jucompiler.l"
+#line 96 "jucompiler.l"
 {if(flag==0){printf("PLUS\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return PLUS;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 96 "jucompiler.l"
+#line 97 "jucompiler.l"
 {if(flag==0){printf("RBRACE\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return RBRACE;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 97 "jucompiler.l"
+#line 98 "jucompiler.l"
 {if(flag==0){printf("RSQ\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return RSQ;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 98 "jucompiler.l"
+#line 99 "jucompiler.l"
 {if(flag==0){printf("SEMICOLON\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return SEMICOLON;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 99 "jucompiler.l"
+#line 100 "jucompiler.l"
 {if(flag==0){printf("ARROW\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return ARROW;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 100 "jucompiler.l"
+#line 101 "jucompiler.l"
 {if(flag==0){printf("LSHIFT\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return LSHIFT;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 101 "jucompiler.l"
+#line 102 "jucompiler.l"
 {if(flag==0){printf("RSHIFT\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return RSHIFT;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 102 "jucompiler.l"
+#line 103 "jucompiler.l"
 {if(flag==0){printf("XOR\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return XOR;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 103 "jucompiler.l"
+#line 104 "jucompiler.l"
 {if(flag==0){printf("BOOL\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return BOOL;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 104 "jucompiler.l"
+#line 105 "jucompiler.l"
 {if(flag==0){printf("CLASS\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return CLASS;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 105 "jucompiler.l"
+#line 106 "jucompiler.l"
 {if(flag==0){printf("DOTLENGTH\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return DOTLENGTH;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 106 "jucompiler.l"
+#line 107 "jucompiler.l"
 {if(flag==0){printf("DOUBLE\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return DOUBLE;}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 107 "jucompiler.l"
+#line 108 "jucompiler.l"
 {if(flag==0){printf("ELSE\n");}num_colunas+= yyleng;yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id);  return ELSE;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 108 "jucompiler.l"
+#line 109 "jucompiler.l"
 {if(flag==0){printf("IF\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return IF;}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 109 "jucompiler.l"
+#line 110 "jucompiler.l"
 {if(flag==0){printf("INT\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return INT;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 110 "jucompiler.l"
+#line 111 "jucompiler.l"
 {if(flag==0){printf("PRINT\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return PRINT;}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 111 "jucompiler.l"
+#line 112 "jucompiler.l"
 {if(flag==0){printf("PARSEINT\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return PARSEINT;} 
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 112 "jucompiler.l"
+#line 113 "jucompiler.l"
 {if(flag==0){printf("PUBLIC\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return PUBLIC;}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 113 "jucompiler.l"
+#line 114 "jucompiler.l"
 {if(flag==0){printf("RETURN\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return RETURN;}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 114 "jucompiler.l"
+#line 115 "jucompiler.l"
 {if(flag==0){printf("STATIC\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return STATIC;}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 115 "jucompiler.l"
+#line 116 "jucompiler.l"
 {if(flag==0){printf("STRING\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return STRING;}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 116 "jucompiler.l"
+#line 117 "jucompiler.l"
 {if(flag==0){printf("VOID\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return VOID;} 
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 117 "jucompiler.l"
+#line 118 "jucompiler.l"
 {if(flag==0){printf("WHILE\n");}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return WHILE;}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 120 "jucompiler.l"
+#line 121 "jucompiler.l"
 {if(flag==0){printf("RESERVED(%s)\n",yytext);}num_colunas+= yyleng; yylval.id=(id_lin_col*)malloc(sizeof(id_lin_col)); yylval.id->id=yytext; yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return RESERVED;}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 123 "jucompiler.l"
+#line 124 "jucompiler.l"
 {if(flag==0){printf("ID(%s)\n",yytext);}num_colunas+= yyleng; yylval.id=(id_lin_col*) malloc(sizeof(id_lin_col)); yylval.id->id=strdup(yytext); yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id);  return ID;}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 124 "jucompiler.l"
+#line 125 "jucompiler.l"
 {if(flag==0){printf("REALLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id=(id_lin_col*) malloc(sizeof(id_lin_col)); yylval.id->id=strdup(yytext); yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return REALLIT;}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 125 "jucompiler.l"
+#line 126 "jucompiler.l"
 {if(flag==0){printf("INTLIT(%s)\n",yytext);}num_colunas+= yyleng; yylval.id=(id_lin_col*) malloc(sizeof(id_lin_col)); yylval.id->id=strdup(yytext); yylval.id->linha = num_linhas; yylval.id->coluna = num_colunas - (int) strlen(yylval.id->id); return INTLIT;}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 128 "jucompiler.l"
+#line 129 "jucompiler.l"
 {num_colunas += yyleng;}
 	YY_BREAK
 case 63:
 /* rule 63 can match eol */
 YY_RULE_SETUP
-#line 129 "jucompiler.l"
+#line 130 "jucompiler.l"
 {num_colunas = 1;num_linhas++; }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 131 "jucompiler.l"
+#line 132 "jucompiler.l"
 {printf("Line %d, col %d: illegal character (%s)\n",num_linhas,num_colunas,yytext);num_colunas+= yyleng;  return yytext[0];  }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 133 "jucompiler.l"
+#line 134 "jucompiler.l"
 ECHO;
 	YY_BREAK
-#line 1339 "lex.yy.c"
+#line 1340 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMEN_LINHA):
 	yyterminate();
@@ -2341,7 +2342,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 133 "jucompiler.l"
+#line 134 "jucompiler.l"
 
 
 
@@ -2375,11 +2376,14 @@ int main(int argc, char *argv[]){
 
 		    	errors=check_program(myprogram);
 
+
+
 			    if(errors>0){
 			        printf("The program has %d errors!\n", errors);
 			    }else{
-			    	show_table();
-			    	print_tree(myprogram);
+			    	//show_table();
+			    	//print_tree(myprogram);
+			    	generation(myprogram);
 			    }
 			}
 

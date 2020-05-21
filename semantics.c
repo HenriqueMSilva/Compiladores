@@ -25,8 +25,7 @@ int check_metodos(is_metodos* metodos){
     }
 
     for(tmp=metodos; tmp; tmp=tmp->next){
-        if(tmp->imdl != NULL/* &&  tmp->imdl->imhl->anotar_body == 1*/){
-            //errorcount+=check_method_list(tmp->imdl);
+        if(tmp->imdl != NULL){
             //Se o body for NULL queremos criar um node na simb com poucas variaveis
             errorcount+=check_methodbody_list(tmp->imdl->imhl, tmp->imdl->imbl);
         }
@@ -39,11 +38,6 @@ int check_field_list(is_fielddecl_list* ifl ) {
 
     //table_element_global* newel = insert_el_fieldDec_global(ifl, ifl->type);
     insert_el_fieldDec_global(ifl, ifl->type);
-
-    /*if(newel==NULL) {
-        printf("Symbol %s already defined!\n", ifl->name);
-        return 1;
-    }*/
 
     return 0;
 }

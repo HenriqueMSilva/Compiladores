@@ -995,13 +995,6 @@ int assinatutas_iguais_global(table_element_global *newSymbol, table_element_glo
 	param_node * param_newSymbol = newSymbol->param_list;
 	param_node * param_aux = aux->param_list;
 
-	//testo o return
-	/*if( strcmp(newSymbol->type_return, aux->type_return) != 0 ){
-		//metodos diferente
-		return 0;
-	}*/
-
-
 	while(param_newSymbol != NULL && param_aux != NULL){
 
 
@@ -1424,7 +1417,6 @@ table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char *
 	}
 
 	return para_dar_return;
-	free(newSymbol);
 }
 
 
@@ -1549,20 +1541,6 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 
 	return newSymbol;
 }
-
-char * type_print_error(char * str){
-	str = lowerCase(str);
-
-	if(strcmp(str,"bool") == 0 ){
-		str = "boolean";
-	}
-	else if(strcmp(str,"stringarray") == 0 ){
-		str = "String[]";
-	}
-
-	return str;
-}
-
 
 
 
