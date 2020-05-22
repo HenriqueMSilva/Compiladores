@@ -5,6 +5,7 @@
 
 int methodcounter = 0;
 int registocounter = 1;
+int hasmain = 0;
 
 void generation(is_program* p){
 
@@ -14,6 +15,9 @@ void generation(is_program* p){
 
 void generation_metodos(is_metodos* metodos){
 	is_metodos* tmp;
+	char * typeFunction;
+	char * nameFunction;
+	char * aux;
 
 	for(tmp=metodos; tmp; tmp=tmp->next){
         if(tmp->ifl != NULL){
@@ -31,12 +35,44 @@ void generation_metodos(is_metodos* metodos){
 	//printf("@.str.0 = constant [2 x i8]\n");	
 
 	for(tmp=metodos; tmp; tmp=tmp->next){
+
         if(tmp->imdl != NULL){
             generation_method_list(tmp->imdl);
+
+            typeFunction = tmp->imdl->imhl->type;
+            nameFunction = tmp->imdl->imhl->name;
+
+            if(strcmp(nameFunction,"main") == 0){
+            	hasmain = 1;
+            }
+			if( strcmp(typeFunction,"Void") == 0 ){
+				printf("ret void\n}\n");
+			}else{
+
+				if( strcmp(typeFunction,"Double") == 0){
+					aux = "0.0";
+				}else if(strcmp(typeFunction,"Int") == 0){
+					aux = "0";
+				}else if(strcmp(typeFunction,"Bool") == 0){
+					aux = "0"; 
+				}
+				printf("ret %s %s\n}\n",generation_tipo(lowerType(typeFunction)),aux);
+			}
         }
+
         registocounter = 1;
     }
 
+
+    //verificar se existe main fiz uma aldrabice com um if e um contador, era para fazer com as tabelas mas nao as consegui fazer com que acede.se aqui
+    if(hasmain == 0){
+    	printf("define i32 @main(i32 %%.size,i8** %%.args){\n");
+    	printf("ret i32 0\n}\n");
+    }
+
+    //nos casos testes isto estava sempre no fim
+    printf("declare i32 @printf(i8*, ...)\n");
+    printf("declare i32 @atoi(i8*)\n");
 }
 
 
@@ -44,7 +80,7 @@ void generation_metodos(is_metodos* metodos){
 void generation_field_list(is_fielddecl_list* ifl){
 
 	is_fielddecl_list* temp = ifl;
-	char * aux;
+	char * aux = NULL;
 	while(temp != NULL){
 
 		if( strcmp(temp->type,"Double") == 0){
@@ -52,7 +88,7 @@ void generation_field_list(is_fielddecl_list* ifl){
 		}else if(strcmp(temp->type,"Int") == 0){
 			aux = "0";
 		}else if(strcmp(temp->type,"Bool") == 0){
-			aux = "i1"; //o joda e o miguel meteram assim mas not sure
+			aux = "0";
 		}
 		printf("@%s = common global %s %s\n",temp->name, lowerType(temp->type) ,aux);
 		temp = temp->next;
@@ -80,14 +116,13 @@ void generation_method_list(is_methoddecl_list* imdl){
 void generation_methodheader_list(is_methodheader_list* imhl){
 
 	is_methodparams_list* ast_param_list = imhl->impl;
-	char * type = NULL;
 
 	//print do tipo da funcao
-	printf("define %s @",lowerType(imhl->type));
+	printf("define %s @",generation_tipo(lowerType(imhl->type)));
 
 	//verificar se a funçao é a main
 	if(strcmp(imhl->name,"main") == 0){
-		printf("%s(",imhl->name);
+		printf("%s.entry(i32 %%.size.,",imhl->name);
 	}else{ //verificar o counter??? como fazer counter
 		printf("method_%s_%d(",imhl->name,methodcounter);
 	}
@@ -116,18 +151,23 @@ void generation_methodheader_list(is_methodheader_list* imhl){
 	printf(") {\n");
 
 
-	generation_param_list(imhl->impl);
+	generation_param_list(imhl->impl,imhl->name);
 
 }
 
 
-void generation_param_list(is_methodparams_list* impl){
+void generation_param_list(is_methodparams_list* impl, char* nameFunction){
 
 	is_methodparams_list* asl = impl;
 
+	if(strcmp(nameFunction,"main") == 0){
+		printf("%%size. = alloca i32");
+		printf("store i32 %%.size., i32* %%size.");
+	}
+
 	while(asl != NULL){
 
-		printf("%%%s = alloca %s\n",asl->name,asl->generation_type);
+		printf("%%%s = alloca %s\n",asl->name, asl->generation_type);
 		printf("store %s %%.%s, %s* %%%s\n", asl->generation_type,asl->name,asl->generation_type,asl->name);
 
 		asl = asl->next;
@@ -183,13 +223,9 @@ void generation_statment_list(is_statment_list* statment){
 
 	if(strcmp(statment->name_function,"Return") == 0){
 		//se for undef entao return; logo é void
-		if(strcmp(statment->expr->tipo,"undef") == 0){
-			printf("ret void\n}\n");
-		}else{
+		if(strcmp(statment->expr->tipo,"undef") != 0){
 			printf("ret %s %%.%d\n",statment->expr->generation_type,registocounter-1);
-			printf("ret 0\n}\n");
 		}
-
 	}
 
 
@@ -212,13 +248,14 @@ void generation_statment_list(is_statment_list* statment){
 void generation_expression(is_expression_list* expr){
 
 	//se for ID retorna registo
-	if( strcmp(expr->operation, "Id" ) == 0 ){
+	//if( strcmp(expr->operation, "Id" ) == 0 || strcmp(expr->operation, "RealLit" ) == 0 || strcmp(expr->operation, "BoolLit" ) == 0 || strcmp(expr->operation, "DecLit" ) == 0 || strcmp(expr->operation, "StrLit" ) == 0){
 
 		expr->generation_type = generation_tipo(expr->tipo);
 
 		printf("%%.%d = load %s, %s* %%%s\n",registocounter,expr->generation_type,expr->generation_type,expr->value);
 
-	}
+	//}
+
 
 	registocounter++;
 
@@ -228,13 +265,13 @@ void generation_expression(is_expression_list* expr){
 
 
 char * generation_tipo(char * str){
-	char * aux;	
+	char * aux = NULL;	
 
 	if( strcmp(lowerType(str),"double") == 0){
 		aux = "double";
 	}else if( strcmp(lowerType(str),"int") == 0){
 		aux = "i32";
-	}else if( strcmp(lowerType(str),"bool") == 0){
+	}else if( strcmp(lowerType(str),"boolean") == 0){
 		aux = "i1";
 	}else if( strcmp(lowerType(str),"stringarray") == 0){
 		aux = "i8**";
