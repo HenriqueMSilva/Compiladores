@@ -7,6 +7,7 @@ typedef struct _sel{
 	char *string;
 	int tamanho;
 	int pos;
+	int printed;
 	struct _sel *next;
 } string_element;
 

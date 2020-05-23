@@ -214,19 +214,21 @@ void generation_methodbody_list(is_methodbody_list* imbl){
 void generation_vardecl_list(is_vardecl_list* ivdl){
 
 	is_vardecl_list* temp = ivdl;
+	char * aux = NULL;
 
+	if( strcmp(temp->type,"Double") == 0){
+		aux = "double";
+	}else if( strcmp(temp->type,"Int") == 0){
+		aux = "i32";
+	}else if( strcmp(temp->type,"Bool") == 0){
+		aux = "i1";
+	}else if( strcmp(temp->type,"StringArray") == 0){
+		aux = "i8**";
+	}
+
+	temp->generation_type = aux;
 	while(temp != NULL){
-
-		if( strcmp(temp->type,"Double") == 0){
-			temp->generation_type = "double";
-		}else if( strcmp(temp->type,"Int") == 0){
-			temp->generation_type = "i32";
-		}else if( strcmp(temp->type,"Bool") == 0){
-			temp->generation_type = "i1";
-		}else if( strcmp(temp->type,"StringArray") == 0){
-			temp->generation_type = "i8**";
-		}
-
+		temp->generation_type = aux;
 		printf("%%%s = alloca %s\n",temp->name,temp->generation_type);
 		temp = temp->next;
 	}
@@ -241,7 +243,32 @@ void generation_statment_list(is_statment_list* statment){
 	}
 	
 
-	
+	if(strcmp(statment->name_function,"Print") == 0){
+
+		if(strcmp(statment->expr->tipo,"String") == 0){
+			string_element 	*string_element = symtab_global->string_element;
+
+			while(string_element != NULL){
+				if(string_element->printed == 0){
+					printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([%d x i8], [%d x i8]* @.str.%d, i32 0, i32 0))\n",registocounter,string_element->tamanho,string_element->tamanho,string_element->pos);
+					string_element->printed = 1;
+					break;
+				}
+				string_element = string_element->next; 
+			}
+			
+		}else if(strcmp(lowerType(statment->expr->tipo),"boolean") == 0){
+			printf("nada\n");
+		}else if(strcmp(lowerType(statment->expr->tipo),"int") == 0){
+			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([3 x i8], [3 x i8]* @.str.int, i32 0, i32 0), i32 %%.%d)\n",registocounter,statment->expr->registo_number);
+		}else if(strcmp(lowerType(statment->expr->tipo),"double") == 0){
+			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %%.%d)\n",registocounter,statment->expr->registo_number);
+		}
+
+		registocounter++;
+	}
+
+
 	if(strcmp(statment->name_function,"Return") == 0){
 		//se for undef entao return; logo é void
 		if(strcmp(statment->expr->tipo,"undef") != 0){
@@ -358,13 +385,11 @@ void generation_expression(is_expression_list* expr){
 
 
 	if((strcmp(expr->value,"Add") == 0)){
-		/*if(expr->expr1 != NULL ){
-			printf("%s %s\n",expr->expr1->value,expr->expr1->tipo);
-		}
 
-		if(expr->expr2 != NULL ){
-			printf("%s %s\n",expr->expr2->value,expr->expr2->tipo);
-		}*/
+		expr->generation_type = generation_tipo(expr->tipo);
+		expr->registo_number = registocounter;
+		printf("%%.%d = add %s %%.%d, %%.%d\n",expr->registo_number,expr->generation_type,expr->expr1->registo_number,expr->expr2->registo_number);
+		registocounter++;
 	}
 
 

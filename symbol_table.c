@@ -103,26 +103,31 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		string_element *aux_sel = (string_element*) malloc(sizeof(string_element));
 
 		char * str = expr->value;
-		int i,k=0,tam_array=0;
+		int i,k=0;
 
-
-		for(i=0;i<strlen(str);i++){
-			if( str[i] != '\"'){
-				tam_array = tam_array + 1;
-			}
-		}
 		
-		char * new_str = (char*) malloc(tam_array*sizeof(char*)); 
+		char * new_str = (char*) malloc(100*sizeof(char*)); 
 		
 		for(i=0;i<strlen(str);i++){
-			if( str[i] != '\"'){
+			//se for \n substitui para \0A
+			if(str[i] == '\\' && str[i+1] == 'n'){
+				new_str[k] = '\\'; k++;
+				new_str[k] = '0'; k++;
+				new_str[k] = 'A'; k++;
+				aux_sel->tamanho += 1;
+				i++;
+			//tudo sem ser aspa 
+			}else if( str[i] != '\"'){
 				new_str[k] = str[i];
+				aux_sel->tamanho += 1;
 				k++;
 			}
 		}
 
+		//as aspas nao sao adicionadas
 		aux_sel->string = new_str;
-		aux_sel->tamanho = strlen(new_str)+1;
+		aux_sel->tamanho += 1;
+		aux_sel->printed = 0;
 		aux_sel->next = NULL;
 
 
