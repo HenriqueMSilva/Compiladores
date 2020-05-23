@@ -11,6 +11,8 @@ typedef struct _s11 {
 // EXPR
 typedef struct _s10 {
     char *generation_type;
+    int registo_number;
+
     char *operation;
     char *value;
 	char * tipo;

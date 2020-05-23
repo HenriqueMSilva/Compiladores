@@ -1,23 +1,16 @@
-class fluxControl1 {
-    //It's necessary to add a main method 'by hand' at *.ll file
-    public static int a(int input){
-		return input;
-    }
-    
-    public static int b(int input){
-		return input;
+class Main {
+	public static int overload;
+    public static void overload(int n){
+        System.out.print("I have a parameter");
     }
 
-    public static int main(String[] args) {
-		return a(input);
+    public static void overload(){
+         System.out.print("I don't have a parameter");
+    }
+
+    public static void main(String[] args){ //Antes estava: public static int main (int n)
+    	if(args.length > 0)	overload(Integer.parseInt(args[0]));
+		else overload();
+		System.out.print("\n");
     }
 }
-//x = true;
-
-/*if(i) { // if int
-while(d) {}// while double
-}*/
-
-//System.out.print(h.length);
-//Integer.parseInt(args[args]);
-

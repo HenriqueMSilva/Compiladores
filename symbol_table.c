@@ -97,6 +97,47 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	}
 
 	if(strcmp(expr->operation, "StrLit" ) == 0){ 
+		string_element *aux;
+		string_element* previous;
+
+		string_element *aux_sel = (string_element*) malloc(sizeof(string_element));
+
+		char * str = expr->value;
+		int i,k=0,tam_array=0;
+
+
+		for(i=0;i<strlen(str);i++){
+			if( str[i] != '\"'){
+				tam_array = tam_array + 1;
+			}
+		}
+		
+		char * new_str = (char*) malloc(tam_array*sizeof(char*)); 
+		
+		for(i=0;i<strlen(str);i++){
+			if( str[i] != '\"'){
+				new_str[k] = str[i];
+				k++;
+			}
+		}
+
+		aux_sel->string = new_str;
+		aux_sel->tamanho = strlen(new_str)+1;
+		aux_sel->next = NULL;
+
+
+		if(symtab_global->string_element != NULL){
+			
+			//Procura cauda da lista e verifica se simbolo ja existe 
+			for(aux = symtab_global->string_element; aux != NULL ; previous = aux, aux = aux->next){
+
+			}
+			
+			previous->next = aux_sel;	//adiciona ao final da lista
+		}else{
+			symtab_global->string_element = aux_sel;	
+		}
+
 		expr->tipo = "String"; 
 		return expr->tipo;
 	}
@@ -328,6 +369,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 
 		if((strcmp(expr->value,"Add") == 0 || strcmp(expr->value,"Sub") == 0 || strcmp(expr->value,"Mul") == 0 || strcmp(expr->value,"Div") == 0 || strcmp(expr->value,"Mod") == 0)){
+
 
 			if(strcmp(str1,"bool") == 0 || strcmp(str2,"bool") == 0 || strcmp(str1,"undef") == 0 || strcmp(str2,"undef") == 0 || strcmp(str1,"stringarray") == 0 || strcmp(str2,"stringarray") == 0){
 
@@ -1191,6 +1233,7 @@ header_global* insert_classname(char *str){
 	header_global *stg=(header_global*) malloc(sizeof(header_global));
 
 	stg->name = (char*)strdup(str);
+	stg->string_element = NULL;
 	stg->declarations = NULL;
 
 	symtab_global = stg;

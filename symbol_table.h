@@ -2,6 +2,15 @@
 #define SYMBOL_TABLE_H
 #include "structures.h"
 
+//STRING ELEMENTS
+typedef struct _sel{
+	char *string;
+	int tamanho;
+	int pos;
+	struct _sel *next;
+} string_element;
+
+
 //VARIAVEIS DO METODO
 typedef struct _tel{
 	char *name;
@@ -36,6 +45,7 @@ typedef struct _teg{
 //TABELA DE SIMBOLOS GLOBAL
 typedef struct _hg{
 	char *name;
+	struct _sel *string_element;
 	struct _teg *declarations;
 } header_global;
 

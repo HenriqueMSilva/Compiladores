@@ -3,9 +3,11 @@
 #include<string.h>
 #include<stdio.h>
 
+extern 	header_global 	*symtab_global;
+extern	table_element_local 	*symtab_local;
+
 int methodcounter = 0;
 int registocounter = 1;
-int hasmain = 0;
 
 void generation(is_program* p){
 
@@ -15,10 +17,14 @@ void generation(is_program* p){
 
 void generation_metodos(is_metodos* metodos){
 	is_metodos* tmp;
+	string_element 	*tabela_global = symtab_global->string_element;
+
 	char * typeFunction;
 	char * nameFunction;
 	char * aux;
+	int hasmain = 0, stringcounter = 0;
 
+	//printf das variaveis globais
 	for(tmp=metodos; tmp; tmp=tmp->next){
         if(tmp->ifl != NULL){
         	generation_field_list(tmp->ifl);
@@ -31,9 +37,17 @@ void generation_metodos(is_metodos* metodos){
 	printf("@.str.true = constant [5 x i8] c\"true\\00\"\n");
 	printf("@.str.false = constant [6 x i8] c\"false\\00\"\n");
 
-	// \n so se encontrar mos nas strings
-	//printf("@.str.0 = constant [2 x i8]\n");	
 
+	//print das strings 
+	while(tabela_global != NULL){
+		tabela_global->pos = stringcounter;
+		printf("@.str.%d = constant [%d x i8] c\"%s\\00\"\n",tabela_global->pos,tabela_global->tamanho,tabela_global->string); // tamanho mais 1 para contar com o \n pelo o que parece
+		stringcounter++;
+		tabela_global = tabela_global->next; 
+	}
+
+
+	//print do metodo
 	for(tmp=metodos; tmp; tmp=tmp->next){
 
         if(tmp->imdl != NULL){
@@ -42,9 +56,11 @@ void generation_metodos(is_metodos* metodos){
             typeFunction = tmp->imdl->imhl->type;
             nameFunction = tmp->imdl->imhl->name;
 
+            //se for main
             if(strcmp(nameFunction,"main") == 0){
             	hasmain = 1;
             }
+            //se for void
 			if( strcmp(typeFunction,"Void") == 0 ){
 				printf("ret void\n}\n");
 			}else{
@@ -68,6 +84,10 @@ void generation_metodos(is_metodos* metodos){
     if(hasmain == 0){
     	printf("define i32 @main(i32 %%.size,i8** %%.args){\n");
     	printf("ret i32 0\n}\n");
+    }else{
+    	printf("define i32 @main(i32 %%.size,i8** %%.args){\n");
+		printf("call void @main.entry(i32 %%.size, i8** %%.args)\n");
+		printf("ret i32 0\n}\n");
     }
 
     //nos casos testes isto estava sempre no fim
@@ -161,8 +181,8 @@ void generation_param_list(is_methodparams_list* impl, char* nameFunction){
 	is_methodparams_list* asl = impl;
 
 	if(strcmp(nameFunction,"main") == 0){
-		printf("%%size. = alloca i32");
-		printf("store i32 %%.size., i32* %%size.");
+		printf("%%size. = alloca i32\n");
+		printf("store i32 %%.size., i32* %%size.\n");
 	}
 
 	while(asl != NULL){
@@ -221,10 +241,11 @@ void generation_statment_list(is_statment_list* statment){
 	}
 	
 
+	
 	if(strcmp(statment->name_function,"Return") == 0){
 		//se for undef entao return; logo é void
 		if(strcmp(statment->expr->tipo,"undef") != 0){
-			printf("ret %s %%.%d\n",statment->expr->generation_type,registocounter-1);
+			printf("ret %s %%.%d\n",statment->expr->generation_type,statment->expr->registo_number);
 		}
 	}
 
@@ -247,17 +268,105 @@ void generation_statment_list(is_statment_list* statment){
 
 void generation_expression(is_expression_list* expr){
 
+
+	if(expr->expr1 != NULL ){
+		generation_expression(expr->expr1 );
+	}
+
+	if(expr->expr2 != NULL ){
+		generation_expression(expr->expr2 );
+	}
+
+	//printf("%s %s\n",expr->operation,expr->value);
+
 	//se for ID retorna registo
-	//if( strcmp(expr->operation, "Id" ) == 0 || strcmp(expr->operation, "RealLit" ) == 0 || strcmp(expr->operation, "BoolLit" ) == 0 || strcmp(expr->operation, "DecLit" ) == 0 || strcmp(expr->operation, "StrLit" ) == 0){
+	if( strcmp(expr->operation, "Id" ) == 0){
 
 		expr->generation_type = generation_tipo(expr->tipo);
+		expr->registo_number = registocounter;
+
 
 		printf("%%.%d = load %s, %s* %%%s\n",registocounter,expr->generation_type,expr->generation_type,expr->value);
+		registocounter++;
 
-	//}
+	}
+
+	//adicionar a um registo o valor inteiro
+	if(strcmp(expr->operation, "DecLit" ) == 0){
+
+		expr->generation_type = generation_tipo(expr->tipo);
+		expr->registo_number = registocounter;
+		printf("%%.%d = add %s 0, %s\n",expr->registo_number,expr->generation_type,expr->value);
+		registocounter++;
+	}
+
+	//adicionar a um registo o valor double
+	if(strcmp(expr->operation, "RealLit" ) == 0){
+
+		//REVER AINDA NAO ESTA BEM
+		expr->generation_type = generation_tipo(expr->tipo);
+		expr->registo_number = registocounter;
+		printf("%%.%d = fadd  %s 0.000000, %s\n",expr->registo_number,expr->generation_type,expr->value);
+		registocounter++;
+	}
+
+	//adicionar a um registo o valor bool
+	if(strcmp(expr->operation, "BoolLit" ) == 0){
+
+		expr->generation_type = generation_tipo(expr->tipo);
+		expr->registo_number = registocounter;
+		printf("%%.%d = or %s false, %s\n",expr->registo_number,expr->generation_type,expr->value);
+		registocounter++;
+	}
 
 
-	registocounter++;
+	/*if(	strcmp(expr->operation, "StrLit" ) == 0){
+
+		//REVER AINDA NAO ESTA BEM
+		expr->generation_type = generation_tipo(expr->tipo);
+		expr->registo_number = registocounter;
+		printf("%%.%d = or %s ?, %s\n",expr->registo_number,expr->generation_type,expr->value);
+		registocounter++;
+	}*/
+
+
+
+
+	/*if((strcmp(expr->operation,"Call") == 0)){
+		table_element_global* tabela_global = symtab_global->declarations;
+
+		printf("%s %s\n",expr->value,expr->tipo);
+
+		if(tabela_global != NULL){
+			
+			if(){
+
+			}
+
+			tabela_global = tabela_global->next;
+		}
+	}*/
+
+
+
+	if( strcmp(expr->operation, "Assign" ) == 0 ){
+		
+		expr->generation_type = generation_tipo(expr->tipo);
+		printf("store %s %%.%d, %s* %%%s\n",expr->generation_type,expr->expr1->registo_number,expr->generation_type,expr->value);
+	
+	}
+
+
+	if((strcmp(expr->value,"Add") == 0)){
+		/*if(expr->expr1 != NULL ){
+			printf("%s %s\n",expr->expr1->value,expr->expr1->tipo);
+		}
+
+		if(expr->expr2 != NULL ){
+			printf("%s %s\n",expr->expr2->value,expr->expr2->tipo);
+		}*/
+	}
+
 
 }
 
@@ -275,6 +384,10 @@ char * generation_tipo(char * str){
 		aux = "i1";
 	}else if( strcmp(lowerType(str),"stringarray") == 0){
 		aux = "i8**";
+	}else if( strcmp(lowerType(str),"void") == 0){
+		aux = "void";
+	}else if( strcmp(lowerType(str),"String") == 0){
+		aux = "i8*";
 	}
 
 	return aux;
