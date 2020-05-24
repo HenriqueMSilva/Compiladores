@@ -4,7 +4,7 @@
 @.str.false = constant [6 x i8] c"false\00"
 @.str.0 = constant [10 x i8] c"Is pair: \00"
 @.str.1 = constant [3 x i8] c"|\0A\00"
-define i32 @main.entry(i32 %.size.,i8** %.args) {
+define i1 @main.entry(i32 %.size.,i8** %.args) {
 %size. = alloca i32
 store i32 %.size., i32* %size.
 %args = alloca i8**
@@ -22,6 +22,7 @@ store i32 %.3, i32* %g
 %.4 = add i32 0, 0
 store i32 %.4, i32* %is_pair
 %input = alloca i32
+%b = alloca i1
 %.5 = add i32 0, 40
 store i32 %.5, i32* %input
 br label %while1
@@ -112,10 +113,12 @@ whileCont1:
 %.51 = load i32, i32* %is_pair
 %.52 = call i32 (i8*, ...) @printf(i8* getelementptr  ([3 x i8], [3 x i8]* @.str.int, i32 0, i32 0), i32 %.51)
 %.53 = call i32 (i8*, ...) @printf(i8* getelementptr  ([3 x i8], [3 x i8]* @.str.1, i32 0, i32 0))
-ret i32 0
+%.54 = load i1, i1* %b
+ret i1 %.54
+ret i1 0
 }
 define i32 @main(i32 %.size,i8** %.args){
-call i32 @main.entry(i32 %.size, i8** %.args)
+call i1 @main.entry(i32 %.size, i8** %.args)
 ret i32 0
 }
 declare i32 @printf(i8*, ...)

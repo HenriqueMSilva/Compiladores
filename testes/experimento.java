@@ -1,10 +1,11 @@
 class fluxControl3 {
-
-    public static int main(String[] args) {
+	//Insert '30' as a param
+    public static boolean main(String[] args) {
 		int k; k = 0;
 		int i,g; i = 0; g = 0;
 		int is_pair; is_pair = 0;
 		int input;
+		boolean b;
 		input = 40;
         while( k < 5){
 			if(k == 1) { 
@@ -31,5 +32,6 @@ class fluxControl3 {
 		System.out.print("Is pair: ");
 		System.out.print(is_pair);
 		System.out.print("|\n");
+		return b;
     }
 }

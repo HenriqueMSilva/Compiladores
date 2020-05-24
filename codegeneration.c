@@ -14,6 +14,7 @@ int ifcounter = 1;
 void generation(is_program* p){
 
 	generation_metodos(p->metodos);
+	
 }
 
 
@@ -34,18 +35,19 @@ void generation_metodos(is_metodos* metodos){
         }
     }
 
-	//falta as aspas , nao as sei meter
-	printf("@.str.int = constant [3 x i8] c\"%%d\\00\"\n");
-	printf("@.str.double = constant [6 x i8] c\"%%.16e\\00\"\n");
-	printf("@.str.true = constant [5 x i8] c\"true\\00\"\n");
-	printf("@.str.false = constant [6 x i8] c\"false\\00\"\n");
+    if(metodos != NULL){
+		printf("@.str.int = constant [3 x i8] c\"%%d\\00\"\n");
+		printf("@.str.double = constant [6 x i8] c\"%%.16e\\00\"\n");
+		printf("@.str.true = constant [5 x i8] c\"true\\00\"\n");
+		printf("@.str.false = constant [6 x i8] c\"false\\00\"\n");
+	}
 
 	if(symtab_global->minus_operation == 1){
 		printf("@.str.minus = constant [2 x i8] c\"-\\00\"\n");
 	}
 
 	if(symtab_global->plus_operation == 1){
-		printf("@.str.minus = constant [2 x i8] c\"+\\00\"\n");
+		printf("@.str.plus = constant [2 x i8] c\"+\\00\"\n");
 	}
 
 	//print das strings 
@@ -76,11 +78,12 @@ void generation_metodos(is_metodos* metodos){
 					mainType = "i32";
 				}else if( strcmp(tmp->imdl->imhl->type,"Bool") == 0){
 					mainType= "i1";
-				}else if( strcmp(tmp->imdl->imhl->type,"StringArray") == 0){
-					mainType = "i8**";
+				}else if( strcmp(tmp->imdl->imhl->type,"Void") == 0){
+					mainType= "void";
 				}
 
             }
+
             //se for void
 			if( strcmp(typeFunction,"Void") == 0 ){
 				printf("ret void\n}\n");
@@ -295,7 +298,7 @@ void generation_statment_list(is_statment_list* statment){
 		registocounter++;
 	}
 
-	if(strcmp(statment->name_function,"While") == 0){
+	if(strcmp(statment->name_function,"While") == 0){ 
 		statment->number_condition = whilecounter;
 		printf("br label %%while%d\n",statment->number_condition);
 		printf("while%d:\n",statment->number_condition);
