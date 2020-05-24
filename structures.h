@@ -15,7 +15,7 @@ typedef struct _s10 {
 
     char *operation;
     char *value;
-	char * tipo;
+	char *tipo;
 
     int linha;
     int coluna;
@@ -31,6 +31,7 @@ typedef struct _s10 {
 typedef struct _s9 {
 	char *name_function;
 	int num_statements;
+    int number_condition;
 	is_expression_list* expr;
 	struct _s9* statment1;
 	struct _s9* statment2;

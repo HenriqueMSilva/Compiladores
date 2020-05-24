@@ -47,6 +47,8 @@ typedef struct _teg{
 typedef struct _hg{
 	char *name;
 	struct _sel *string_element;
+	int minus_operation;
+	int plus_operation;
 	struct _teg *declarations;
 } header_global;
 

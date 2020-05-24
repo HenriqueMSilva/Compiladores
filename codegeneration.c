@@ -8,6 +8,8 @@ extern	table_element_local 	*symtab_local;
 
 int methodcounter = 0;
 int registocounter = 1;
+int whilecounter = 1;
+int ifcounter = 1;
 
 void generation(is_program* p){
 
@@ -21,6 +23,7 @@ void generation_metodos(is_metodos* metodos){
 
 	char * typeFunction;
 	char * nameFunction;
+	char * mainType;
 	char * aux;
 	int hasmain = 0, stringcounter = 0;
 
@@ -37,11 +40,18 @@ void generation_metodos(is_metodos* metodos){
 	printf("@.str.true = constant [5 x i8] c\"true\\00\"\n");
 	printf("@.str.false = constant [6 x i8] c\"false\\00\"\n");
 
+	if(symtab_global->minus_operation == 1){
+		printf("@.str.minus = constant [2 x i8] c\"-\\00\"\n");
+	}
+
+	if(symtab_global->plus_operation == 1){
+		printf("@.str.minus = constant [2 x i8] c\"+\\00\"\n");
+	}
 
 	//print das strings 
 	while(tabela_global != NULL){
 		tabela_global->pos = stringcounter;
-		printf("@.str.%d = constant [%d x i8] c\"%s\\00\"\n",tabela_global->pos,tabela_global->tamanho,tabela_global->string); // tamanho mais 1 para contar com o \n pelo o que parece
+		printf("@.str.%d = constant [%d x i8] c\"%s\\00\"\n",tabela_global->pos,tabela_global->tamanho,tabela_global->string);
 		stringcounter++;
 		tabela_global = tabela_global->next; 
 	}
@@ -59,6 +69,17 @@ void generation_metodos(is_metodos* metodos){
             //se for main
             if(strcmp(nameFunction,"main") == 0){
             	hasmain = 1;
+
+            	if( strcmp(tmp->imdl->imhl->type,"Double") == 0){
+					mainType = "double";
+				}else if( strcmp(tmp->imdl->imhl->type,"Int") == 0){
+					mainType = "i32";
+				}else if( strcmp(tmp->imdl->imhl->type,"Bool") == 0){
+					mainType= "i1";
+				}else if( strcmp(tmp->imdl->imhl->type,"StringArray") == 0){
+					mainType = "i8**";
+				}
+
             }
             //se for void
 			if( strcmp(typeFunction,"Void") == 0 ){
@@ -84,11 +105,17 @@ void generation_metodos(is_metodos* metodos){
     if(hasmain == 0){
     	printf("define i32 @main(i32 %%.size,i8** %%.args){\n");
     	printf("ret i32 0\n}\n");
+    }
+
+        //verificar entry e size nao sei bem disso ainda
+    /*if(hasmain == 0){
+    	printf("define i32 @main(i32 %%.size,i8** %%.args){\n");
+    	printf("ret i32 0\n}\n");
     }else{
     	printf("define i32 @main(i32 %%.size,i8** %%.args){\n");
-		printf("call void @main.entry(i32 %%.size, i8** %%.args)\n");
+		printf("call %s @main.entry(i32 %%.size, i8** %%.args)\n",mainType);
 		printf("ret i32 0\n}\n");
-    }
+    }*/
 
     //nos casos testes isto estava sempre no fim
     printf("declare i32 @printf(i8*, ...)\n");
@@ -238,7 +265,7 @@ void generation_vardecl_list(is_vardecl_list* ivdl){
 
 void generation_statment_list(is_statment_list* statment){
 
-	if(statment->expr != NULL){
+	if(statment->expr != NULL && strcmp(statment->name_function,"While") != 0){
 		generation_expression(statment->expr);
 	}
 	
@@ -268,6 +295,19 @@ void generation_statment_list(is_statment_list* statment){
 		registocounter++;
 	}
 
+	if(strcmp(statment->name_function,"While") == 0){
+		statment->number_condition = whilecounter;
+		printf("br label %%while%d\n",statment->number_condition);
+		printf("while%d:\n",statment->number_condition);
+		whilecounter++;
+	}
+
+	if(strcmp(statment->name_function,"If") == 0 || strcmp(statment->name_function,"IfElse") == 0){
+		statment->number_condition = ifcounter;
+		printf("br i1 %%.%d, label %%then%d, label %%else%d\n",statment->expr->registo_number,statment->number_condition ,statment->number_condition);
+		printf("then%d:\n",statment->number_condition);
+		ifcounter++;
+	}
 
 	if(strcmp(statment->name_function,"Return") == 0){
 		//se for undef entao return; logo é void
@@ -282,11 +322,32 @@ void generation_statment_list(is_statment_list* statment){
 		generation_statment_list(statment->statment1);
 	}
 
+	if(strcmp(statment->name_function,"If") == 0 || strcmp(statment->name_function,"IfElse") == 0){
+		printf("br label %%ifCont%d\n",statment->number_condition);
+		printf("else%d:\n",statment->number_condition);
+	}
+
 	//ir para statmet2
 	if(statment->statment2 != NULL ){
 		generation_statment_list(statment->statment2);
 	}
 
+
+
+	if(strcmp(statment->name_function,"While") == 0){
+
+		if(statment->expr != NULL){
+			generation_expression(statment->expr);
+		}
+		
+		printf("br i1 %%.%d, label %%while%d, label %%whileCont%d\n", statment->expr->registo_number, statment->number_condition,statment->number_condition);
+		printf("whileCont%d:\n",statment->number_condition);
+	}
+
+	if(strcmp(statment->name_function,"If") == 0 || strcmp(statment->name_function,"IfElse") == 0){
+		printf("br label %%ifCont%d\n",statment->number_condition);
+		printf("ifCont%d:\n",statment->number_condition);
+	}
 
 }
 
@@ -294,7 +355,7 @@ void generation_statment_list(is_statment_list* statment){
 
 
 void generation_expression(is_expression_list* expr){
-
+	char * aux = NULL;
 
 	if(expr->expr1 != NULL ){
 		generation_expression(expr->expr1 );
@@ -384,11 +445,43 @@ void generation_expression(is_expression_list* expr){
 	}
 
 
-	if((strcmp(expr->value,"Add") == 0)){
+	if((strcmp(expr->value,"Add") == 0 || strcmp(expr->value,"Sub") == 0 || strcmp(expr->value,"Mul") == 0 || strcmp(expr->value,"Div") == 0 || strcmp(expr->value,"Mod") == 0)){
 
 		expr->generation_type = generation_tipo(expr->tipo);
 		expr->registo_number = registocounter;
-		printf("%%.%d = add %s %%.%d, %%.%d\n",expr->registo_number,expr->generation_type,expr->expr1->registo_number,expr->expr2->registo_number);
+
+
+		if(strcmp(expr->tipo,"double") == 0){
+			aux = generationOperation( expr->value, expr->tipo);
+		}
+
+		if(strcmp(expr->tipo,"int") == 0){
+			aux = generationOperation( expr->value, expr->tipo);
+		}
+
+		printf("%%.%d = %s %s %%.%d, %%.%d\n",expr->registo_number,aux,expr->generation_type,expr->expr1->registo_number,expr->expr2->registo_number);
+		registocounter++;
+	}
+
+
+	if(strcmp(expr->value,"Eq") == 0 || strcmp(expr->value,"Ne") == 0 || strcmp(expr->value,"Ge") == 0 || strcmp(expr->value,"Gt") == 0 || strcmp(expr->value,"Le") == 0 || strcmp(expr->value,"Lt") == 0 ){
+
+		expr->generation_type = generation_tipo(expr->tipo);
+		expr->registo_number = registocounter;
+		aux = generationOperation( expr->value, "");
+		//icmp define estas operaçoes , o tipo nao sera boolean mas sim i32 vi na documentacao
+		printf("%%.%d = icmp %s i32 %%.%d, %%.%d\n",expr->registo_number,aux,expr->expr1->registo_number,expr->expr2->registo_number);
+		registocounter++;
+	}
+
+
+	if(strcmp(expr->value,"And") == 0 || strcmp(expr->value,"Or") == 0){
+
+		expr->generation_type = generation_tipo(expr->tipo);
+		expr->registo_number = registocounter;
+		aux = generationOperation( expr->value, "");
+
+		printf("%%.%d = %s i23 %%.%d, %%.%d\n",expr->registo_number,aux,expr->expr1->registo_number,expr->expr2->registo_number);
 		registocounter++;
 	}
 
@@ -444,4 +537,49 @@ char * lowerType (char * value){
 
 	return operador;
 
+}
+
+
+char * generationOperation(char * value, char * type){
+	char * operador = NULL;
+	
+	if(strcmp(value,"Add") == 0 && strcmp(type,"int") == 0 ){
+		operador = "add";
+	}else if(strcmp(value,"Add") == 0  && strcmp(type,"double") == 0 ){
+		operador = "fadd";
+	}else if(strcmp(value,"Sub") == 0  && strcmp(type,"int") == 0 ){
+		operador = "sub";
+	}else if(strcmp(value,"Sub") == 0  && strcmp(type,"double") == 0 ){
+		operador = "fsub";
+	}else if(strcmp(value,"Mul") == 0  && strcmp(type,"int") == 0){
+		operador = "mul";
+	}else if(strcmp(value,"Mul") == 0  && strcmp(type,"double") == 0){
+		operador = "fmul";
+	}else if(strcmp(value,"Div") == 0  && strcmp(type,"int") == 0){
+		operador = "sdiv";
+	}else if(strcmp(value,"Div") == 0  && strcmp(type,"double") == 0){
+		operador = "fdiv";
+	}else if(strcmp(value,"Mod") == 0  && strcmp(type,"int") == 0){
+		operador = "urem";
+	}else if(strcmp(value,"Mod") == 0  && strcmp(type,"double") == 0){
+		operador = "frem";
+	}else if(strcmp(value,"Eq") == 0){
+		operador = "eq";
+	}else if(strcmp(value,"Ge") == 0){
+		operador = "sge";
+	}else if(strcmp(value,"Gt") == 0){
+		operador = "sgt";
+	}else if(strcmp(value,"Le") == 0){
+		operador = "sle";
+	}else if(strcmp(value,"Lt") == 0){
+		operador = "slt";
+	}else if(strcmp(value,"Ne") == 0){
+		operador = "ne";
+	}else if(strcmp(value,"And") == 0){
+		operador = "and";
+	}else if(strcmp(value,"Or") == 0){
+		operador = "or";
+	}
+
+	return operador;
 }

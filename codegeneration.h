@@ -16,6 +16,7 @@ void generation_vardecl_list(is_vardecl_list* ivdl);
 void generation_statment_list(is_statment_list* ivdl);
 void generation_expression(is_expression_list* expr);
 char * generation_tipo(char * str);
+char * generationOperation(char * value, char * type);
 
 
 #endif

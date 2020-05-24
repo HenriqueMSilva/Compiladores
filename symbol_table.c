@@ -107,7 +107,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 		
 		char * new_str = (char*) malloc(100*sizeof(char*)); 
-		
+
 		for(i=0;i<strlen(str);i++){
 			//se for \n substitui para \0A
 			if(str[i] == '\\' && str[i+1] == 'n'){
@@ -116,7 +116,15 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				new_str[k] = 'A'; k++;
 				aux_sel->tamanho += 1;
 				i++;
-			//tudo sem ser aspa 
+			//percentagem
+			}else if(str[i] == '%' ){
+				new_str[k] = '%'; k++;
+				new_str[k] = '%'; k++;
+				new_str[k] = '%'; k++;
+				new_str[k] = '%'; k++;
+				aux_sel->tamanho += 4;
+				i++;
+			//tudo sem ser aspa
 			}else if( str[i] != '\"'){
 				new_str[k] = str[i];
 				aux_sel->tamanho += 1;
@@ -409,6 +417,12 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				expr->tipo = "undef"; 
 				return expr->tipo;			
 			}else{
+				if(strcmp(expr->value,"Minus") == 0 )
+					symtab_global->minus_operation = 1;
+
+				if(strcmp(expr->value,"Plus") == 0)
+					symtab_global->plus_operation = 1;
+
 				expr->tipo = str1; 
 				return expr->tipo;
 			}
