@@ -13,6 +13,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	char * str2;
 	char * operador = NULL;
 	char * aux = NULL;
+	int sair=0;
 
 
 
@@ -1379,6 +1380,7 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 					var_metodo->name = (char*)strdup(ast_var_dec_list->name);
 					var_metodo->type = (char*)strdup(tipo);
 					var_metodo->is_param = 0;
+					var_metodo->is_declared = 0;
 					var_metodo->next = NULL;
 
 					//se a vardec da foi declarada 

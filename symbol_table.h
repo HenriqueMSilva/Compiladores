@@ -16,6 +16,7 @@ typedef struct _sel{
 typedef struct _tel{
 	char *name;
 	char *type;
+	int is_declared;
 	int is_param;
 	struct _tel *next;
 } method_var;

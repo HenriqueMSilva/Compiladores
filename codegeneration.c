@@ -28,6 +28,8 @@ void generation_metodos(is_metodos* metodos){
 	char * aux;
 	int hasmain = 0, stringcounter = 0;
 
+
+	printf("@..length = common global i32 0\n");
 	//printf das variaveis globais
 	for(tmp=metodos; tmp; tmp=tmp->next){
         if(tmp->ifl != NULL){
@@ -103,22 +105,19 @@ void generation_metodos(is_metodos* metodos){
         registocounter = 1;
     }
 
-
-    //verificar se existe main fiz uma aldrabice com um if e um contador, era para fazer com as tabelas mas nao as consegui fazer com que acede.se aqui
-    if(hasmain == 0){
-    	printf("define i32 @main(i32 %%.size,i8** %%.args){\n");
-    	printf("ret i32 0\n}\n");
-    }
-
         //verificar entry e size nao sei bem disso ainda
-    /*if(hasmain == 0){
-    	printf("define i32 @main(i32 %%.size,i8** %%.args){\n");
+    if(hasmain == 0){
+    	printf("define i32 @main(i32 %%...args, i8** %%.args){\n");
     	printf("ret i32 0\n}\n");
     }else{
-    	printf("define i32 @main(i32 %%.size,i8** %%.args){\n");
-		printf("call %s @main.entry(i32 %%.size, i8** %%.args)\n",mainType);
+    	printf("define i32 @main(i32 %%...args, i8** %%.args){\n");
+    	printf("%%..args = alloca i32\n");
+    	printf("store i32 %%...args, i32* %%..args\n");
+    	printf("%%.1 = load i32, i32* %%..args\n");
+    	printf("store i32 %%.1, i32* @..length\n");
+		printf("call %s @main.StringArray.(i8** %%.args)\n",mainType);
 		printf("ret i32 0\n}\n");
-    }*/
+    }
 
     //nos casos testes isto estava sempre no fim
     printf("declare i32 @printf(i8*, ...)\n");
@@ -131,16 +130,24 @@ void generation_field_list(is_fielddecl_list* ifl){
 
 	is_fielddecl_list* temp = ifl;
 	char * aux = NULL;
+	char * aux2 = NULL;
+
+	if( strcmp(lowerType(temp->type),"double") == 0){
+		aux = "0.0";
+	}else if(strcmp(lowerType(temp->type),"int") == 0){
+		aux = "0";
+	}else if(strcmp(lowerType(temp->type),"boolean") == 0){
+		aux = "0";
+	}
+
+	if(temp != NULL){
+		aux2 = generation_tipo(temp->type);
+	}
+
+
 	while(temp != NULL){
 
-		if( strcmp(temp->type,"Double") == 0){
-			aux = "0.0";
-		}else if(strcmp(temp->type,"Int") == 0){
-			aux = "0";
-		}else if(strcmp(temp->type,"Bool") == 0){
-			aux = "0";
-		}
-		printf("@%s = common global %s %s\n",temp->name, lowerType(temp->type) ,aux);
+		printf("@%s = common global %s %s\n",temp->name,aux2 ,aux);
 		temp = temp->next;
 	}
 
@@ -156,7 +163,7 @@ void generation_method_list(is_methoddecl_list* imdl){
     generation_methodheader_list(tmp->imhl);
  
  	//le body
- 	generation_methodbody_list(tmp->imbl);
+ 	generation_methodbody_list(tmp->imbl,tmp->imhl);
 
  
 }
@@ -172,7 +179,7 @@ void generation_methodheader_list(is_methodheader_list* imhl){
 
 	//verificar se a funçao é a main
 	if(strcmp(imhl->name,"main") == 0){
-		printf("%s.entry(i32 %%.size.,",imhl->name);
+		printf("%s.StringArray.(",imhl->name);
 	}else{ //verificar o counter??? como fazer counter
 		printf("method_%s_%d(",imhl->name,methodcounter);
 	}
@@ -181,13 +188,13 @@ void generation_methodheader_list(is_methodheader_list* imhl){
 	
 	while(ast_param_list != NULL){
 
-		if( strcmp(ast_param_list->type,"Double") == 0){
+		if( strcmp(lowerType(ast_param_list->type),"double") == 0){
 			ast_param_list->generation_type = "double";
-		}else if( strcmp(ast_param_list->type,"Int") == 0){
+		}else if( strcmp(lowerType(ast_param_list->type),"int") == 0){
 			ast_param_list->generation_type = "i32";
-		}else if( strcmp(ast_param_list->type,"Bool") == 0){
+		}else if( strcmp(lowerType(ast_param_list->type),"boolean") == 0){
 			ast_param_list->generation_type = "i1";
-		}else if( strcmp(ast_param_list->type,"StringArray") == 0){
+		}else if( strcmp(lowerType(ast_param_list->type),"String[]") == 0){
 			ast_param_list->generation_type = "i8**";
 		}
 
@@ -210,11 +217,6 @@ void generation_param_list(is_methodparams_list* impl, char* nameFunction){
 
 	is_methodparams_list* asl = impl;
 
-	if(strcmp(nameFunction,"main") == 0){
-		printf("%%size. = alloca i32\n");
-		printf("store i32 %%.size., i32* %%size.\n");
-	}
-
 	while(asl != NULL){
 
 		printf("%%%s = alloca %s\n",asl->name, asl->generation_type);
@@ -225,25 +227,63 @@ void generation_param_list(is_methodparams_list* impl, char* nameFunction){
 }
 
 
-void generation_methodbody_list(is_methodbody_list* imbl){
+void generation_methodbody_list(is_methodbody_list* imbl,is_methodheader_list* imhl){
 
 	is_methodbody_list* tmp;
 
-
 	for(tmp=imbl; tmp; tmp=tmp->next){
         if(tmp->ivdl != NULL){
-        	generation_vardecl_list(tmp->ivdl);
+        	generation_vardecl_list(tmp->ivdl,imhl);
         }
 	    if(tmp->statment != NULL){
-	    	generation_statment_list(tmp->statment);
+	    	generation_statment_list(tmp->statment,imhl);
 	    }
     }
 }
 
 
-void generation_vardecl_list(is_vardecl_list* ivdl){
+int assinaturas_iguais_local(is_methodheader_list* imhl,table_element_local *tabela_local ){
 
+
+	method_var *  local_param = tabela_local->tel->next;
+	is_methodparams_list * ast_param = imhl->impl;
+	
+	while(local_param != NULL && ast_param != NULL){
+
+
+		//testo os parametros de entrada
+		if( strcmp(local_param->type, ast_param->type) != 0 && local_param->is_param == 0){
+			//parametro diff
+			
+			return 0;
+		}
+
+
+
+		local_param = local_param->next;
+		ast_param = ast_param->next;
+	
+	}
+
+
+	//todos os param era iguais-> assinatura igual
+	if(local_param == NULL && ast_param == NULL){
+
+		return 1;
+	}
+
+	return 1;
+
+}
+
+
+
+void generation_vardecl_list(is_vardecl_list* ivdl,is_methodheader_list* imhl){
+
+	table_element_local *tabela_local;
 	is_vardecl_list* temp = ivdl;
+	method_var *  local_param = NULL;
+
 	char * aux = NULL;
 
 	if( strcmp(temp->type,"Double") == 0){
@@ -258,6 +298,30 @@ void generation_vardecl_list(is_vardecl_list* ivdl){
 
 	temp->generation_type = aux;
 	while(temp != NULL){
+		tabela_local = symtab_local;
+
+		while(tabela_local != NULL){
+
+			if(strcmp(tabela_local->name, imhl->name) == 0){
+				if( assinaturas_iguais_local(imhl, tabela_local) == 1){
+					local_param = tabela_local->tel->next;
+					while(local_param != NULL){
+						if(strcmp(temp->name,local_param->name) == 0 ){
+
+							local_param->is_declared = 1;
+							break;
+						}
+						
+						local_param = local_param->next;
+					}
+				}
+
+			}
+			tabela_local = tabela_local->next;
+		}
+
+
+
 		temp->generation_type = aux;
 		printf("%%%s = alloca %s\n",temp->name,temp->generation_type);
 		temp = temp->next;
@@ -266,10 +330,10 @@ void generation_vardecl_list(is_vardecl_list* ivdl){
 
 
 
-void generation_statment_list(is_statment_list* statment){
+void generation_statment_list(is_statment_list* statment,is_methodheader_list* imhl){
 
 	if(statment->expr != NULL && strcmp(statment->name_function,"While") != 0){
-		generation_expression(statment->expr);
+		generation_expression(statment->expr, imhl);
 	}
 	
 
@@ -280,7 +344,7 @@ void generation_statment_list(is_statment_list* statment){
 
 			while(string_element != NULL){
 				if(string_element->printed == 0){
-					printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([%d x i8], [%d x i8]* @.str.%d, i32 0, i32 0))\n",registocounter,string_element->tamanho,string_element->tamanho,string_element->pos);
+					printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([%d x i8], [%d x i8]* @.str.%d, i32 0, i32 0))\n",registocounter,string_element->tamanho,string_element->tamanho,string_element->pos);
 					string_element->printed = 1;
 					break;
 				}
@@ -288,14 +352,28 @@ void generation_statment_list(is_statment_list* statment){
 			}
 			
 		}else if(strcmp(lowerType(statment->expr->tipo),"boolean") == 0){
-			printf("nada\n");
+
+			printf("br i1 %%.%d, label %%then%d, label %%else%d\n",statment->expr->registo_number,ifcounter,ifcounter);
+			printf("then%d:\n",ifcounter);
+			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.true, i32 0, i32 0))\n",registocounter);
+			printf("br label %%ifCont%d\n",ifcounter);
+			printf("else%d:\n",ifcounter);
+			registocounter++;
+			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([6 x i8], [6 x i8]* @.str.false, i32 0, i32 0))\n",registocounter);
+			printf("br label %%ifCont%d\n",ifcounter);
+			printf("ifCont%d:\n",ifcounter);
+
 		}else if(strcmp(lowerType(statment->expr->tipo),"int") == 0){
-			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([3 x i8], [3 x i8]* @.str.int, i32 0, i32 0), i32 %%.%d)\n",registocounter,statment->expr->registo_number);
+
+			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str.int, i32 0, i32 0), i32 %%.%d)\n",registocounter,statment->expr->registo_number);
+		
 		}else if(strcmp(lowerType(statment->expr->tipo),"double") == 0){
-			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %%.%d)\n",registocounter,statment->expr->registo_number);
+
+			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %%.%d)\n",registocounter,statment->expr->registo_number);
 		}
 
 		registocounter++;
+		ifcounter++;
 	}
 
 	if(strcmp(statment->name_function,"While") == 0){ 
@@ -322,7 +400,7 @@ void generation_statment_list(is_statment_list* statment){
 
 	//ir para statmet1
 	if(statment->statment1 != NULL ){
-		generation_statment_list(statment->statment1);
+		generation_statment_list(statment->statment1,imhl);
 	}
 
 	if(strcmp(statment->name_function,"If") == 0 || strcmp(statment->name_function,"IfElse") == 0){
@@ -332,7 +410,7 @@ void generation_statment_list(is_statment_list* statment){
 
 	//ir para statmet2
 	if(statment->statment2 != NULL ){
-		generation_statment_list(statment->statment2);
+		generation_statment_list(statment->statment2,imhl);
 	}
 
 
@@ -340,7 +418,7 @@ void generation_statment_list(is_statment_list* statment){
 	if(strcmp(statment->name_function,"While") == 0){
 
 		if(statment->expr != NULL){
-			generation_expression(statment->expr);
+			generation_expression(statment->expr,imhl);
 		}
 		
 		printf("br i1 %%.%d, label %%while%d, label %%whileCont%d\n", statment->expr->registo_number, statment->number_condition,statment->number_condition);
@@ -355,17 +433,61 @@ void generation_statment_list(is_statment_list* statment){
 }
 
 
+int verifica_variavel(is_methodheader_list* imhl,is_expression_list* expr){
+	table_element_local *tabela_local = symtab_local;
+	method_var *  local_param = NULL;
 
 
-void generation_expression(is_expression_list* expr){
+	while(tabela_local != NULL){
+
+		//verifica nome da funçao
+		if(strcmp(tabela_local->name, imhl->name) == 0){
+
+			//verifica assinatura da funçao
+			if( assinaturas_iguais_local(imhl, tabela_local) == 1){
+
+				//percorro lista de parametros da tabela local
+				local_param = tabela_local->tel->next;
+				while(local_param != NULL){
+
+					//printf("%d\n",local_param->is_declared);
+					if(strcmp(expr->value,local_param->name) == 0 && local_param->is_declared == 1){
+						//se for local
+						return 1;
+					}
+					
+					local_param = local_param->next;
+				}
+			}
+
+		}
+		tabela_local = tabela_local->next;
+	}
+	return 0;
+}
+
+
+
+
+
+
+int convertType(const char* value, double *destination) {
+  char sentinel;
+  return sscanf(value,"%lf %c", destination, &sentinel) == 1;
+}
+
+
+void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 	char * aux = NULL;
+	char * minusplusAux = NULL;
+	int result= 0;
 
 	if(expr->expr1 != NULL ){
-		generation_expression(expr->expr1 );
+		generation_expression(expr->expr1,imhl );
 	}
 
 	if(expr->expr2 != NULL ){
-		generation_expression(expr->expr2 );
+		generation_expression(expr->expr2,imhl );
 	}
 
 	//printf("%s %s\n",expr->operation,expr->value);
@@ -373,11 +495,19 @@ void generation_expression(is_expression_list* expr){
 	//se for ID retorna registo
 	if( strcmp(expr->operation, "Id" ) == 0){
 
+		result = verifica_variavel(imhl,expr);
 		expr->generation_type = generation_tipo(expr->tipo);
 		expr->registo_number = registocounter;
 
+		if(result == 1){
+			//se for local
+			printf("%%.%d = load %s, %s* %%%s\n",registocounter,expr->generation_type,expr->generation_type,expr->value);
+		
+		}else {
+			//se for global
+			printf("%%.%d = load %s, %s* @%s\n",registocounter,expr->generation_type,expr->generation_type,expr->value);
+		}
 
-		printf("%%.%d = load %s, %s* %%%s\n",registocounter,expr->generation_type,expr->generation_type,expr->value);
 		registocounter++;
 
 	}
@@ -387,7 +517,22 @@ void generation_expression(is_expression_list* expr){
 
 		expr->generation_type = generation_tipo(expr->tipo);
 		expr->registo_number = registocounter;
-		printf("%%.%d = add %s 0, %s\n",expr->registo_number,expr->generation_type,expr->value);
+
+
+		char * str = expr->value;
+		int i,k=0;
+
+		char * new_str = (char*) malloc(100*sizeof(char*)); 
+
+		for(i=0;i<strlen(str);i++){
+			//ignorar o _
+			if( str[i] != '_'){
+				new_str[k] = str[i];
+				k++;
+			}
+		}
+
+		printf("%%.%d = add %s 0, %s\n",expr->registo_number,expr->generation_type,new_str);
 		registocounter++;
 	}
 
@@ -397,7 +542,26 @@ void generation_expression(is_expression_list* expr){
 		//REVER AINDA NAO ESTA BEM
 		expr->generation_type = generation_tipo(expr->tipo);
 		expr->registo_number = registocounter;
-		printf("%%.%d = fadd  %s 0.000000, %s\n",expr->registo_number,expr->generation_type,expr->value);
+
+
+		char * str = expr->value;
+		int i,k=0;
+
+		char * new_str = (char*) malloc(100*sizeof(char*)); 
+
+		for(i=0;i<strlen(str);i++){
+			//ignorar o _
+			if( str[i] != '_'){
+				new_str[k] = str[i];
+				k++;
+			}
+		}
+
+		double x;
+		convertType(new_str, &x);
+
+
+		printf("%%.%d = fadd  %s 0.000000, %.16e\n",expr->registo_number,expr->generation_type,x);
 		registocounter++;
 	}
 
@@ -422,29 +586,48 @@ void generation_expression(is_expression_list* expr){
 
 
 
-
-	/*if((strcmp(expr->operation,"Call") == 0)){
-		table_element_global* tabela_global = symtab_global->declarations;
-
-		printf("%s %s\n",expr->value,expr->tipo);
-
-		if(tabela_global != NULL){
-			
-			if(){
-
-			}
-
-			tabela_global = tabela_global->next;
-		}
-	}*/
-
-
-
 	if( strcmp(expr->operation, "Assign" ) == 0 ){
 		
+
+
+		result = verifica_variavel(imhl,expr);
 		expr->generation_type = generation_tipo(expr->tipo);
-		printf("store %s %%.%d, %s* %%%s\n",expr->generation_type,expr->expr1->registo_number,expr->generation_type,expr->value);
-	
+		expr->registo_number = registocounter-1;		
+		//printf("%d\n", result);
+
+		//printf("%s %d \n",expr->value,registocounter);
+		if(result == 1){
+			//se for local
+
+			if(strcmp(lowerType(expr->tipo),"double") ==0 && strcmp(lowerType(expr->expr1->tipo),"int") ==0){
+
+				printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number,expr->generation_type);
+
+				printf("store %s %%.%d, %s* %%%s\n",expr->generation_type,registocounter,expr->generation_type,expr->value);
+				registocounter++;
+			}else{
+			
+				printf("store %s %%.%d, %s* %%%s\n",expr->generation_type,expr->expr1->registo_number,expr->generation_type,expr->value);
+
+			}
+		
+		}else{
+			//se for global
+
+			if(strcmp(lowerType(expr->tipo),"double") == 0 && strcmp(lowerType(expr->expr1->tipo),"int") ==0){
+				
+				printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number,expr->generation_type);
+
+				printf("store %s %%.%d, %s* @%s\n",expr->generation_type,registocounter,expr->generation_type,expr->value);
+				registocounter++;
+			}else{
+			
+				printf("store %s %%.%d, %s* @%s\n",expr->generation_type,expr->expr1->registo_number,expr->generation_type,expr->value);
+
+			}
+		}
+			
+			//printf("%s %s %s\n",expr->value,expr->tipo,expr->generation_type);
 	}
 
 
@@ -484,11 +667,28 @@ void generation_expression(is_expression_list* expr){
 		expr->registo_number = registocounter;
 		aux = generationOperation( expr->value, "");
 
-		printf("%%.%d = %s i23 %%.%d, %%.%d\n",expr->registo_number,aux,expr->expr1->registo_number,expr->expr2->registo_number);
+		printf("%%.%d = %s i32 %%.%d, %%.%d\n",expr->registo_number,aux,expr->expr1->registo_number,expr->expr2->registo_number);
 		registocounter++;
 	}
 
+	if((strcmp(expr->value,"Minus") == 0 || strcmp(expr->value,"Plus") == 0)){
 
+		expr->generation_type = generation_tipo(expr->tipo);
+		expr->registo_number = registocounter;
+
+		if(strcmp(expr->tipo,"double") == 0){
+			aux = generationOperation( expr->value, expr->tipo);
+			minusplusAux = "0.0";
+		}
+
+		if(strcmp(expr->tipo,"int") == 0){
+			aux = generationOperation( expr->value, expr->tipo);
+			minusplusAux = "0";
+		}
+
+		printf("%%.%d = %s %s %s, %%.%d\n",expr->registo_number,aux,expr->generation_type,minusplusAux,expr->expr1->registo_number);
+		registocounter++;
+	}
 }
 
 
@@ -546,13 +746,13 @@ char * lowerType (char * value){
 char * generationOperation(char * value, char * type){
 	char * operador = NULL;
 	
-	if(strcmp(value,"Add") == 0 && strcmp(type,"int") == 0 ){
+	if( (strcmp(value,"Add") == 0 || strcmp(value,"Plus") == 0 ) && strcmp(type,"int") == 0 ){
 		operador = "add";
-	}else if(strcmp(value,"Add") == 0  && strcmp(type,"double") == 0 ){
+	}else if((strcmp(value,"Add") == 0 || strcmp(value,"Plus") == 0 )  && strcmp(type,"double") == 0 ){
 		operador = "fadd";
-	}else if(strcmp(value,"Sub") == 0  && strcmp(type,"int") == 0 ){
+	}else if( (strcmp(value,"Sub") == 0 || strcmp(value,"Minus") == 0) && strcmp(type,"int") == 0 ){
 		operador = "sub";
-	}else if(strcmp(value,"Sub") == 0  && strcmp(type,"double") == 0 ){
+	}else if((strcmp(value,"Sub") == 0 || strcmp(value,"Minus") == 0) && strcmp(type,"double") == 0 ){
 		operador = "fsub";
 	}else if(strcmp(value,"Mul") == 0  && strcmp(type,"int") == 0){
 		operador = "mul";
