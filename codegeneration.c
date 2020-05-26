@@ -29,7 +29,7 @@ void generation_metodos(is_metodos* metodos){
 	int hasmain = 0, stringcounter = 0;
 
 
-	printf("@..length = common global i32 0\n");
+	printf("@.argc = common global i32 0\n");
 	//printf das variaveis globais
 	for(tmp=metodos; tmp; tmp=tmp->next){
         if(tmp->ifl != NULL){
@@ -38,6 +38,8 @@ void generation_metodos(is_metodos* metodos){
     }
 
     if(metodos != NULL){
+
+		printf("@.str.argv = constant [3 x i8] c\"%%s\\00\"\n");
 		printf("@.str.int = constant [3 x i8] c\"%%d\\00\"\n");
 		printf("@.str.double = constant [6 x i8] c\"%%.16e\\00\"\n");
 		printf("@.str.true = constant [5 x i8] c\"true\\00\"\n");
@@ -107,15 +109,15 @@ void generation_metodos(is_metodos* metodos){
 
         //verificar entry e size nao sei bem disso ainda
     if(hasmain == 0){
-    	printf("define i32 @main(i32 %%...args, i8** %%.args){\n");
+    	printf("define i32 @main(i32 %%.argc, i8** %%.argv){\n");
     	printf("ret i32 0\n}\n");
     }else{
-    	printf("define i32 @main(i32 %%...args, i8** %%.args){\n");
-    	printf("%%..args = alloca i32\n");
-    	printf("store i32 %%...args, i32* %%..args\n");
-    	printf("%%.1 = load i32, i32* %%..args\n");
-    	printf("store i32 %%.1, i32* @..length\n");
-		printf("call %s @main.StringArray.(i8** %%.args)\n",mainType);
+    	printf("define i32 @main(i32 %%.argc, i8** %%.argv){\n");
+    	printf("%%.argc_1 = alloca i32\n");
+    	printf("store i32 %%.argc, i32* %%.argc_1\n");
+    	printf("%%.1 = load i32, i32* %%.argc_1\n");
+    	printf("store i32 %%.1, i32* @.argc\n");
+		printf("call %s @main.nossa(i8** %%.argv)\n",mainType);
 		printf("ret i32 0\n}\n");
     }
 
@@ -179,7 +181,7 @@ void generation_methodheader_list(is_methodheader_list* imhl){
 
 	//verificar se a funçao é a main
 	if(strcmp(imhl->name,"main") == 0){
-		printf("%s.StringArray.(",imhl->name);
+		printf("%s.nossa(",imhl->name);
 	}else{ //verificar o counter??? como fazer counter
 		printf("method_%s_%d(",imhl->name,methodcounter);
 	}
@@ -350,8 +352,42 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 				}
 				string_element = string_element->next; 
 			}
+		
+		}else if(strcmp(lowerType(statment->expr->tipo),"String[]") == 0 && strcmp(statment->expr->operation,"ParseArgs") == 0 ){
+			//Parse.Int( args[ExprA] ) 
 			
-		}else if(strcmp(lowerType(statment->expr->tipo),"boolean") == 0){
+		
+			//vou buscar a %argv local 								
+			printf("%%.%d = load i8**, i8*** %%%s\n",registocounter, statment->expr->value);
+            registocounter++;
+            
+
+            //TODO essa value nao vai funcionar se tiver _
+			printf("%%.%d = getelementptr i8*, i8** %%.%d, i64 %d\n",registocounter, registocounter - 1, atoi(statment->expr->expr1->value) + 1 );
+			registocounter++;
+			
+			printf("%%.%d = load i8*, i8** %%.%d\n", registocounter, registocounter - 1);
+			registocounter++;
+
+
+			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([3 x i8], [3 x i8]* @.str.argv, i32 0, i32 0), i8* %%.%d)\n",registocounter, registocounter-1 );
+
+
+
+		}else if(strcmp(lowerType(statment->expr->tipo),"String[]") == 0 && strcmp(statment->expr->operation,"Length") == 0 ){
+            //args.lenght
+        
+            printf("%%.%d = load i32, i32* @.argc\n",registocounter);
+            registocounter++;
+
+            printf("%%.%d = sub i32 %%.%d, 1 \n",registocounter, registocounter-1 );
+            registocounter++;
+            
+
+            printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([3 x i8], [3 x i8]* @.str.int, i32 0, i32 0), i32 %%.%d)\n",registocounter,registocounter-1 );
+			
+
+        }else if(strcmp(lowerType(statment->expr->tipo),"boolean") == 0){
 
 			printf("br i1 %%.%d, label %%then%d, label %%else%d\n",statment->expr->registo_number,ifcounter,ifcounter);
 			printf("then%d:\n",ifcounter);
@@ -586,6 +622,25 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 
 
 
+	if(strcmp(expr->operation,"Length") == 0 ){
+        //args.lenght
+
+		//este generation tipo e problematico? TODO
+		expr->generation_type = generation_tipo(expr->tipo);
+    
+        printf("%%.%d = load i32, i32* @.argc\n",registocounter);
+        registocounter++;
+
+
+		expr->registo_number = registocounter;
+        printf("%%.%d = sub i32 %%.%d, 1 \n",registocounter, registocounter-1 );
+        registocounter++;
+    
+	}
+
+
+
+
 	if( strcmp(expr->operation, "Assign" ) == 0 ){
 		
 
@@ -689,6 +744,7 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		printf("%%.%d = %s %s %s, %%.%d\n",expr->registo_number,aux,expr->generation_type,minusplusAux,expr->expr1->registo_number);
 		registocounter++;
 	}
+
 }
 
 
