@@ -515,14 +515,13 @@ int convertType(const char* value, double *destination) {
 
 void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 	char * aux = NULL;
-	char * minusplusAux = NULL;
 	int result= 0;
 
-	if(expr->expr1 != NULL ){
+	if(expr->expr1 != NULL  ){
 		generation_expression(expr->expr1,imhl );
 	}
 
-	if(expr->expr2 != NULL ){
+	if(expr->expr2 != NULL && strcmp(expr->value,"And") != 0 && strcmp(expr->value,"Or") != 0){
 		generation_expression(expr->expr2,imhl );
 	}
 
@@ -716,35 +715,128 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 	}
 
 
-	if(strcmp(expr->value,"And") == 0 || strcmp(expr->value,"Or") == 0){
+
+	if(strcmp(expr->value,"And") == 0){
+
+		printf("br i1 %%.%d, label %%thenaux%d, label %%else%d\n",expr->expr1->registo_number,ifcounter,ifcounter);
+		printf("thenaux%d:\n",ifcounter);
+
+		if(expr->expr2 != NULL){
+			generation_expression(expr->expr2,imhl );
+		}
+
+		printf("br label %%then%d\n",ifcounter);
+		printf("then%d:\n",ifcounter);
+
+		printf("%%.%d = add i1 0, %%.%d\n",registocounter,expr->expr2->registo_number);
+
+		printf("br label %%ifCont%d\n",ifcounter);
+
+
+		printf("else%d:\n",ifcounter);
+		printf("br label %%ifCont%d\n",ifcounter);
+		printf("ifCont%d:\n",ifcounter);
+
+		registocounter++;
+
+
+		printf("%%.%d = phi i1 [  %%.%d, %%then%d ], [ %%.%d, %%else%d ]\n",registocounter,expr->expr2->registo_number+1,ifcounter,expr->expr1->registo_number,ifcounter);
 
 		expr->generation_type = generation_tipo(expr->tipo);
 		expr->registo_number = registocounter;
-		aux = generationOperation( expr->value, "");
 
-		printf("%%.%d = %s i32 %%.%d, %%.%d\n",expr->registo_number,aux,expr->expr1->registo_number,expr->expr2->registo_number);
+		ifcounter++;
 		registocounter++;
 	}
 
-	if((strcmp(expr->value,"Minus") == 0 || strcmp(expr->value,"Plus") == 0)){
+
+	if(strcmp(expr->value,"Or") == 0){
+
+		printf("br i1 %%.%d, label %%then%d, label %%elseaux%d\n",expr->expr1->registo_number,ifcounter,ifcounter);
+		printf("then%d:\n",ifcounter);
+		printf("br label %%ifCont%d\n",ifcounter);
+
+		printf("elseaux%d:\n",ifcounter);
+
+		if(expr->expr2 != NULL){
+			generation_expression(expr->expr2,imhl );
+		}
+
+		printf("br label %%else%d\n",ifcounter);
+		printf("else%d:\n",ifcounter);
+
+
+		printf("%%.%d = add i1 0, %%.%d\n",registocounter,expr->expr2->registo_number);
+
+		printf("br label %%ifCont%d\n",ifcounter);
+
+		printf("ifCont%d:\n",ifcounter);
+
+		registocounter++;
+
+		printf("%%.%d = phi i1 [  %%.%d, %%then%d ], [ %%.%d, %%else%d ]\n",registocounter,expr->expr1->registo_number,ifcounter,expr->expr2->registo_number+1,ifcounter);
 
 		expr->generation_type = generation_tipo(expr->tipo);
 		expr->registo_number = registocounter;
 
+		ifcounter++;
+		registocounter++;
+	}
+
+
+
+
+	if(strcmp(expr->value,"Minus") == 0){
+
+		expr->generation_type = generation_tipo(expr->tipo);
+		expr->registo_number = registocounter;
+		
 		if(strcmp(expr->tipo,"double") == 0){
-			aux = generationOperation( expr->value, expr->tipo);
-			minusplusAux = "0.0";
+			printf("%%.%d = fmul double -1.0, %%.%d\n",expr->registo_number,expr->expr1->registo_number);
 		}
-
 		if(strcmp(expr->tipo,"int") == 0){
-			aux = generationOperation( expr->value, expr->tipo);
-			minusplusAux = "0";
+			printf("%%.%d = mul i32 -1, %%.%d\n",expr->registo_number,expr->expr1->registo_number);
 		}
 
-		printf("%%.%d = %s %s %s, %%.%d\n",expr->registo_number,aux,expr->generation_type,minusplusAux,expr->expr1->registo_number);
 		registocounter++;
 	}
 
+
+	if(strcmp(expr->value,"Plus") == 0){
+		expr->generation_type = generation_tipo(expr->tipo);
+		expr->registo_number = registocounter;
+		
+		if(strcmp(expr->tipo,"double") == 0){
+			printf("%%.%d = fmul double 1.0, %%.%d\n",expr->registo_number,expr->expr1->registo_number);
+		}
+		if(strcmp(expr->tipo,"int") == 0){
+			printf("%%.%d = mul i32 1, %%.%d\n",expr->registo_number,expr->expr1->registo_number);
+		}
+		
+
+		registocounter++;
+	}
+
+
+
+	if(strcmp(expr->value,"Not") == 0){
+
+		printf("%%.%d = alloca i1\n",registocounter);
+		printf("br i1 %%.%d, label %%then%d, label %%else%d\n",expr->expr1->registo_number,ifcounter,ifcounter);
+		printf("then%d:\n",ifcounter);
+		printf("store i1 false, i1* %%.%d\n",registocounter);
+		printf("br label %%ifCont%d\nelse%d:\n",ifcounter,ifcounter);
+		printf("store i1 true, i1* %%.%d\n",registocounter);
+		printf("br label %%ifCont%d\nifCont%d:\n",ifcounter,ifcounter);
+		registocounter++;
+		printf("%%.%d = load i1, i1* %%.%d\n",registocounter,registocounter-1);
+
+		expr->expr1->registo_number = registocounter; 
+		expr->generation_type =  generation_tipo(expr->tipo);
+		expr->registo_number = expr->expr1->registo_number;
+		ifcounter++;
+		registocounter++;
+	}	
 }
 
 
@@ -802,13 +894,13 @@ char * lowerType (char * value){
 char * generationOperation(char * value, char * type){
 	char * operador = NULL;
 	
-	if( (strcmp(value,"Add") == 0 || strcmp(value,"Plus") == 0 ) && strcmp(type,"int") == 0 ){
+	if( strcmp(value,"Add") == 0 && strcmp(type,"int") == 0 ){
 		operador = "add";
-	}else if((strcmp(value,"Add") == 0 || strcmp(value,"Plus") == 0 )  && strcmp(type,"double") == 0 ){
+	}else if(strcmp(value,"Add") == 0   && strcmp(type,"double") == 0 ){
 		operador = "fadd";
-	}else if( (strcmp(value,"Sub") == 0 || strcmp(value,"Minus") == 0) && strcmp(type,"int") == 0 ){
+	}else if( strcmp(value,"Sub") == 0 && strcmp(type,"int") == 0 ){
 		operador = "sub";
-	}else if((strcmp(value,"Sub") == 0 || strcmp(value,"Minus") == 0) && strcmp(type,"double") == 0 ){
+	}else if(strcmp(value,"Sub") == 0 && strcmp(type,"double") == 0 ){
 		operador = "fsub";
 	}else if(strcmp(value,"Mul") == 0  && strcmp(type,"int") == 0){
 		operador = "mul";
@@ -838,6 +930,8 @@ char * generationOperation(char * value, char * type){
 		operador = "and";
 	}else if(strcmp(value,"Or") == 0){
 		operador = "or";
+	}else if( strcmp(value,"Minus") == 0 || strcmp(value,"Plus") == 0){
+		operador = "fneg";
 	}
 
 	return operador;
