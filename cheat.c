@@ -1,6 +1,25 @@
+#include<stdlib.h>
+#include<string.h>
+#include<stdio.h>
+
+
+
 int i;
 
+double ddble( int e ){
+    int inteiro;
 
-void joca(){
+    inteiro = 10;
+    e = 20;
 
+    return 1.0; 
+}
+
+int main1( int argc, char *argv[ ] ){
+    char * r;
+    //ddble(15);
+    r = argv[3];
+
+    printf("%s\n",argv[1]);
+    return 1; 
 }
