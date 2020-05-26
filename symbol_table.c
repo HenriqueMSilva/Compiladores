@@ -13,7 +13,6 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	char * str2;
 	char * operador = NULL;
 	char * aux = NULL;
-	int sair=0;
 
 
 
@@ -106,18 +105,44 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		char * str = expr->value;
 		int i,k=0;
 
-		
 		char * new_str = (char*) malloc(100*sizeof(char*)); 
 
 		for(i=0;i<strlen(str);i++){
 			//se for \n substitui para \0A
-			if(str[i] == '\\' && str[i+1] == 'n'){
-				new_str[k] = '\\'; k++;
-				new_str[k] = '0'; k++;
-				new_str[k] = 'A'; k++;
+			if(str[i] == '\\'){
+				if(str[i+1] == 'n'){
+					new_str[k] = '\\'; k++;
+					new_str[k] = '0'; k++;
+					new_str[k] = 'A'; k++;
+				}
+				if(str[i+1] == 't'){
+					new_str[k] = '\\'; k++;
+					new_str[k] = '0'; k++;
+					new_str[k] = '9'; k++;
+				}
+				if(str[i+1] == 'r'){
+					new_str[k] = '\\'; k++;
+					new_str[k] = '0'; k++;
+					new_str[k] = 'D'; k++;
+				}
+				if(str[i+1] == '\\'){
+					new_str[k] = '\\'; k++;
+					new_str[k] = '5'; k++;
+					new_str[k] = 'C'; k++;
+				}
+				if(str[i+1] == '\"'){
+					new_str[k] = '\\'; k++;
+					new_str[k] = '2'; k++;
+					new_str[k] = '2'; k++;
+				}
+				if(str[i+1] == 'f'){
+					new_str[k] = '\\'; k++;
+					new_str[k] = '0'; k++;
+					new_str[k] = 'C'; k++;
+				}
+
 				aux_sel->tamanho += 1;
 				i++;
-			//percentagem
 			}else if(str[i] == '%' ){
 				new_str[k] = '%'; k++;
 				new_str[k] = '%'; k++;
