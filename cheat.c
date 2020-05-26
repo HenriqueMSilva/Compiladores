@@ -2,8 +2,15 @@
 #include<string.h>
 #include<stdio.h>
 
+/*
+int main1(){
+	int a;
+	a = (int) (argv[1+0-4+7]);
+	
+	return 2;
+}*/
 
-
+/*
 int i;
 
 double ddble( int e ){
@@ -22,4 +29,4 @@ int main1( int argc, char *argv[ ] ){
 
     printf("%s\n",argv[1]);
     return 1; 
-}
+}*/

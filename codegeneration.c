@@ -356,36 +356,68 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 		}else if(strcmp(lowerType(statment->expr->tipo),"String[]") == 0 && strcmp(statment->expr->operation,"ParseArgs") == 0 ){
 			//Parse.Int( args[ExprA] ) 
 			
-		
+			//System.out.print( )
+			
+
+/*
 			//vou buscar a %argv local 								
 			printf("%%.%d = load i8**, i8*** %%%s\n",registocounter, statment->expr->value);
             registocounter++;
             
 
+			
+            					//EXPA
+			// vou buscar  statment->expr->expr1->registo_number
+        	printf("%%.%d = load i32, i32* %%.%d\n",registocounter, );
+        	registocounter++;
+
+        	//novo index
+        	printf("%%.%d = add i32 %%.%d, 1 \n",registocounter, statment->expr->expr1->registo_number );
+        	registocounter++;
+
+            
+            //load expr->registo
+
+
+
+
             //TODO essa value nao vai funcionar se tiver _
-			printf("%%.%d = getelementptr i8*, i8** %%.%d, i64 %d\n",registocounter, registocounter - 1, atoi(statment->expr->expr1->value) + 1 );
+//			printf("%%.%d = getelementptr i8*, i8** %%.%d, i64 %d\n",registocounter, registocounter - 1, atoi(  novo_formato_int(statment->expr->expr1->value)) + 1 );
+			printf("%%.%d = getelementptr i8*, i8** %%.%d, i32 %%.%d\n",registocounter, registocounter - 2, registocounter - 1 );
 			registocounter++;
 			
+
+			//registo com o int em string p.e. "15"
 			printf("%%.%d = load i8*, i8** %%.%d\n", registocounter, registocounter - 1);
 			registocounter++;
 
+			//printf("%%.%d = ptrtoint i8*  %%.%d  i32\n", registocounter, registocounter - 1);
+			//registocounter++;
 
-			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([3 x i8], [3 x i8]* @.str.argv, i32 0, i32 0), i8* %%.%d)\n",registocounter, registocounter-1 );
+  			//%10 = ptrtoint i8* %9 to i32
+
+
+			printf("%%.%d = add i32 0, %%.%d\n",registocounter, registocounter - 1);
+			statment->expr->registo_number = registocounter;
+			registocounter++;
+
+
+			//expr->expr1->registo_number
+
+*/
+
+			//printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([3 x i8], [3 x i8]* @.str.argv, i32 0, i32 0), i8* %%.%d)\n",registocounter, registocounter-1 );
+			
+
+			//PRint PARAMANTER 
+			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([3 x i8], [3 x i8]* @.str.int, i32 0, i32 0), i32 %%.%d)\n",registocounter, statment->expr->registo_number);
 
 
 
 		}else if(strcmp(lowerType(statment->expr->tipo),"String[]") == 0 && strcmp(statment->expr->operation,"Length") == 0 ){
             //args.lenght
-        
-            printf("%%.%d = load i32, i32* @.argc\n",registocounter);
-            registocounter++;
-
-            printf("%%.%d = sub i32 %%.%d, 1 \n",registocounter, registocounter-1 );
-            registocounter++;
-            
-
-            printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([3 x i8], [3 x i8]* @.str.int, i32 0, i32 0), i32 %%.%d)\n",registocounter,registocounter-1 );
-			
+       
+			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str.int, i32 0, i32 0), i32 %%.%d)\n",registocounter,statment->expr->registo_number);
 
         }else if(strcmp(lowerType(statment->expr->tipo),"boolean") == 0){
 
@@ -513,6 +545,22 @@ int convertType(const char* value, double *destination) {
 }
 
 
+char * novo_formato_int(char * str){
+	int i,k=0;
+
+	char * new_str =  (char*) malloc(100*sizeof(char*)); 
+
+	for(i=0;i<strlen(str);i++){
+		//ignorar o _
+		if( str[i] != '_'){
+			new_str[k] = str[i];
+			k++;
+		}
+	}
+	return new_str;
+}
+
+
 void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 	char * aux = NULL;
 	char * minusplusAux = NULL;
@@ -556,17 +604,9 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 
 
 		char * str = expr->value;
-		int i,k=0;
+		
 
-		char * new_str = (char*) malloc(100*sizeof(char*)); 
-
-		for(i=0;i<strlen(str);i++){
-			//ignorar o _
-			if( str[i] != '_'){
-				new_str[k] = str[i];
-				k++;
-			}
-		}
+		char * new_str = novo_formato_int(str);
 
 		printf("%%.%d = add %s 0, %s\n",expr->registo_number,expr->generation_type,new_str);
 		registocounter++;
@@ -581,17 +621,9 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 
 
 		char * str = expr->value;
-		int i,k=0;
+		
 
-		char * new_str = (char*) malloc(100*sizeof(char*)); 
-
-		for(i=0;i<strlen(str);i++){
-			//ignorar o _
-			if( str[i] != '_'){
-				new_str[k] = str[i];
-				k++;
-			}
-		}
+		char * new_str = novo_formato_int(str);
 
 		double x;
 		convertType(new_str, &x);
@@ -621,12 +653,72 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 	}*/
 
 
+	if(strcmp(expr->operation,"ParseArgs") == 0 ){
+			//Parse.Int( args[ExprA] ) 
+			
+			//este generation tipo e problematico? TODO
+			expr->generation_type = generation_tipo("int");
+	
+
+			//vou buscar a %argv local 								
+			printf("%%.%d = load i8**, i8*** %%%s\n",registocounter, expr->value);
+            registocounter++;
+            
+
+        	//novo index
+        	printf("%%.%d = add i32 %%.%d, 1 \n",registocounter, expr->expr1->registo_number );
+        	registocounter++;
+
+            
+        	//ponteiro com o endereco do paramentro de entrada certo
+          	printf("%%.%d = getelementptr i8*, i8** %%.%d, i32 %%.%d\n",registocounter, registocounter - 2, registocounter - 1 );
+			registocounter++;
+			
+
+			//registo com o int em string p.e. "15"
+			printf("%%.%d = load i8*, i8** %%.%d\n", registocounter, registocounter - 1);
+			int load_str = registocounter++;
+
+
+			//%.6 = call i32 @atoi(i8* %.5)
+			printf("%%.%d = call i32 @atoi(i8* %%.%d)\n", registocounter, registocounter - 1);
+
+/*
+			//type cast para int
+			printf("%%.%d = ptrtoint i8*  %%.%d to i32\n", registocounter, registocounter - 1);
+			 registocounter++;
+
+  			//%10 = ptrtoint i8* %9 to i32
+
+			//store i32 %10, i32* %6, align 4
+			
+*/
+
+			//printf("%%.%d = add i32 0, %%.%d\n",registocounter, registocounter - 1);
+			expr->registo_number = registocounter;
+			int valor_inteiro = registocounter++;
+
+
+			//expr->expr1->registo_number
+
+
+/*
+			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([3 x i8], [3 x i8]* @.str.argv, i32 0, i32 0), i8* %%.%d)\n",registocounter, load_str );
+			registocounter++;
+			printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr  ([3 x i8], [3 x i8]* @.str.int, i32 0, i32 0), i32 %%.%d)\n",registocounter, valor_inteiro );
+			registocounter++;*/
+
+
+	}
+
+
 
 	if(strcmp(expr->operation,"Length") == 0 ){
         //args.lenght
 
 		//este generation tipo e problematico? TODO
-		expr->generation_type = generation_tipo(expr->tipo);
+		expr->generation_type = generation_tipo("int");
+	
     
         printf("%%.%d = load i32, i32* @.argc\n",registocounter);
         registocounter++;
@@ -662,14 +754,20 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 				registocounter++;
 			}else{
 			
-				printf("store %s %%.%d, %s* %%%s\n",expr->generation_type,expr->expr1->registo_number,expr->generation_type,expr->value);
+/*
+				if(strcmp(expr->expr1->operation,"ParseArgs") == 0){
+					//Integer.parseInt( args[ExprA] )
+					printf("store %s %%.%d, %s* %%%s\n",expr->generation_type, expr->registo_number, expr->generation_type, expr->value);
 
+				}else{
+				*/	printf("store %s %%.%d, %s* %%%s\n",expr->generation_type, expr->expr1->registo_number,expr->generation_type,expr->value);
+				//}
 			}
 		
 		}else{
 			//se for global
 
-			if(strcmp(lowerType(expr->tipo),"double") == 0 && strcmp(lowerType(expr->expr1->tipo),"int") ==0){
+			if(strcmp(lowerType(expr->tipo),"double") == 0 && strcmp(lowerType(expr->expr1->tipo),"int") == 0){
 				
 				printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number,expr->generation_type);
 
@@ -677,7 +775,15 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 				registocounter++;
 			}else{
 			
-				printf("store %s %%.%d, %s* @%s\n",expr->generation_type,expr->expr1->registo_number,expr->generation_type,expr->value);
+				/*if(strcmp(expr->expr1->operation,"ParseArgs") == 0){
+					//Integer.parseInt( args[ExprA] )
+					printf("store %s %%.%d, %s* @%s\n",expr->generation_type, expr->registo_number, expr->generation_type, expr->value);
+
+				}else{
+				*/	printf("store %s %%.%d, %s* @%s\n",expr->generation_type,expr->expr1->registo_number,expr->generation_type,expr->value);
+					
+				//}
+
 
 			}
 		}

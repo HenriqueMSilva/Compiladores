@@ -7,6 +7,7 @@
 
 int verifica_variavel(is_methodheader_list* imhl,is_expression_list* expr);
 char * lowerType(char * str);
+char * novo_formato_int(char * str);
 void generation(is_program* p);
 void generation_metodos(is_metodos* metodos);
 void generation_field_list(is_fielddecl_list* ifl);
