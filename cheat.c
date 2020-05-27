@@ -2,13 +2,13 @@
 #include<string.h>
 #include<stdio.h>
 
-/*
+
 int main1(){
-	int a;
-	a = (int) (argv[1+0-4+7]);
+	
+	printf("Teste\tde \fstring\\\"\r%%");
 	
 	return 2;
-}*/
+}
 
 /*
 int i;

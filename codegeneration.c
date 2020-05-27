@@ -177,6 +177,9 @@ void generation_method_list(is_methoddecl_list* imdl){
 void generation_methodheader_list(is_methodheader_list* imhl){
 
 	is_methodparams_list* ast_param_list = imhl->impl;
+	//TODO aumentar este buffer?
+	//char * nome_func; 
+
 
 	//print do tipo da funcao
 	printf("define %s @",generation_tipo(lowerType(imhl->type)));
@@ -186,6 +189,11 @@ void generation_methodheader_list(is_methodheader_list* imhl){
 		printf("%s.nossa(",imhl->name);
 	}else{
 		printf("method_%s_%d(",imhl->name,methodcounter);
+
+
+
+		//sprintf(nome_func , "method_%s_%d",imhl->name, methodcounter);
+		//imhl->nome_llvm = nome_func;
 	}
 	
 	methodcounter++;
@@ -413,6 +421,17 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 		}
 	}
 
+	if(strcmp(statment->name_function,"Call") == 0){
+/*
+		printf("call double @method_ddble_1()\n");
+
+		printf("\n func:%s \n ",statment->expr->value);
+		//call void @method_overload_0(i32 %.10)
+*/
+
+	}
+
+
 
 	//ir para statmet1
 	if(statment->statment1 != NULL ){
@@ -449,7 +468,7 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 }
 
 
-int verifica_variavel(is_methodheader_list* imhl,is_expression_list* expr){
+int verifica_variavel(is_methodheader_list* imhl, is_expression_list* expr){
 	table_element_local *tabela_local = symtab_local;
 	method_var *  local_param = NULL;
 
@@ -465,6 +484,7 @@ int verifica_variavel(is_methodheader_list* imhl,is_expression_list* expr){
 				//percorro lista de parametros da tabela local
 				local_param = tabela_local->tel->next;
 				while(local_param != NULL){
+
 
 					//printf("%d\n",local_param->is_declared);
 					if(strcmp(expr->value,local_param->name) == 0 && local_param->is_declared == 1){
@@ -527,6 +547,7 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 	if( strcmp(expr->operation, "Id" ) == 0){
 
 		result = verifica_variavel(imhl,expr);
+
 		expr->generation_type = generation_tipo(expr->tipo);
 		expr->registo_number = registocounter;
 
@@ -655,6 +676,7 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 
 
 		result = verifica_variavel(imhl,expr);
+
 		expr->generation_type = generation_tipo(expr->tipo);
 		expr->registo_number = registocounter-1;		
 		//printf("%d\n", result);
