@@ -26,7 +26,7 @@ valid_escape			\f|\t|\\{2}|\\\"
 invalid_escape			[^frtn\\\"]
 
 
-lineTerminator			\n|\r|(\r\n)
+lineTerminator			\r|\n|(\r\n)
 
 
 letras					[A-Za-z_\$]

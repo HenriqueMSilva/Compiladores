@@ -105,43 +105,35 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		char * str = expr->value;
 		int i,k=0;
 
-		//printf("-sizeof-%d-\n",(int) sizeof(str) );
-		//printf("-strl-%d-\n",(int) strlen(str) );
 
-		//char * new_str = (char*) malloc(100*sizeof(char*)); 
-		
-		char * new_str = (char*) malloc( 2 * strlen(str) *sizeof(char*)); 
+		char * new_str = (char*) malloc(2 * strlen(str)*sizeof(char));
+		new_str[0] = '\0';
+
+
 
 		for(i=0;i<strlen(str);i++){
 			//se for \n substitui para \0A
+
 			if(str[i] == '\\'){
+				new_str[k] = '\\'; k++;
+
+
 				if(str[i+1] == 'n'){
-					new_str[k] = '\\'; k++;
 					new_str[k] = '0'; k++;
 					new_str[k] = 'A'; k++;
-				}
-				if(str[i+1] == 't'){
-					new_str[k] = '\\'; k++;
+				}else if(str[i+1] == 't'){
 					new_str[k] = '0'; k++;
 					new_str[k] = '9'; k++;
-				}
-				if(str[i+1] == 'r'){
-					new_str[k] = '\\'; k++;
+				}else if(str[i+1] == 'r'){
 					new_str[k] = '0'; k++;
 					new_str[k] = 'D'; k++;
-				}
-				if(str[i+1] == '\\'){
-					new_str[k] = '\\'; k++;
+				}else if(str[i+1] == '\\'){
 					new_str[k] = '5'; k++;
 					new_str[k] = 'C'; k++;
-				}
-				if(str[i+1] == '\"'){
-					new_str[k] = '\\'; k++;
+				}else if(str[i+1] == '\"'){
 					new_str[k] = '2'; k++;
 					new_str[k] = '2'; k++;
-				}
-				if(str[i+1] == 'f'){
-					new_str[k] = '\\'; k++;
+				}else if(str[i+1] == 'f'){
 					new_str[k] = '0'; k++;
 					new_str[k] = 'C'; k++;
 				}
@@ -163,6 +155,8 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			}
 		}
 
+		new_str[k] = '\0';
+		//printf("%s\n",new_str);
 		//as aspas nao sao adicionadas
 		aux_sel->string = new_str;
 		aux_sel->tamanho += 1;
