@@ -685,7 +685,8 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		if(result == 1){
 			//se for local
 
-			if(strcmp(lowerType(expr->tipo),"double") ==0 && strcmp(lowerType(expr->expr1->tipo),"int") ==0){
+			//printf("%s %s",expr->tipo,expr->expr1->tipo);
+			if(strcmp(lowerType(expr->tipo),"double") ==0 && (strcmp(lowerType(expr->expr1->tipo),"int") ==0 || strcmp(expr->expr1->tipo,"String[]") == 0) ){
 
 				printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number,expr->generation_type);
 
@@ -704,7 +705,7 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		}else{
 			//se for global
 
-			if(strcmp(lowerType(expr->tipo),"double") == 0 && strcmp(lowerType(expr->expr1->tipo),"int") == 0){
+			if(strcmp(lowerType(expr->tipo),"double") == 0 &&  (strcmp(lowerType(expr->expr1->tipo),"int") ==0 || strcmp(expr->expr1->tipo,"String[]") == 0)){
 				
 				printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number,expr->generation_type);
 				

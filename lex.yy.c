@@ -2381,7 +2381,7 @@ int main(int argc, char *argv[]){
 			    }else{
 			    	show_table();
 			    	print_tree(myprogram);
-			    	//generation(myprogram);
+			    	generation(myprogram);
 			    }
 			}
 
@@ -2397,12 +2397,12 @@ int main(int argc, char *argv[]){
 		if(erro_sintaxe == 0){
 
 	   		errors=check_program(myprogram);
-	   		if(errors>0){
-			        printf("The program has %d errors!\n", errors);
-			    }else{
+   			if(errors>0){
+		        printf("The program has %d errors!\n", errors);
+		    }else{
 
-			    	generation(myprogram);
-			    }
+		    	generation(myprogram);
+		    }
 
 		}
 
