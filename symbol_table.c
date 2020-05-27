@@ -105,7 +105,12 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		char * str = expr->value;
 		int i,k=0;
 
-		char * new_str = (char*) malloc(100*sizeof(char*)); 
+		//printf("-sizeof-%d-\n",(int) sizeof(str) );
+		//printf("-strl-%d-\n",(int) strlen(str) );
+
+		//char * new_str = (char*) malloc(100*sizeof(char*)); 
+		
+		char * new_str = (char*) malloc( 2 * strlen(str) *sizeof(char*)); 
 
 		for(i=0;i<strlen(str);i++){
 			//se for \n substitui para \0A
@@ -1346,6 +1351,9 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 		if(verifica_param_repetido == 1){
 			//param de entrada valido 
 			var_metodo->is_param = 1;
+
+			//todos os parametros de entrada estao inicializados
+			var_metodo->is_declared = 1;
 
 		}else if(verifica_param_repetido == 0){
 			//param de entrada ja declarado antes

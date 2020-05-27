@@ -81,6 +81,8 @@ is_methodheader_list* insert_methodheader(char *type , char *id, is_methodparams
         imhl->name=(char*)strdup(id);
         imhl->anotar_body = 1;
 
+        imhl->nome_llvm = NULL;
+
         imhl->linha = linha;
         imhl->coluna = coluna;
 
