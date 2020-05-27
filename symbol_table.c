@@ -105,7 +105,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		char * str = expr->value;
 		int i,k=0;
 
-		char * new_str = (char*) malloc(10000*sizeof(char));
+		char * new_str = (char*) malloc(1000*sizeof(char));
 		new_str[0] = '\0';
 
 		for(i=0;i<strlen(str);i++){
@@ -143,7 +143,6 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				new_str[k] = '%'; k++;
 				new_str[k] = '%'; k++;
 				aux_sel->tamanho += 4;
-				i++;
 			//tudo sem ser aspa
 			}else if( str[i] != '\"'){
 				new_str[k] = str[i];
