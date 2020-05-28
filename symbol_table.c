@@ -6,6 +6,7 @@
 
 extern 	header_global 	*symtab_global;
 extern	table_element_local 	*symtab_local;
+int errorcount = 0;
 
 int methodcounter = 0;
 
@@ -40,6 +41,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			expr->tipo = tipo;
 			return expr->tipo;
 		}else{
+			errorcount++;
 			printf("Line %d, col %d: Cannot find symbol %s\n",expr->linha,expr->coluna, expr->value);
 		}
 	}
@@ -81,14 +83,17 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 		char bound[10] = "2147483648";
 		if(tam_array > 10){
+			errorcount++;
 			printf("Line %d, col %d: Number %s out of bounds\n",expr->linha,expr->coluna,expr->value);
 		}else if( tam_array == 10){
 			for(i=0;i< tam_array ;i++){
 				if(((int)new_str[9]) >= ((int) bound[9])){
+					errorcount++;
 					printf("Line %d, col %d: Number %s out of bounds\n",expr->linha,expr->coluna,expr->value);
 					break;
 				}
 				if( ((int)new_str[i]) > ((int) bound[i])){
+					errorcount++;
 					printf("Line %d, col %d: Number %s out of bounds\n",expr->linha,expr->coluna,expr->value);
 					break;
 				}
@@ -213,7 +218,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 					aux = retorna_operador(expr->expr1->tipo);
 					operador = retorna_operador(expr->operation);
 
-
+					errorcount++;
 					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador , expr->tipo , aux);
 				
 				}
@@ -228,14 +233,14 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 				//se for length so da print ao valor que chama o length
 				if(strcmp(expr->operation, "Length" ) == 0){
-
+					errorcount++;
 					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha2,expr->coluna2, operador , retorna_operador(tipo));
 
 
 				}else{
 
 					aux = retorna_operador(expr->expr1->tipo);
-
+					errorcount++;
 					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,retorna_operador(tipo),  aux);
 
 				}
@@ -258,7 +263,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 					aux = retorna_operador(expr->expr1->tipo);
 					operador = retorna_operador(expr->operation);
-
+					errorcount++;
 					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,expr->tipo,  retorna_operador(aux));
 				
 				}
@@ -271,7 +276,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 				//se for length so da print ao valor que chama o length
 				if(strcmp(expr->operation, "Length" ) == 0){
-
+					errorcount++;
 					//somar mais um na coluna para contar o ponto antes do length
 					printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha2,expr->coluna2, operador ,retorna_operador(tipo));
 
@@ -280,7 +285,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 					aux = retorna_operador(expr->expr1->tipo);
 
-
+					errorcount++;
 					printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna, operador ,retorna_operador(tipo), aux);
 
 				}
@@ -295,9 +300,11 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		operador = retorna_operador(expr->operation);
 		// print do erro para o parse args
 		if(expr->expr1 != NULL){	
+			errorcount++;
 			printf("Line %d, col %d: Cannot find symbol %s\n", expr->linha2 ,expr->coluna2 , expr->value);
 			printf("Line %d, col %d: Operator %s cannot be applied to types undef, %s\n",expr->linha,expr->coluna, operador , retorna_operador(expr->expr1->tipo));
 		}else{ //print de erro para o length
+			errorcount++;
 			printf("Line %d, col %d: Cannot find symbol %s\n", expr->linha ,expr->coluna , expr->value);
 			printf("Line %d, col %d: Operator %s cannot be applied to type undef\n",expr->linha2,expr->coluna2, operador);
 		}
@@ -334,6 +341,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 		// entra aqui se o id nao for definido
 		operador = retorna_operador(expr->operation);
+		errorcount++;
 		printf("Line %d, col %d: Cannot find symbol %s\n", expr->linha ,expr->coluna , expr->value);
 		printf("Line %d, col %d: Operator %s cannot be applied to types undef, %s\n",expr->linha2,expr->coluna2, operador , retorna_operador(expr->expr1->tipo));
 	}
@@ -414,7 +422,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 				//verifica operador a dar print
 				operador = retorna_operador(expr->value);
-
+				errorcount++;
 				printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna,operador,retorna_operador(str1),retorna_operador(str2));
 
 				expr->tipo = "undef";
@@ -437,7 +445,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 			if(strcmp(str1,"bool") == 0  || strcmp(str1,"undef") == 0 ){
 
 				operador = retorna_operador(expr->value);
-
+				errorcount++;
 				printf("Line %d, col %d: Operator %s cannot be applied to type %s\n",expr->linha,expr->coluna,operador,retorna_operador(str1));
 
 				expr->tipo = "undef"; 
@@ -457,6 +465,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 
 			if(strcmp(str1,"bool") != 0){
+				errorcount++;
 				printf("Line %d, col %d: Operator ! cannot be applied to type %s\n",expr->linha,expr->coluna,str1);	
 			}
 
@@ -468,7 +477,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
             operador = retorna_operador(expr->value);
 
             if( ( !( (strcmp(str1,"int") == 0 && strcmp(str2,"double") == 0) || (strcmp(str2,"int") == 0 && strcmp(str1,"double") == 0) ) && strcmp(str2,str1) != 0) || strcmp(str1,"undef") == 0 || strcmp(str2,"undef") == 0 || strcmp(str1,"stringarray") == 0 || strcmp(str2,"stringarray") == 0){
-                
+                errorcount++;
                 printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna,operador,retorna_operador(str1),retorna_operador(str2));
             }
 
@@ -485,6 +494,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
             //double double
 
             if(  !( (strcmp(str1,"int") == 0 || strcmp(str1,"double") == 0) && (strcmp(str2,"int") == 0 || strcmp(str2,"double") == 0)) ){
+            	errorcount++;
                 printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna,operador,retorna_operador(str1),retorna_operador(str2));
             }
 
@@ -496,6 +506,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
             operador = retorna_operador(expr->value);
             
             if( strcmp(str1,"bool") != 0 || strcmp(str2,"bool") != 0 || strcmp(str1,"undef") == 0 || strcmp(str2,"undef") == 0){
+            	errorcount++;
                 printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha,expr->coluna,operador,retorna_operador(str1),retorna_operador(str2));
             }
 
@@ -538,7 +549,7 @@ void print_erro_assign(is_expression_list* expr, char * type){
 		
 	//nao podemos igualar strings e se forem diferentes sem contar com o caso double = int
 	if( strcmp( tipo , "String[]" ) == 0 || strcmp( aux , "String[]" ) == 0 || (!(strcmp(tipo,"double") == 0 && strcmp(aux,"int") == 0) && strcmp(tipo,aux) != 0)){
-
+		errorcount++;
 		printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n",expr->linha2,expr->coluna2,operation, tipo , aux);
 		
 	}
@@ -632,6 +643,7 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 			}
 
 			if(strcmp(aux,"undef") == 0 || strcmp( aux , "StringArray") == 0 || strcmp( aux,"Void") == 0){
+				errorcount++;
 				printf("Line %d, col %d: Incompatible type %s in System.out.print statement\n",statment->expr->linha,statment->expr->coluna,retorna_operador(aux));
 			}
 
@@ -643,7 +655,7 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 				
 				linha = statment->expr->linha;
 				coluna = statment->expr->coluna;
-
+				errorcount++;
 				printf("Line %d, col %d: Incompatible type %s in return statement\n",linha, coluna, error_declaration);
 			}
 
@@ -653,7 +665,7 @@ void recursao_statment(is_statment_list* statment, table_element_local * new_met
 			aux = retorna_operador(statment->expr->tipo);
 			operador =  retorna_operador(statment->name_function);
 			if( strcmp(aux, "boolean") != 0 ){
-
+				errorcount++;
 				printf("Line %d, col %d: Incompatible type %s in %s statement\n",statment->expr->linha,statment->expr->coluna,retorna_operador( statment->expr->tipo),operador);
 
 			}
@@ -907,6 +919,7 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 	}else if(num_metodos > 1){
 
 		//ambig
+		errorcount++;
 		printf("Line %d, col %d: Reference to method %s(",expr->linha,expr->coluna,expr->value);
 		if(expr->expr1 != NULL){
 			expr = expr->expr1;
@@ -927,6 +940,7 @@ char * type_call_verification(is_expression_list* expr, method_var* lista_do_met
 	}else if(num_metodos == 0){
 
 		//nao declarado		
+		errorcount++;
 		printf("Line %d, col %d: Cannot find symbol %s(",expr->linha,expr->coluna,expr->value);
 		if(expr->expr1 != NULL){
 			expr = expr->expr1;
@@ -1122,14 +1136,16 @@ int assinatutas_iguais_global(table_element_global *newSymbol, table_element_glo
 }
 
 
-void tenta_inserir_fieldDec_na_tail_global(table_element_global * newSymbol, is_fielddecl_list* ifdl){
+int tenta_inserir_fieldDec_na_tail_global(table_element_global * newSymbol, is_fielddecl_list* ifdl){
+	int errorcount = 0;
 	table_element_global *aux;
 	table_element_global* previous;
 
 	if(strcmp(newSymbol->name,"_") == 0 ){
 
 		printf("Line %d, col %d: Symbol %s is reserved\n",ifdl->linha, ifdl->coluna, newSymbol->name);
-		return;
+		errorcount += 1;
+		return errorcount;
 	}
 
 
@@ -1143,8 +1159,9 @@ void tenta_inserir_fieldDec_na_tail_global(table_element_global * newSymbol, is_
 
 			if(strcmp(aux->name, newSymbol->name) == 0 && aux->type_return == NULL ){
 				//encontramos um field dec declarado aj com este nome
+				errorcount += 1;
 				printf("Line %d, col %d: Symbol %s already defined\n",ifdl->linha, ifdl->coluna, newSymbol->name);
-				return;
+				return errorcount;
 			}
 		}
 		
@@ -1153,6 +1170,7 @@ void tenta_inserir_fieldDec_na_tail_global(table_element_global * newSymbol, is_
 		symtab_global->declarations = newSymbol;	
 	}
 
+	return errorcount;
 }
 
 
@@ -1296,11 +1314,11 @@ header_global* insert_classname(char *str){
 	symtab_global = stg;
 
 	return stg;
-	free(stg);
 }
 
 
-table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_methodbody_list* imbl){
+int insert_el_metodo_local(is_methodheader_list* imhl, is_methodbody_list* imbl){
+	int errorcount1 = 0;
 	char * tipo;
 	int verifica_param_repetido = 1;
 
@@ -1428,10 +1446,12 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 
 						if(strcmp(var_metodo->name,"_") == 0){
 							//era um _"
+							errorcount1+=1;
 							printf("Line %d, col %d: Symbol %s is reserved\n", ast_var_dec_list->linha, ast_var_dec_list->coluna, ast_var_dec_list->name);
 							
 						}else{
 							//estava declarada
+							errorcount1+=1;
 							printf("Line %d, col %d: Symbol %s already defined\n",ast_var_dec_list->linha, ast_var_dec_list->coluna, ast_var_dec_list->name);
 						}
 
@@ -1460,16 +1480,16 @@ table_element_local *insert_el_metodo_local(is_methodheader_list* imhl, is_metho
 	}
 
 
-
-	return new_method;
+	errorcount1 += errorcount;
+	return errorcount1;
 }
 
 
 
 
 //Insere um novo(s) elemtentos na global devido a FieldDeclaration             
-table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char * var_type){
-		
+int insert_el_fieldDec_global(is_fielddecl_list* ifdl, char * var_type){
+	int errorcount = 0;
 	table_element_global *newSymbol;
 
 	table_element_global* para_dar_return;
@@ -1495,7 +1515,7 @@ table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char *
 		newSymbol->param_list->next = NULL;
 
 		//SERVE PARA ADICIONAR E VERIFICAR SE JA EXISTE
-		tenta_inserir_fieldDec_na_tail_global(newSymbol, ifdl);
+		errorcount += tenta_inserir_fieldDec_na_tail_global(newSymbol, ifdl);
 
 
 	}
@@ -1517,13 +1537,13 @@ table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char *
 		newSymbol->param_list->next = NULL;
 
 
-		tenta_inserir_fieldDec_na_tail_global(newSymbol, ifdl);
+		errorcount += tenta_inserir_fieldDec_na_tail_global(newSymbol, ifdl);
 
 
 		ifdl = ifdl->next;
 	}
 
-	return para_dar_return;
+	return errorcount;
 }
 
 
@@ -1531,8 +1551,8 @@ table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char *
 
 
 //Insere um novo elemtento na global devido a Metodo
-table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
-
+int insert_el_metodo_global(is_methodheader_list* imhl){
+	int errorcount = 0;
 
 	table_element_global *newSymbol;
 	char * nome_func;
@@ -1609,6 +1629,7 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 		for(lista_param_entrada_aux = imhl->impl, num_aux = 0 ; num_aux < num_param_entrada_percorridos ; num_aux++, lista_param_entrada_aux=lista_param_entrada_aux->next ){
 
 			if(strcmp(lista_param_entrada_aux->name, ast_param_list->name) == 0 ){
+				errorcount+=1;
 				printf("Line %d, col %d: Symbol %s already defined\n",ast_param_list->linha, ast_param_list->coluna, ast_param_list->name);
 				break;
 			}
@@ -1618,6 +1639,7 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 
 
 		if(strcmp(ast_param_list->name, "_") == 0 ){
+			errorcount+=1;
 			printf("Line %d, col %d: Symbol %s is reserved\n", ast_param_list->linha, ast_param_list->coluna, ast_param_list->name);
 		}
 
@@ -1633,7 +1655,7 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 	if( tenta_inserir_metodo_na_tail_global(newSymbol) == 0 ) {
 		//a assinatura deste metodo era repetida
 		//DEBUG
-
+		errorcount+=1;
 		printf("Line %d, col %d: Symbol %s(",imhl->linha,imhl->coluna,imhl->name);
 
 		param_node* aux_param = newSymbol->param_list;
@@ -1656,7 +1678,7 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 	}
 	
 
-	return newSymbol;
+	return errorcount;
 }
 
 

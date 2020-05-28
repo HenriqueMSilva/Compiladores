@@ -12,6 +12,8 @@ typedef struct _s11 {
 typedef struct _s10 {
     char *generation_type;
     int registo_number;
+    int pos_strlit;
+    int tamanho;
 
     char *operation;
     char *value;
