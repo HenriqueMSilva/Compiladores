@@ -404,7 +404,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				str2 = "stringarray";
 			}else if(strcmp(expr->expr2->tipo,"String[]") == 0 ){ 
 				str2 = "int";
-			}else if( strcmp(expr->expr1->operation,"Length") == 0 || strcmp(expr->expr1->operation,"ParseArgs") == 0 ){
+			}else if( strcmp(expr->expr2->operation,"Length") == 0 || strcmp(expr->expr2->operation,"ParseArgs") == 0 ){
                 str2 = "int";
             }else{
 				str2 = expr->expr2->tipo;

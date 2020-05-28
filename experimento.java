@@ -26,18 +26,12 @@ class CeD{
     	//a = 4;
     	//dd = 4.0 ;
 		
-		//ddble(ddble());
-		dd = 4.0;
-		ddble(dd);
-		a = ddble(6);
+
 		
-		ddble( Integer.parseInt(args[1]) );
+		ddble( Integer.parseInt(args[1]) + 4.0 );
 		ddble( args.length );
 		
-		//System.out.print( dd );
-		//System.out.print( "\n" );
 
-		System.out.print( a + 14_9 );
 		System.out.print( "\n" );
 
     }
@@ -61,13 +55,7 @@ class CeD{
 	}
 
 
-	public static int ddble( int e ){
-		System.out.print("Inte\n");
-		System.out.print(e + 4);
-		System.out.print("\n");
 
-	    return e + 5; 
-	}
 
 
 }
