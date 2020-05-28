@@ -28,8 +28,8 @@ class CeD{
 		
 
 		
-		ddble( Integer.parseInt(args[1]) + 4.0 );
-		ddble( args.length );
+		a = Integer.parseInt(args[1]);
+		ddble( );
 		
 
 		System.out.print( "\n" );
@@ -37,9 +37,11 @@ class CeD{
     }
 
 
-	public static int ddble(  ){
+	public static double ddble(  ){
+		double e;
 		System.out.print("we\n");
-	    return 1; 
+	    e = 1.0 + a;
+	    return  e; 
 	}
 
 

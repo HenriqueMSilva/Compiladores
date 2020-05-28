@@ -274,6 +274,9 @@ int assinaturas_iguais_local(is_methodheader_list* imhl,table_element_local *tab
 	method_var *  local_param = tabela_local->tel->next;
 	is_methodparams_list * ast_param = imhl->impl;
 	
+	//skip do param return;
+	local_param = local_param->next;
+
 	while(local_param != NULL && ast_param != NULL){
 
 
@@ -492,15 +495,17 @@ int verifica_variavel(is_methodheader_list* imhl, is_expression_list* expr){
 		//verifica nome da funçao
 		if(strcmp(tabela_local->name, imhl->name) == 0){
 
+
 			//verifica assinatura da funçao
 			if( assinaturas_iguais_local(imhl, tabela_local) == 1){
+
 
 				//percorro lista de parametros da tabela local
 				local_param = tabela_local->tel->next;
 				while(local_param != NULL){
 
 
-					//printf("%d\n",local_param->is_declared);
+					//printf("expr:%s loacal: %s\n\n\n", expr->value, local_param->name);
 					if(strcmp(expr->value,local_param->name) == 0 && local_param->is_declared == 1){
 						//se for local
 						return 1;
@@ -513,6 +518,7 @@ int verifica_variavel(is_methodheader_list* imhl, is_expression_list* expr){
 		}
 		tabela_local = tabela_local->next;
 	}
+	
 	return 0;
 }
 
