@@ -7,6 +7,9 @@
 extern 	header_global 	*symtab_global;
 extern	table_element_local 	*symtab_local;
 
+int methodcounter = 0;
+
+
 char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 	char * tipo;
 	char * str1;
@@ -108,7 +111,6 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 		char * new_str = (char*) malloc(2 * strlen(str)*sizeof(char));
 		new_str[0] = '\0';
-
 
 
 		for(i=0;i<strlen(str);i++){
@@ -1009,6 +1011,12 @@ int assinatutas_parecidas_call(is_expression_list* expr, param_node* param_list,
 		str1 = lowerCase(expr->expr1->tipo);
 		str2 = lowerCase(param_list->type_param);
 
+		//nao tinhamos na meta 3
+		if( strcmp(expr->expr1->operation,"Length") == 0 || strcmp(expr->expr1->operation,"ParseArgs") == 0 ){
+            str1 = "int";
+		}
+
+
 		//testo os parametros de entrada
 		//NOT (parametros aceitaves)
 		if( !(strcmp(str1, str2) == 0  || (strcmp(str1, "int") == 0 && strcmp(str2, "double") == 0 )     )  ){
@@ -1049,6 +1057,12 @@ int assinatutas_iguais_call(is_expression_list* expr, param_node* param_list, me
 
 		str1 = lowerCase(expr->expr1->tipo);
 		str2 = lowerCase(param_list->type_param);
+
+		//nao tinhamos na meta 3
+		if( strcmp(expr->expr1->operation,"Length") == 0 || strcmp(expr->expr1->operation,"ParseArgs") == 0 ){
+            str1 = "int";
+		}
+
 
 		//testo os parametros de entrada
 		if( strcmp(str1, str2) != 0){
@@ -1470,6 +1484,9 @@ table_element_global * insert_el_fieldDec_global(is_fielddecl_list* ifdl, char *
 
 
 		newSymbol->name = (char*)strdup(ifdl->name);
+
+		newSymbol->nome_llvm = NULL;
+
 		newSymbol->param_list = (param_node*) malloc(sizeof(param_node));
 		newSymbol->type_return = NULL;
 		newSymbol->next = NULL;
@@ -1519,7 +1536,7 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 
 
 	table_element_global *newSymbol;
-	
+	char * nome_func;
 
 	is_methodparams_list*  lista_param_entrada_aux;
 
@@ -1534,8 +1551,18 @@ table_element_global *insert_el_metodo_global(is_methodheader_list* imhl){
 
 	
 	newSymbol = (table_element_global*) malloc(sizeof(table_element_global));
-
 	newSymbol->name = (char*)strdup(imhl->name);
+
+	
+	nome_func = (char*) malloc( (2 * strlen(imhl->name) * sizeof(char) ) + 15 );
+	sprintf(nome_func , "method_%s_%d",imhl->name, methodcounter);
+
+	newSymbol->nome_llvm = nome_func;
+	imhl->nome_llvm = nome_func;
+	methodcounter++;
+
+
+
 	newSymbol->type_return= (char*)strdup(imhl->type);
 	newSymbol->param_list = NULL;
 	newSymbol->next = NULL;

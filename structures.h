@@ -78,7 +78,8 @@ typedef struct _s5 {
     char* type;
     char* name;
     int anotar_body;
-    
+
+
     char * nome_llvm;
 
     int linha;

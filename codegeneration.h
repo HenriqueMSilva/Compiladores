@@ -21,6 +21,10 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl);
 char * generation_tipo(char * str);
 char * generationOperation(char * value, char * type);
 int assinaturas_iguais_local(is_methodheader_list* imhl,table_element_local *tabela_local);
+char * devolve_nome_func_llvm_igual(is_expression_list * expr, table_element_global * metodos_da_classe);
+char * devolve_nome_func_llvm_parecida(is_expression_list * expr, table_element_global * metodos_da_classe);
+void guarda_nome_func_llvm(char* nome_guardar, is_methodheader_list* imhl , table_element_global * metodos_da_classe);
+
 
 
 
