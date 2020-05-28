@@ -417,7 +417,6 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 		if((strcmp(expr->value,"Add") == 0 || strcmp(expr->value,"Sub") == 0 || strcmp(expr->value,"Mul") == 0 || strcmp(expr->value,"Div") == 0 || strcmp(expr->value,"Mod") == 0)){
 
-
 			if(strcmp(str1,"bool") == 0 || strcmp(str2,"bool") == 0 || strcmp(str1,"undef") == 0 || strcmp(str2,"undef") == 0 || strcmp(str1,"stringarray") == 0 || strcmp(str2,"stringarray") == 0){
 
 				//verifica operador a dar print
@@ -428,10 +427,11 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				expr->tipo = "undef";
 				return expr->tipo;
 
-			}else if(strcmp(str1,"int")  == 0  && strcmp(str2,"double") == 0){
+
+			}else if(strcmp(str1,"int") == 0  && strcmp(str2,"double") == 0){
 				expr->tipo = "double";
 				return expr->tipo;
-			}else if(strcmp(str1,"double")  == 0 && strcmp(str2,"int") == 0){
+			}else if(strcmp(str1,"double")  == 0 && strcmp(str2,"int") == 0 ){
 				expr->tipo = "double";
 				return expr->tipo;
 			}else{

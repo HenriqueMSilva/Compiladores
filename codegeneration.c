@@ -75,7 +75,9 @@ void generation_metodos(is_metodos* metodos){
             nameFunction = tmp->imdl->imhl->name;
 
             //se for main
+
             if( strcmp(nameFunction,"main") == 0 && tmp->imdl->imhl->impl != NULL && strcmp(tmp->imdl->imhl->impl->type,"StringArray") == 0 ){
+
             	hasmain = 1;
 
             	if( strcmp(tmp->imdl->imhl->type,"Double") == 0){
@@ -178,7 +180,6 @@ void generation_methodheader_list(is_methodheader_list* imhl){
 
 	is_methodparams_list* ast_param_list = imhl->impl;
 	//TODO aumentar este buffer?
-	char * nome_func; 
 
 
 	//print do tipo da funcao
@@ -1109,15 +1110,14 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 			aux = generationOperation( expr->value,lowerType(expr->tipo));
 		}
 
-		if( (    (strcmp(lowerType(expr->expr1->tipo),"int") == 0 || strcmp(lowerType(expr->expr1->tipo),"String[]") == 0 ) && strcmp(lowerType(expr->expr2->tipo),"double") == 0) ){
-		//if( (    strcmp(lowerType(expr->expr1->tipo),"int") == 0  && strcmp(lowerType(expr->expr2->tipo),"double") == 0) ){
-			printf("%%.%d = sitofp  %s %%.%d to %s\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number,expr->generation_type);
+		if( ((strcmp(lowerType(expr->expr1->tipo),"int") == 0 || strcmp(lowerType(expr->expr1->tipo),"String[]") == 0 ) && strcmp(lowerType(expr->expr2->tipo),"double") == 0) ){
+
+			printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number,expr->generation_type);
 			expr->expr1->registo_number = registocounter;
 		}
 
-		if( (  strcmp(lowerType(expr->expr1->tipo),"double") == 0 && ( strcmp(lowerType(expr->expr2->tipo),"int") == 0  ||  strcmp(lowerType(expr->expr2->tipo),"String[]") == 0)   )){
-		//if( (  strcmp(lowerType(expr->expr1->tipo),"double") == 0 &&  strcmp(lowerType(expr->expr2->tipo),"int") == 0    )){
-			printf("%%.%d = sitofp  %s %%.%d to %s\n",registocounter,expr->expr2->generation_type,expr->expr2->registo_number,expr->generation_type);
+		if((strcmp(lowerType(expr->expr1->tipo),"double") == 0 && (strcmp(lowerType(expr->expr2->tipo),"int") == 0 || strcmp(lowerType(expr->expr2->tipo),"String[]") == 0 ))){
+			printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr2->generation_type,expr->expr2->registo_number,expr->generation_type);
 			expr->expr2->registo_number = registocounter;
 		}
 
@@ -1312,6 +1312,28 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		ifcounter++;
 		registocounter++;
 	}	
+
+	if(strcmp(expr->value,"Xor") == 0){
+
+		printf("%%.%d = alloca i1\n",registocounter);
+		printf("br i1 %%.%d, label %%then%d, label %%else%d\n",expr->expr1->registo_number,ifcounter,ifcounter);
+		printf("then%d:\n",ifcounter);
+		printf("store i1 false, i1* %%.%d\n",registocounter);
+		printf("br label %%ifCont%d\nelse%d:\n",ifcounter,ifcounter);
+		printf("store i1 true, i1* %%.%d\n",registocounter);
+		printf("br label %%ifCont%d\nifCont%d:\n",ifcounter,ifcounter);
+		registocounter++;
+		printf("%%.%d = load i1, i1* %%.%d\n",registocounter,registocounter-1);
+		registocounter++;
+		printf("%%.%d = xor i1 %%.%d, %%.%d\n",registocounter,registocounter-1,expr->expr2->registo_number);
+
+		expr->expr1->registo_number = registocounter; 
+		expr->generation_type =  generation_tipo(lowerType(expr->tipo));
+		expr->registo_number = expr->expr1->registo_number;
+		ifcounter++;
+		registocounter++;
+
+	}
 }
 
 
