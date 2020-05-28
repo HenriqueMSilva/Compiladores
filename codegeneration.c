@@ -6,7 +6,7 @@
 extern 	header_global 	*symtab_global;
 extern	table_element_local 	*symtab_local;
 
-int methodcounter = 0;
+
 int registocounter = 1;
 int whilecounter = 1;
 int ifcounter = 1;
@@ -178,7 +178,7 @@ void generation_methodheader_list(is_methodheader_list* imhl){
 
 	is_methodparams_list* ast_param_list = imhl->impl;
 	//TODO aumentar este buffer?
-	//char * nome_func; 
+	char * nome_func; 
 
 
 	//print do tipo da funcao
@@ -187,16 +187,13 @@ void generation_methodheader_list(is_methodheader_list* imhl){
 	//verificar se a funçao é a main
 	if(strcmp(imhl->name,"main") == 0){
 		printf("%s.nossa(",imhl->name);
-	}else{
-		printf("method_%s_%d(",imhl->name,methodcounter);
+	}else{ 
+	
+		//nome da funcao
+		printf("%s(",imhl->nome_llvm);
 
-
-
-		//sprintf(nome_func , "method_%s_%d",imhl->name, methodcounter);
-		//imhl->nome_llvm = nome_func;
 	}
 	
-	methodcounter++;
 	
 	while(ast_param_list != NULL){
 
@@ -415,6 +412,11 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 	}
 
 	if(strcmp(statment->name_function,"Return") == 0){
+
+
+		//simb table ponteiro num returrn;
+		//simb table tipo returrn;
+
 		//se for undef entao return; logo é void
 		if(strcmp(statment->expr->tipo,"undef") != 0){
 			printf("ret %s %%.%d\n",statment->expr->generation_type,statment->expr->registo_number);
@@ -422,12 +424,7 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 	}
 
 	if(strcmp(statment->name_function,"Call") == 0){
-/*
-		printf("call double @method_ddble_1()\n");
-
-		printf("\n func:%s \n ",statment->expr->value);
-		//call void @method_overload_0(i32 %.10)
-*/
+		//nao preciso de fazer nada
 
 	}
 
@@ -505,6 +502,197 @@ int verifica_variavel(is_methodheader_list* imhl, is_expression_list* expr){
 
 
 
+/*
+void guarda_nome_func_llvm(char* nome_guardar, is_methodheader_list* imhl , table_element_global * metodos_da_classe){
+	//expr do call
+	// metodos_da_class e a tabela SIMB global
+	
+	param_node * simb_param;	
+	is_methodparams_list* ast_param;
+
+	char * ast_tipo;
+	char * simb_tipo;
+
+
+	while(metodos_da_classe != NULL){
+
+
+		//compara o nome das funcoes
+		if(strcmp(metodos_da_classe->name, imhl->name) == 0){
+
+
+			ast_param = imhl->impl;
+			simb_param = metodos_da_classe->param_list;
+
+
+			//percorrer os parametos de entrada das duas funcoes
+			while( simb_param != NULL &&  ast_param != NULL){
+
+ 				ast_tipo =  lowerType(ast_param->type);
+ 				simb_tipo =  lowerType(simb_param->type_param);
+
+
+				if(strcmp(ast_tipo, simb_tipo) != 0 ){
+					//tipos dos parametros de entrada differentes
+					break;
+				}
+
+				//eram iguais, vamos verificar o proximo parametro
+
+				ast_param = ast_param->next;
+				simb_param = simb_param->next;
+			}
+
+
+			if(simb_param == NULL &&  ast_param == NULL){
+				
+				//assinaturas iguais
+				metodos_da_classe->nome_llvm = nome_guardar;
+
+
+				//printf("\n\nGuardou: %s Na FUNC: %s\n\n\n",metodos_da_classe->nome_llvm, metodos_da_classe->name );
+				return; 
+			}
+
+
+		}
+
+		metodos_da_classe = metodos_da_classe->next;
+
+	}
+
+
+}*/
+
+table_element_global * devolve_nome_func_llvm_parecida(is_expression_list * expr, table_element_global * metodos_da_classe){
+//expr do call
+	// metodos_da_class e a tabela SIMB global
+
+	is_expression_list* ast_param; 
+	param_node * simb_param;
+
+	char * ast_tipo;
+	char * simb_tipo;
+
+	while(metodos_da_classe != NULL){
+
+		//compara o nome das funcoes
+		if(strcmp(metodos_da_classe->name, expr->value ) == 0){
+
+			//callmore
+			ast_param =	expr->expr1;
+			simb_param = metodos_da_classe->param_list;
+
+			//percorrer os parametos de entrada das duas funcoes
+			while( simb_param != NULL &&  ast_param != NULL){
+
+ 				ast_tipo =  lowerType(ast_param->expr1->tipo);
+ 				simb_tipo =  lowerType(simb_param->type_param);
+
+
+				if(strcmp(ast_param->expr1->operation,"Length") == 0 || strcmp(ast_param->expr1->operation,"ParseArgs") == 0 ){
+	            	ast_tipo = "int";
+				}
+
+
+				//NOT (parametros aceitaves)
+				if( !(strcmp(ast_tipo, simb_tipo) == 0  || (strcmp( lowerType(ast_tipo), "int") == 0 && strcmp(lowerType(simb_tipo), "double") == 0) )  ){
+					//tipos dos parametros de entrada differentes
+					break;
+
+				}
+
+				//eram iguais, vamos verificar o proximo parametro
+
+				ast_param = ast_param->expr2;
+				simb_param = simb_param->next;
+			}
+
+
+			if(simb_param == NULL &&  ast_param == NULL){
+				//assinaturas iguais
+				//return metodos_da_classe->nome_llvm;
+				return metodos_da_classe;
+			}
+
+		}
+
+		metodos_da_classe = metodos_da_classe->next;
+
+	}
+
+
+	//NUNCA DEVE CHEGAR AQUI
+	return NULL;
+
+
+
+}
+
+table_element_global * devolve_nome_func_llvm_igual(is_expression_list * expr, table_element_global * metodos_da_classe){
+	//expr do call
+	// metodos_da_class e a tabela SIMB global
+
+	is_expression_list* ast_param; 
+	param_node * simb_param;
+
+	char * ast_tipo;
+	char * simb_tipo;
+
+	while(metodos_da_classe != NULL){
+
+		//compara o nome das funcoes
+		if(strcmp(metodos_da_classe->name, expr->value ) == 0){
+
+			//callmore
+			ast_param =	expr->expr1;
+			simb_param = metodos_da_classe->param_list;
+
+			//percorrer os parametos de entrada das duas funcoes
+			while( simb_param != NULL &&  ast_param != NULL){
+
+ 				ast_tipo =  lowerType(ast_param->expr1->tipo);
+ 				simb_tipo =  lowerType(simb_param->type_param);
+
+				if(strcmp(ast_param->expr1->operation,"Length") == 0 || strcmp(ast_param->expr1->operation,"ParseArgs") == 0 ){
+	            	ast_tipo = "int";
+				}
+
+
+				if(strcmp(ast_tipo, simb_tipo) != 0 ){
+					//tipos dos parametros de entrada differentes
+					break;
+
+				}
+
+				//eram iguais, vamos verificar o proximo parametro
+
+				ast_param = ast_param->expr2;
+				simb_param = simb_param->next;
+			}
+
+
+			if(simb_param == NULL &&  ast_param == NULL){
+				//assinaturas iguais
+				//return metodos_da_classe->nome_llvm;
+				return metodos_da_classe;
+
+			}
+
+		}
+
+		metodos_da_classe = metodos_da_classe->next;
+
+	}
+
+
+	//chega aqui se nao encontro uma funcao declarada igual
+	//e possivel chegar aqui se estiver a ser usada uma funcao 
+	return NULL;
+
+}
+
+
 
 
 int convertType(const char* value, double *destination) {
@@ -516,7 +704,7 @@ int convertType(const char* value, double *destination) {
 char * novo_formato_int(char * str){
 	int i,k=0;
 
-	char * new_str =  (char*) malloc(100*sizeof(char*)); 
+	char * new_str =  (char*) malloc(100*sizeof(char)); 
 
 	for(i=0;i<strlen(str);i++){
 		//ignorar o _
@@ -612,36 +800,39 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 
 
 	if(strcmp(expr->operation,"ParseArgs") == 0 ){
-			//Parse.Int( args[ExprA] ) 
-			
-			//este generation tipo e problematico? TODO
-			expr->generation_type = generation_tipo("int");
-	
+		//Parse.Int( args[ExprA] ) 
+		
+		//este generation tipo e problematico? TODO
+		expr->generation_type = generation_tipo("int");
 
-			//vou buscar a %argv local 								
-			printf("%%.%d = load i8**, i8*** %%%s\n",registocounter, expr->value);
-            registocounter++;
-            
-
-        	//novo index
-        	printf("%%.%d = add i32 1 , %%.%d \n",registocounter, expr->expr1->registo_number );
-        	registocounter++;
-
-            
-        	//ponteiro com o endereco do paramentro de entrada certo
-          	printf("%%.%d = getelementptr i8*, i8** %%.%d, i32 %%.%d\n",registocounter, registocounter - 2, registocounter - 1 );
-			registocounter++;
-			
-
-			//registo com o int em string p.e. "15"
-			printf("%%.%d = load i8*, i8** %%.%d\n", registocounter, registocounter - 1);
-			registocounter++;
+		//printf("-%s-\n\n\n",expr->generation_type );
+		
 
 
-			//%.6 = call i32 @atoi(i8* %.5)
-			printf("%%.%d = call i32 @atoi(i8* %%.%d)\n", registocounter, registocounter - 1);
-			expr->registo_number = registocounter;
-			registocounter++;
+		//vou buscar a %argv local 								
+		printf("%%.%d = load i8**, i8*** %%%s\n",registocounter, expr->value);
+        registocounter++;
+        
+
+    	//novo index
+    	printf("%%.%d = add i32 1 , %%.%d \n",registocounter, expr->expr1->registo_number );
+    	registocounter++;
+
+        
+    	//ponteiro com o endereco do paramentro de entrada certo
+      	printf("%%.%d = getelementptr i8*, i8** %%.%d, i32 %%.%d\n",registocounter, registocounter - 2, registocounter - 1 );
+		registocounter++;
+		
+
+		//registo com o int em string p.e. "15"
+		printf("%%.%d = load i8*, i8** %%.%d\n", registocounter, registocounter - 1);
+		registocounter++;
+
+
+		//%.6 = call i32 @atoi(i8* %.5)
+		printf("%%.%d = call i32 @atoi(i8* %%.%d)\n", registocounter, registocounter - 1);
+		expr->registo_number = registocounter;
+		registocounter++;
 
 
 	
@@ -669,6 +860,138 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 	}
 
 
+
+	if(strcmp(expr->operation, "Call" ) == 0){
+		char * nome_llvm;
+		is_expression_list * param;
+		param_node * simb_param;
+		
+		table_element_global * ref_funcao;
+
+		char * tipo;
+		int numero;
+		int offset = 0;
+
+
+
+		//nome da funcao igual 
+		ref_funcao = devolve_nome_func_llvm_igual(expr, symtab_global->declarations);
+		
+		if(ref_funcao == NULL){
+			//nome da funcao parecida 
+			ref_funcao = devolve_nome_func_llvm_parecida(expr, symtab_global->declarations);
+		}
+
+		nome_llvm = ref_funcao->nome_llvm; 
+
+		expr->registo_number = registocounter;
+		expr->generation_type = generation_tipo(lowerType(expr->tipo));
+
+		//printf("...\n\n\n");
+		//printf("%s\n",expr->tipo  );
+
+
+		//callmore
+		param = expr->expr1;
+		
+		//1 param da simb table
+		simb_param = ref_funcao->param_list;
+
+		//----------------------------------
+		//se estivermos a meter um int no lugar de um double temos de converter primeiro antes do call
+		while(param != NULL){
+
+
+			tipo = param->expr1->generation_type;
+			numero = param->expr1->registo_number;
+
+
+			if(strcmp(lowerType(simb_param->type_param),"double") == 0 && (strcmp(lowerType(param->expr1->tipo),"int") ==0 || strcmp( lowerType(param->expr1->tipo),"String[]") == 0) ){
+
+				printf("%%.%d = sitofp i32 %%.%d to double\n",registocounter, numero );
+
+ 				//tipo = "i32"; 
+ 				//numero = registocounter; 
+
+ 				offset += 1;
+
+				registocounter++;
+				
+			}
+
+			param = param->expr2;
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+		//--------------------------------
+		//print do call
+		if( strcmp(lowerType(expr->tipo),"void") != 0){
+			printf("%%.%d = ",registocounter);
+			
+			offset += 1;
+			registocounter++;
+		}
+
+
+		printf("call %s @%s(", expr->generation_type, nome_llvm  );
+
+
+		//callmore
+		param = expr->expr1;
+		
+		//1 param da simb table
+		simb_param = ref_funcao->param_list;
+
+		while(param != NULL){
+
+
+			tipo = param->expr1->generation_type;
+			numero = param->expr1->registo_number;
+
+
+			if(strcmp(lowerType(simb_param->type_param),"double") == 0 && (strcmp(lowerType(param->expr1->tipo),"int") ==0 || strcmp( lowerType(param->expr1->tipo),"String[]") == 0) ){
+
+				//printf("%%.%d = sitofp i32 %%.%d to double\n",registocounter, numero );
+
+ 				tipo = "double"; 
+ 				numero = registocounter - offset; 
+				
+			}
+
+
+
+			printf("%s %%.%d", tipo, numero  );
+
+			if(param->expr2 != NULL){
+				printf(", ");
+			}	
+
+			param = param->expr2;
+		}
+
+		printf(")\n");
+
+
+
+
+
+
+	}
+
+
+	if(strcmp(expr->operation, "CallMore" ) == 0){
+		//nao precisa de fazer nada
+	}
 
 
 	if( strcmp(expr->operation, "Assign" ) == 0 ){

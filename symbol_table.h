@@ -39,6 +39,9 @@ typedef struct param{
 //METODOS NA CLASSE
 typedef struct _teg{
 	char *name;
+
+	char * nome_llvm;
+
 	param_node *param_list;
 	char *type_return;
 	struct _teg *next;
