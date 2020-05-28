@@ -1,9 +1,10 @@
 class Main {
 
-    public static boolean b1;
+    public static boolean b1,b2;
     public static void main(String[] args){
-        b1 = true;
-        System.out.print(false^!b1);
+        int b1,b3;
+        b1 = 1;
+        System.out.print(b1);
        // if(b1&&true || b1||true && !b1^false) 
         //if(true&&b1 || true||b1 && false^!b1) {}
         /*double argument;

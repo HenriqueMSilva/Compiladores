@@ -276,11 +276,11 @@ int assinaturas_iguais_local(is_methodheader_list* imhl,table_element_local *tab
 	//skip do param return;
 	local_param = local_param->next;
 
-	while(local_param != NULL && ast_param != NULL){
+	while( local_param != NULL && ast_param != NULL && local_param->is_param == 1){
 
-
+		
 		//testo os parametros de entrada
-		if( strcmp(local_param->type, ast_param->type) != 0 && local_param->is_param == 0){
+		if( ! (strcmp(lowerType(local_param->type) , lowerType(ast_param->type) ) == 0 && local_param->is_param == 1)  ){
 			//parametro diff
 			
 			return 0;
@@ -295,7 +295,7 @@ int assinaturas_iguais_local(is_methodheader_list* imhl,table_element_local *tab
 
 
 	//todos os param era iguais-> assinatura igual
-	if(local_param == NULL && ast_param == NULL){
+	if( (local_param == NULL || (local_param != NULL && local_param->is_param == 0)) && ast_param == NULL){
 
 		return 1;
 	}
