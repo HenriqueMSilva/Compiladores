@@ -148,7 +148,6 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 				new_str[k] = '%'; k++;
 				new_str[k] = '%'; k++;
 				aux_sel->tamanho += 4;
-				i++;
 			//tudo sem ser aspa
 			}else if( str[i] != '\"'){
 				new_str[k] = str[i];

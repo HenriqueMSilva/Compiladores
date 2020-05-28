@@ -54,8 +54,10 @@ void generation_metodos(is_metodos* metodos){
 		printf("@.str.plus = constant [2 x i8] c\"+\\00\"\n");
 	}
 
+
 	//print das strings 
 	while(tabela_global != NULL){
+
 		tabela_global->pos = stringcounter;
 		printf("@.str.%d = constant [%d x i8] c\"%s\\00\"\n",tabela_global->pos,tabela_global->tamanho,tabela_global->string);
 		stringcounter++;
@@ -339,7 +341,7 @@ void generation_vardecl_list(is_vardecl_list* ivdl,is_methodheader_list* imhl){
 
 void generation_statment_list(is_statment_list* statment,is_methodheader_list* imhl){
 
-	if(statment->expr != NULL && strcmp(statment->name_function,"While") != 0){
+	if(statment->expr != NULL /*&& strcmp(statment->name_function,"While") != 0*/){
 		generation_expression(statment->expr, imhl);
 	}
 	
@@ -834,16 +836,6 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 	}
 
 
-	/*if(	strcmp(expr->operation, "StrLit" ) == 0){
-
-		//REVER AINDA NAO ESTA BEM
-		expr->generation_type = generation_tipo(expr->tipo);
-		expr->registo_number = registocounter;
-		printf("%%.%d = or %s ?, %s\n",expr->registo_number,expr->generation_type,expr->value);
-		registocounter++;
-	}*/
-
-
 	if(strcmp(expr->operation,"ParseArgs") == 0 ){
 		//Parse.Int( args[ExprA] ) 
 		
@@ -853,14 +845,18 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		//printf("-%s-\n\n\n",expr->generation_type );
 		
 
+
 		//vou buscar a %argv local 								
 		printf("%%.%d = load i8**, i8*** %%%s\n",registocounter, expr->value);
         registocounter++;
         
 
-    	//novo index
-    	printf("%%.%d = add i32 %%.%d, 1 \n",registocounter, expr->expr1->registo_number );
-    	registocounter++;
+        	//novo index
+        	printf("%%.%d = add i32 1 , %%.%d \n",registocounter, expr->expr1->registo_number );
+        	registocounter++;
+
+
+    	
 
         
     	//ponteiro com o endereco do paramentro de entrada certo
@@ -974,14 +970,19 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		if(result == 1){
 			//se for local
 
-			if(strcmp(lowerType(expr->tipo),"double") ==0 && strcmp(lowerType(expr->expr1->tipo),"int") ==0){
+			//printf("%s %s",expr->tipo,expr->expr1->tipo);
+			if(strcmp(lowerType(expr->tipo),"double") ==0 && (strcmp(lowerType(expr->expr1->tipo),"int") ==0 || strcmp(expr->expr1->tipo,"String[]") == 0) ){
 
 				printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number,expr->generation_type);
 
+				expr->expr1->registo_number = registocounter;
+				expr->registo_number = registocounter;
+				
 				printf("store %s %%.%d, %s* %%%s\n",expr->generation_type,registocounter,expr->generation_type,expr->value);
+
 				registocounter++;
 			}else{
-	
+
 				printf("store %s %%.%d, %s* %%%s\n",expr->generation_type, expr->expr1->registo_number,expr->generation_type,expr->value);
 				
 			}
@@ -989,10 +990,13 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		}else{
 			//se for global
 
-			if(strcmp(lowerType(expr->tipo),"double") == 0 && strcmp(lowerType(expr->expr1->tipo),"int") == 0){
+			if(strcmp(lowerType(expr->tipo),"double") == 0 &&  (strcmp(lowerType(expr->expr1->tipo),"int") ==0 || strcmp(expr->expr1->tipo,"String[]") == 0)){
 				
 				printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number,expr->generation_type);
-
+				
+				expr->expr1->registo_number = registocounter;
+				expr->registo_number = registocounter;
+				
 				printf("store %s %%.%d, %s* @%s\n",expr->generation_type,registocounter,expr->generation_type,expr->value);
 				registocounter++;
 			}else{
@@ -1006,10 +1010,12 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 	}
 
 
+
+
+
 	if((strcmp(expr->value,"Add") == 0 || strcmp(expr->value,"Sub") == 0 || strcmp(expr->value,"Mul") == 0 || strcmp(expr->value,"Div") == 0 || strcmp(expr->value,"Mod") == 0)){
 
 		expr->generation_type = generation_tipo(expr->tipo);
-		expr->registo_number = registocounter;
 
 
 		if(strcmp(expr->tipo,"double") == 0){
@@ -1020,18 +1026,81 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 			aux = generationOperation( expr->value, expr->tipo);
 		}
 
-		printf("%%.%d = %s %s %%.%d, %%.%d\n",expr->registo_number,aux,expr->generation_type,expr->expr1->registo_number,expr->expr2->registo_number);
+		if( (strcmp(expr->expr1->tipo,"int") == 0 && strcmp(expr->expr2->tipo,"double") == 0) ){
+			printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number,expr->generation_type);
+			expr->expr1->registo_number = registocounter;
+		}
+
+		if((strcmp(expr->expr1->tipo,"double") == 0 && strcmp(expr->expr2->tipo,"int") == 0)){
+			printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr2->generation_type,expr->expr2->registo_number,expr->generation_type);
+			expr->expr2->registo_number = registocounter;
+		}
+
+		registocounter++;
+
+		printf("%%.%d = %s %s %%.%d, %%.%d\n",registocounter,aux,expr->generation_type,expr->expr1->registo_number,expr->expr2->registo_number);
+		
+		expr->registo_number = registocounter;
 		registocounter++;
 	}
 
 
+
+
+
 	if(strcmp(expr->value,"Eq") == 0 || strcmp(expr->value,"Ne") == 0 || strcmp(expr->value,"Ge") == 0 || strcmp(expr->value,"Gt") == 0 || strcmp(expr->value,"Le") == 0 || strcmp(expr->value,"Lt") == 0 ){
 
+		//tipo boolean
 		expr->generation_type = generation_tipo(expr->tipo);
+
+
+		//verifica se algum deles e double para passar o inteiro para double
+		if( (strcmp(expr->expr1->tipo,"int") == 0 || strcmp(expr->expr1->tipo,"String[]") == 0 ) && strcmp(expr->expr2->tipo,"double") == 0 ){
+			printf("%%.%d = sitofp %s %%.%d to double\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number);
+			expr->expr1->registo_number = registocounter;
+			registocounter++;
+		}
+
+		if( strcmp(expr->expr1->tipo,"double") == 0 && (strcmp(expr->expr2->tipo,"int") == 0 || strcmp(expr->expr2->tipo,"String[]") == 0 )  ){
+			printf("%%.%d = sitofp %s %%.%d to double\n",registocounter,expr->expr2->generation_type,expr->expr2->registo_number);
+			expr->expr2->registo_number = registocounter;
+			registocounter++;
+		}
+		
+		
+
+		//printa consoante o tipo double e int
+		if(strcmp(expr->expr1->tipo,"double") == 0 || strcmp(expr->expr2->tipo,"double") == 0){
+			aux = generationOperation( expr->value, "double");	
+			printf("%%.%d = fcmp %s double %%.%d, %%.%d\n",registocounter,aux,expr->expr1->registo_number,expr->expr2->registo_number);
+		}
+
+		if((strcmp(expr->expr1->tipo,"int") == 0 || strcmp(expr->expr1->tipo,"String[]") == 0 ) && (strcmp(expr->expr2->tipo,"int") == 0 || strcmp(expr->expr2->tipo,"String[]") == 0 )){
+			aux = generationOperation( expr->value, "int");	
+			printf("%%.%d = icmp %s %s %%.%d, %%.%d\n",registocounter,aux, expr->expr1->generation_type  ,expr->expr1->registo_number,expr->expr2->registo_number);
+		}
+
+
+		//printa consoante o tipo boolean
+		if((strcmp(lowerType(expr->expr1->tipo),"boolean") == 0 && strcmp(lowerType(expr->expr2->tipo),"boolean") == 0)){
+			printf("%%.%d = zext i1 %%.%d to i32\n",registocounter,expr->expr1->registo_number);
+			expr->expr1->registo_number = registocounter;
+			registocounter++;
+
+
+			printf("%%.%d = zext i1 %%.%d to i32\n",registocounter,expr->expr2->registo_number);
+			expr->expr2->registo_number = registocounter;
+			registocounter++;
+
+
+			aux = generationOperation( expr->value, "int");	
+			printf("%%.%d = icmp %s i32 %%.%d, %%.%d\n",registocounter,aux,expr->expr1->registo_number,expr->expr2->registo_number);
+
+		}
+
+
+
 		expr->registo_number = registocounter;
-		aux = generationOperation( expr->value, "");
-		//icmp define estas operaçoes , o tipo nao sera boolean mas sim i32 vi na documentacao
-		printf("%%.%d = icmp %s i32 %%.%d, %%.%d\n",expr->registo_number,aux,expr->expr1->registo_number,expr->expr2->registo_number);
 		registocounter++;
 	}
 
@@ -1103,8 +1172,6 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		ifcounter++;
 		registocounter++;
 	}
-
-
 
 
 	if(strcmp(expr->value,"Minus") == 0){
@@ -1217,7 +1284,7 @@ char * generationOperation(char * value, char * type){
 	
 	if( strcmp(value,"Add") == 0 && strcmp(type,"int") == 0 ){
 		operador = "add";
-	}else if(strcmp(value,"Add") == 0   && strcmp(type,"double") == 0 ){
+	}else if(strcmp(value,"Add") == 0  && strcmp(type,"double") == 0 ){
 		operador = "fadd";
 	}else if( strcmp(value,"Sub") == 0 && strcmp(type,"int") == 0 ){
 		operador = "sub";
@@ -1232,20 +1299,32 @@ char * generationOperation(char * value, char * type){
 	}else if(strcmp(value,"Div") == 0  && strcmp(type,"double") == 0){
 		operador = "fdiv";
 	}else if(strcmp(value,"Mod") == 0  && strcmp(type,"int") == 0){
-		operador = "urem";
+		operador = "srem";
 	}else if(strcmp(value,"Mod") == 0  && strcmp(type,"double") == 0){
 		operador = "frem";
-	}else if(strcmp(value,"Eq") == 0){
+	}else if(strcmp(value,"Eq") == 0 && strcmp(type,"double") == 0){
+		operador = "oeq";
+	}else if(strcmp(value,"Ge") == 0 && strcmp(type,"double") == 0){
+		operador = "oge";
+	}else if(strcmp(value,"Gt") == 0 && strcmp(type,"double") == 0){
+		operador = "ogt";
+	}else if(strcmp(value,"Le") == 0 && strcmp(type,"double") == 0){
+		operador = "ole";
+	}else if(strcmp(value,"Lt") == 0 && strcmp(type,"double") == 0){
+		operador = "olt";
+	}else if(strcmp(value,"Ne") == 0 && strcmp(type,"double") == 0){
+		operador = "one";
+	}else if(strcmp(value,"Eq") == 0 && strcmp(type,"int") == 0){
 		operador = "eq";
-	}else if(strcmp(value,"Ge") == 0){
+	}else if(strcmp(value,"Ge") == 0 && strcmp(type,"int") == 0){
 		operador = "sge";
-	}else if(strcmp(value,"Gt") == 0){
+	}else if(strcmp(value,"Gt") == 0 && strcmp(type,"int") == 0){
 		operador = "sgt";
-	}else if(strcmp(value,"Le") == 0){
+	}else if(strcmp(value,"Le") == 0 && strcmp(type,"int") == 0){
 		operador = "sle";
-	}else if(strcmp(value,"Lt") == 0){
+	}else if(strcmp(value,"Lt") == 0 && strcmp(type,"int") == 0){
 		operador = "slt";
-	}else if(strcmp(value,"Ne") == 0){
+	}else if(strcmp(value,"Ne") == 0 && strcmp(type,"int") == 0){
 		operador = "ne";
 	}else if(strcmp(value,"And") == 0){
 		operador = "and";

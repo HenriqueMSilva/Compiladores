@@ -26,7 +26,7 @@ valid_escape			\f|\t|\\{2}|\\\"
 invalid_escape			[^frtn\\\"]
 
 
-lineTerminator			\r|\n|(\r\n)
+lineTerminator			\n|\r|(\r\n)
 
 
 letras					[A-Za-z_\$]
@@ -164,9 +164,11 @@ int main(int argc, char *argv[]){
 
 		    	errors=check_program(myprogram);
 
-			    if(errors==0){
-			    	//show_table();
-			    	//print_tree(myprogram);
+			    if(errors>0){
+			        printf("The program has %d errors!\n", errors);
+			    }else{
+			    	show_table();
+			    	print_tree(myprogram);
 			    	generation(myprogram);
 			    }
 			}
@@ -183,11 +185,13 @@ int main(int argc, char *argv[]){
 		if(erro_sintaxe == 0){
 
 	   		errors=check_program(myprogram);
-		    if(errors==0){
-		    	//show_table();
-		    	//print_tree(myprogram);
+   			if(errors>0){
+		        printf("The program has %d errors!\n", errors);
+		    }else{
+
 		    	generation(myprogram);
 		    }
+
 		}
 
 		free_tree(myprogram);
