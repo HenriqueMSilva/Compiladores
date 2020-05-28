@@ -75,7 +75,7 @@ void generation_metodos(is_metodos* metodos){
             nameFunction = tmp->imdl->imhl->name;
 
             //se for main
-            if(strcmp(nameFunction,"main") == 0){
+            if( strcmp(nameFunction,"main") == 0 && tmp->imdl->imhl->impl != NULL && strcmp(tmp->imdl->imhl->impl->type,"StringArray") == 0 ){
             	hasmain = 1;
 
             	if( strcmp(tmp->imdl->imhl->type,"Double") == 0){
@@ -271,11 +271,17 @@ void generation_methodbody_list(is_methodbody_list* imbl,is_methodheader_list* i
 int assinaturas_iguais_local(is_methodheader_list* imhl,table_element_local *tabela_local ){
 
 
-	method_var *  local_param = tabela_local->tel->next;
+	method_var *  local_param = tabela_local->tel;
 	is_methodparams_list * ast_param = imhl->impl;
 	
+
+
 	//skip do param return;
-	local_param = local_param->next;
+	if(local_param->is_param == 0 && strcmp(local_param->name,"return") == 0  ){
+		local_param = local_param->next;
+	}
+
+	
 
 	while(local_param != NULL && ast_param != NULL){
 
