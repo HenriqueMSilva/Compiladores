@@ -96,6 +96,9 @@ class er{
 	    argument = Integer.parseInt(args[0]);
         //argument = 7;
         System.out.print(factorial(argument));
+        System.out.print("\n");
+        System.out.print("qweyqwtfeiu");
+        System.out.print("\n");
     
 }
 

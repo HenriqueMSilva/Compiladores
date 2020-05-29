@@ -378,6 +378,28 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 		if(strcmp(lowerType(statment->expr->tipo),"String") == 0){
 			string_element 	*string_element = symtab_global->string_element;
 
+
+			//%arr = alloca i32, i32 3
+			stringcounter++;
+			printf(" %%.str.%d = alloca i8, i8 %d\n", stringcounter, strlen(statment->expr->value));
+
+
+
+			int i;
+			for(i = 0; i < strlen(statment->expr->value); i++ ){
+
+				//%ind0 = getelementptr i32, i32* %arr, i32 0
+				printf("%%.str.%d.ind.%d = getelementptr i8, i8* %%.str.%d , i8 %d\n", stringcounter, i, stringcounter, i );
+
+
+				//store i32 9, i32* %ind0
+				printf(" store i8    %d  , i8* %%.str.%d.ind.%d   \n", i, stringcounter, i, statment->expr->value[i] );
+			}
+
+
+
+
+			/*
 			while(string_element != NULL){
 				if(string_element->printed == 0){
 					printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([%d x i8], [%d x i8]* @.str.%d, i32 0, i32 0))\n",registocounter,string_element->tamanho,string_element->tamanho,string_element->pos);
@@ -385,7 +407,7 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 					break;
 				}
 				string_element = string_element->next; 
-			}
+			}*/
 		
 		}else if(strcmp(lowerType(statment->expr->tipo),"String[]") == 0 && strcmp(statment->expr->operation,"ParseArgs") == 0 ){
 			//Parse.Int( args[ExprA] ) 

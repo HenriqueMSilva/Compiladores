@@ -108,7 +108,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		string_element *aux;
 		string_element* previous;
 
-		string_element *aux_sel = (string_element*) malloc(sizeof(string_element));
+		/*string_element *aux_sel = (string_element*) malloc(sizeof(string_element));
 
 		char * str = expr->value;
 		int i,k=0;
@@ -181,7 +181,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		}else{
 			symtab_global->string_element = aux_sel;	
 		}
-
+*/
 		expr->tipo = "String"; 
 		return expr->tipo;
 	}
