@@ -1,13 +1,17 @@
-class e{
+class Main {
+  
 
-      public static int overload( int ii, double dd  ){
-            return 1+1;
-        }   
+    public static void main(String[] args){
+        int a;
+        //System.out.print(" ");System.out.print("\n");
+        //System.out.print( "\t\n\r\f\\\"qwertyiuoposadjkfd\rnghgfbnncz.,\fmcx;:_ ªª%\nº+*`´][]}{€Ã§€@&\n£§ã€ +¤ ðÐÊË¶¾¹¨°Â©(de%l)000\n0 1.0_23++ 1_23:323.e-12\"\\3123123 pedor$sad  ");
 
-        public static void main(String[] args){
-            double b;
-            b = overload( 2, 1);
-              
-            System.out.print(b);
+        int i;
+        i=1;
+     
+        while(i <= 10 && i > 1){
+            i = i+1;
+            System.out.print(i);
         }
     }
+}

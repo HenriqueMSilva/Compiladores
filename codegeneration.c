@@ -370,7 +370,7 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 
 	if(statment->expr != NULL && strcmp(statment->name_function,"While") != 0){
 		generation_expression(statment->expr, imhl);
-	}
+	} 
 	
 
 	if(strcmp(statment->name_function,"Print") == 0){
@@ -425,9 +425,18 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 	}
 
 	if(strcmp(statment->name_function,"While") == 0){ 
+		
 		statment->number_condition = whilecounter;
-		printf("br label %%while%d\n",statment->number_condition);
-		printf("while%d:\n",statment->number_condition);
+		printf("br label %%entrada%d\n",statment->number_condition);
+		printf("entrada%d:\n",statment->number_condition);
+
+		if(statment->expr != NULL){
+			generation_expression(statment->expr, imhl);
+		} 
+
+		printf("br i1 %%.%d, label %%whiletrue%d, label %%saida%d\n",statment->expr->registo_number,statment->number_condition ,statment->number_condition);
+		
+		printf("whiletrue%d:\n",statment->number_condition);
 		whilecounter++;
 	}
 
@@ -488,12 +497,8 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 
 	if(strcmp(statment->name_function,"While") == 0){
 
-		if(statment->expr != NULL){
-			generation_expression(statment->expr,imhl);
-		}
-		
-		printf("br i1 %%.%d, label %%while%d, label %%whileCont%d\n", statment->expr->registo_number, statment->number_condition,statment->number_condition);
-		printf("whileCont%d:\n",statment->number_condition);
+		printf("br label %%entrada%d\n",statment->number_condition);
+		printf("saida%d:\n",statment->number_condition);
 	}
 
 	if(strcmp(statment->name_function,"If") == 0 || strcmp(statment->name_function,"IfElse") == 0){
@@ -1193,6 +1198,8 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		}
 
 
+
+
 		//printa consoante o tipo boolean
 		if((strcmp(lowerType(expr->expr1->tipo),"boolean") == 0 && strcmp(lowerType(expr->expr2->tipo),"boolean") == 0)){
 			printf("%%.%d = zext i1 %%.%d to i32\n",registocounter,expr->expr1->registo_number);
@@ -1341,7 +1348,7 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		registocounter++;
 	}	
 
-	if(strcmp(expr->value,"Xor") == 0){
+	/*if(strcmp(expr->value,"Xor") == 0){
 
 		printf("%%.%d = alloca i1\n",registocounter);
 		printf("br i1 %%.%d, label %%then%d, label %%else%d\n",expr->expr1->registo_number,ifcounter,ifcounter);
@@ -1361,7 +1368,7 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		ifcounter++;
 		registocounter++;
 
-	}
+	}*/
 }
 
 
