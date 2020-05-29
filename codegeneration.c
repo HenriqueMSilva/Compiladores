@@ -368,7 +368,7 @@ void generation_vardecl_list(is_vardecl_list* ivdl,is_methodheader_list* imhl){
 
 void generation_statment_list(is_statment_list* statment,is_methodheader_list* imhl){
 
-	if(statment->expr != NULL /*&& strcmp(statment->name_function,"While") != 0*/){
+	if(statment->expr != NULL && strcmp(statment->name_function,"While") != 0){
 		generation_expression(statment->expr, imhl);
 	}
 	
@@ -438,17 +438,28 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 		ifcounter++;
 	}
 
+
 	if(strcmp(statment->name_function,"Return") == 0){
 
 
-		//simb table ponteiro num returrn;
-		//simb table tipo returrn;
+        //simb table ponteiro num returrn;
+        //simb table tipo returrn;
 
-		//se for undef entao return; logo é void
-		if(strcmp(statment->expr->tipo,"undef") != 0){
-			printf("ret %s %%.%d\n",statment->expr->generation_type,statment->expr->registo_number);
-		}
-	}
+        //se for undef entao return; logo é void
+        if(strcmp(statment->expr->tipo,"undef") != 0){
+
+            if( strcmp( lowerType(imhl->type), "double") == 0 && (strcmp(lowerType(statment->expr->tipo),"int") == 0 || strcmp(lowerType(statment->expr->tipo),"String[]") == 0 ) ){
+                        
+                printf("%%.%d = sitofp i32 %%.%d to double\n",registocounter, statment->expr->registo_number);
+                registocounter++;
+
+                printf("ret double %%.%d\n",registocounter - 1);
+            }else{
+                printf("ret %s %%.%d\n",statment->expr->generation_type,statment->expr->registo_number);
+            }
+
+        }
+    }
 
 	if(strcmp(statment->name_function,"Call") == 0){
 		//nao preciso de fazer nada
@@ -466,6 +477,7 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 		printf("br label %%ifCont%d\n",statment->number_condition);
 		printf("else%d:\n",statment->number_condition);
 	}
+
 
 	//ir para statmet2
 	if(statment->statment2 != NULL ){
@@ -748,7 +760,7 @@ int convertType(const char* value, double *destination) {
 char * novo_formato_int(char * str){
 	int i,k=0;
 
-	char * new_str =  (char*) malloc(100*sizeof(char)); 
+	char * new_str =  (char*) malloc( (2 * strlen(str)*sizeof(char) ) + 10 );
 
 	for(i=0;i<strlen(str);i++){
 		//ignorar o _
@@ -892,7 +904,7 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		//este generation tipo e problematico? TODO
 		expr->generation_type = generation_tipo("int");
 	
-    
+  
         printf("%%.%d = load i32, i32* @.argc\n",registocounter);
         registocounter++;
 
@@ -905,134 +917,147 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 
 
 
-	if(strcmp(expr->operation, "Call" ) == 0){
-		char * nome_llvm;
-		is_expression_list * param;
-		param_node * simb_param;
-		
-		table_element_global * ref_funcao;
+    if(strcmp(expr->operation, "Call" ) == 0){
+        char * nome_llvm;
+        is_expression_list * param;
+        param_node * simb_param;
+        
+        table_element_global * ref_funcao;
 
-		char * tipo;
-		int numero;
-		int offset = 0;
-
-
-
-		//nome da funcao igual 
-		ref_funcao = devolve_nome_func_llvm_igual(expr, symtab_global->declarations);
-		
-		if(ref_funcao == NULL){
-			//nome da funcao parecida 
-			ref_funcao = devolve_nome_func_llvm_parecida(expr, symtab_global->declarations);
-		}
-
-		//printf("\n\n%s\n\nhega aqui\n\n\n\n",ref_funcao->nome_llvm);
-
-		nome_llvm = ref_funcao->nome_llvm; 
-
-		expr->registo_number = registocounter;
-		expr->generation_type = generation_tipo(lowerType(expr->tipo));
-
-		//printf("...\n\n\n");
-		//printf("%s\n",expr->tipo  );
+        char * tipo;
+        int numero;
+        int offset = 0;
 
 
-		//callmore
-		param = expr->expr1;
-		
-		//1 param da simb table
-		simb_param = ref_funcao->param_list;
 
-		//----------------------------------
-		//se estivermos a meter um int no lugar de um double temos de converter primeiro antes do call
-		while(param != NULL){
+        //nome da funcao igual 
+        ref_funcao = devolve_nome_func_llvm_igual(expr, symtab_global->declarations);
+        
+        if(ref_funcao == NULL){
+            //nome da funcao parecida 
+            ref_funcao = devolve_nome_func_llvm_parecida(expr, symtab_global->declarations);
+        }
+
+        //printf("\n\n%s\n\nhega aqui\n\n\n\n",ref_funcao->nome_llvm);
+
+        nome_llvm = ref_funcao->nome_llvm; 
+
+        expr->registo_number = registocounter;
+        expr->generation_type = generation_tipo(lowerType(expr->tipo));
+
+        //printf("...\n\n\n");
+        //printf("%s\n",expr->tipo  );
 
 
-			tipo = param->expr1->generation_type;
-			numero = param->expr1->registo_number;
+        //callmore
+        param = expr->expr1;
+        
+        //1 param da simb table
+        simb_param = ref_funcao->param_list;
+
+        //----------------------------------
+        //se estivermos a meter um int no lugar de um double temos de converter primeiro antes do call
+        while(param != NULL){
 
 
-			if(strcmp(lowerType(simb_param->type_param),"double") == 0 && (strcmp(lowerType(param->expr1->tipo),"int") ==0 || strcmp( lowerType(param->expr1->tipo),"String[]") == 0) ){
-
-				printf("%%.%d = sitofp i32 %%.%d to double\n",registocounter, numero );
-
- 				//tipo = "i32"; 
- 				//numero = registocounter; 
-
- 				offset += 1;
-
-				registocounter++;
-				
-			}
-
-			param = param->expr2;
-		}
+            tipo = param->expr1->generation_type;
+            numero = param->expr1->registo_number;
 
 
 
 
+            //printf("\nSIMb:%s\n", simb_param->type_param);
+            //printf("\nexpr: %s %s \n", param->expr1->tipo,  param->expr1->value);
 
+            if(strcmp(lowerType(simb_param->type_param),"double") == 0 && (strcmp(lowerType(param->expr1->tipo),"int") ==0 || strcmp( lowerType(param->expr1->tipo),"String[]") == 0) ){
 
+                printf("%%.%d = sitofp i32 %%.%d to double\n",registocounter, numero );
 
+                 //tipo = "i32"; 
+                 //numero = registocounter; 
 
+                 offset += 1;
 
+                registocounter++;
+                
+            }
 
-
-
-		//--------------------------------
-		//print do call
-		if( strcmp(lowerType(expr->tipo),"void") != 0){
-			printf("%%.%d = ",registocounter);
-			
-			offset += 1;
-			registocounter++;
-		}
-
-
-		printf("call %s @%s(", expr->generation_type, nome_llvm  );
-
-
-		//callmore
-		param = expr->expr1;
-		
-		//1 param da simb table
-		simb_param = ref_funcao->param_list;
-
-		while(param != NULL){
-
-
-			tipo = param->expr1->generation_type;
-			numero = param->expr1->registo_number;
-
-
-			if(strcmp(lowerType(simb_param->type_param),"double") == 0 && (strcmp(lowerType(param->expr1->tipo),"int") ==0 || strcmp( lowerType(param->expr1->tipo),"String[]") == 0) ){
-
-				//printf("%%.%d = sitofp i32 %%.%d to double\n",registocounter, numero );
-
- 				tipo = "double"; 
- 				numero = registocounter - offset; 
-				
-			}
-
-
-
-			printf("%s %%.%d", tipo, numero  );
-
-			if(param->expr2 != NULL){
-				printf(", ");
-			}	
-
-			param = param->expr2;
-		}
-
-		printf(")\n");
+            param = param->expr2;
+            simb_param = simb_param->next;
+        }
 
 
 
 
 
 
-	}
+
+
+
+
+        //--------------------------------
+        //print do call
+        if( strcmp(lowerType(expr->tipo),"void") != 0){
+            printf("%%.%d = ",registocounter);
+            
+            //guarda o ponteiro para a call
+            expr->registo_number = registocounter;
+
+
+            offset += 1;
+            registocounter++;
+        }
+
+
+        printf("call %s @%s(", expr->generation_type, nome_llvm  );
+
+
+        //callmore
+        param = expr->expr1;
+        
+        //1 param da simb table
+        simb_param = ref_funcao->param_list;
+
+        while(param != NULL){
+
+
+            tipo = param->expr1->generation_type;
+            numero = param->expr1->registo_number;
+
+            //printf("\n%s\n", simb_param->type_param);
+            //printf("\n%s\n", param->expr1->tipo);
+            //printf("\n%s\n", simb_param->type_param);
+
+            if(strcmp(lowerType(simb_param->type_param),"double") == 0 && (strcmp(lowerType(param->expr1->tipo),"int") == 0 || strcmp( lowerType(param->expr1->tipo),"String[]") == 0) ){
+
+                //printf("%%.%d = sitofp i32 %%.%d to double\n",registocounter, numero );
+
+                 tipo = "double"; 
+                 numero = registocounter - offset; 
+                 offset--;
+                
+            }
+
+
+
+            printf("%s %%.%d", tipo, numero  );
+
+            if(param->expr2 != NULL){
+                printf(", ");
+            }    
+
+            param = param->expr2;
+            simb_param = simb_param->next;
+
+            //simb_param = simb_param->next;
+        }
+
+        printf(")\n");
+
+
+
+
+    }
 
 
 	if(strcmp(expr->operation, "CallMore" ) == 0){
@@ -1112,12 +1137,12 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 
 		if( ((strcmp(lowerType(expr->expr1->tipo),"int") == 0 || strcmp(lowerType(expr->expr1->tipo),"String[]") == 0 ) && strcmp(lowerType(expr->expr2->tipo),"double") == 0) ){
 
-			printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number,expr->generation_type);
+			printf("%%.%d = sitofp %s %%.%d to double\n",registocounter,expr->expr1->generation_type,expr->expr1->registo_number);
 			expr->expr1->registo_number = registocounter;
 		}
 
 		if((strcmp(lowerType(expr->expr1->tipo),"double") == 0 && (strcmp(lowerType(expr->expr2->tipo),"int") == 0 || strcmp(lowerType(expr->expr2->tipo),"String[]") == 0 ))){
-			printf("%%.%d = sitofp %s %%.%d to %s\n",registocounter,expr->expr2->generation_type,expr->expr2->registo_number,expr->generation_type);
+			printf("%%.%d = sitofp %s %%.%d to double\n",registocounter,expr->expr2->generation_type,expr->expr2->registo_number);
 			expr->expr2->registo_number = registocounter;
 		}
 
@@ -1194,69 +1219,72 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 
 
 	if(strcmp(expr->value,"And") == 0){
-
-		printf("br i1 %%.%d, label %%thenaux%d, label %%else%d\n",expr->expr1->registo_number,ifcounter,ifcounter);
-		printf("thenaux%d:\n",ifcounter);
+		
+		int counter = ifcounter;
+		ifcounter++;
+		printf("br i1 %%.%d, label %%thenaux%d, label %%else%d\n",expr->expr1->registo_number,counter,counter);
+		printf("thenaux%d:\n",counter);
 
 		if(expr->expr2 != NULL){
 			generation_expression(expr->expr2,imhl );
 		}
 
-		printf("br label %%then%d\n",ifcounter);
-		printf("then%d:\n",ifcounter);
+		printf("br label %%then%d\n",counter);
+		printf("then%d:\n",counter);
 
 		printf("%%.%d = add i1 0, %%.%d\n",registocounter,expr->expr2->registo_number);
 
-		printf("br label %%ifCont%d\n",ifcounter);
+		printf("br label %%ifCont%d\n",counter);
 
 
-		printf("else%d:\n",ifcounter);
-		printf("br label %%ifCont%d\n",ifcounter);
-		printf("ifCont%d:\n",ifcounter);
+		printf("else%d:\n",counter);
+		printf("br label %%ifCont%d\n",counter);
+		printf("ifCont%d:\n",counter);
 
 		registocounter++;
 
 
-		printf("%%.%d = phi i1 [  %%.%d, %%then%d ], [ %%.%d, %%else%d ]\n",registocounter,expr->expr2->registo_number+1,ifcounter,expr->expr1->registo_number,ifcounter);
+		printf("%%.%d = phi i1 [  %%.%d, %%then%d ], [ %%.%d, %%else%d ]\n",registocounter,expr->expr2->registo_number+1,counter,expr->expr1->registo_number,counter);
 
 		expr->generation_type = generation_tipo(lowerType(expr->tipo));
 		expr->registo_number = registocounter;
 
-		ifcounter++;
+		
 		registocounter++;
 	}
 
 
 	if(strcmp(expr->value,"Or") == 0){
 
-		printf("br i1 %%.%d, label %%then%d, label %%elseaux%d\n",expr->expr1->registo_number,ifcounter,ifcounter);
-		printf("then%d:\n",ifcounter);
-		printf("br label %%ifCont%d\n",ifcounter);
+		int counter = ifcounter;
+		ifcounter++;
+		printf("br i1 %%.%d, label %%then%d, label %%elseaux%d\n",expr->expr1->registo_number,counter,counter);
+		printf("then%d:\n",counter);
+		printf("br label %%ifCont%d\n",counter);
 
-		printf("elseaux%d:\n",ifcounter);
+		printf("elseaux%d:\n",counter);
 
 		if(expr->expr2 != NULL){
 			generation_expression(expr->expr2,imhl );
 		}
 
-		printf("br label %%else%d\n",ifcounter);
-		printf("else%d:\n",ifcounter);
+		printf("br label %%else%d\n",counter);
+		printf("else%d:\n",counter);
 
 
 		printf("%%.%d = add i1 0, %%.%d\n",registocounter,expr->expr2->registo_number);
 
-		printf("br label %%ifCont%d\n",ifcounter);
+		printf("br label %%ifCont%d\n",counter);
 
-		printf("ifCont%d:\n",ifcounter);
+		printf("ifCont%d:\n",counter);
 
 		registocounter++;
 
-		printf("%%.%d = phi i1 [  %%.%d, %%then%d ], [ %%.%d, %%else%d ]\n",registocounter,expr->expr1->registo_number,ifcounter,expr->expr2->registo_number+1,ifcounter);
+		printf("%%.%d = phi i1 [  %%.%d, %%then%d ], [ %%.%d, %%else%d ]\n",registocounter,expr->expr1->registo_number,counter,expr->expr2->registo_number+1,counter);
 
 		expr->generation_type = generation_tipo(lowerType(expr->tipo));
 		expr->registo_number = registocounter;
 
-		ifcounter++;
 		registocounter++;
 	}
 
@@ -1348,7 +1376,7 @@ char * generation_tipo(char * str){
 		aux = "i32";
 	}else if( strcmp(lowerType(str),"boolean") == 0){
 		aux = "i1";
-	}else if( strcmp(lowerType(str),"stringarray") == 0){
+	}else if( strcmp(lowerType(str),"String[]") == 0){
 		aux = "i8**";
 	}else if( strcmp(lowerType(str),"void") == 0){
 		aux = "void";

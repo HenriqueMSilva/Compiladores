@@ -114,7 +114,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		int i,k=0;
 
 
-		char * new_str = (char*) malloc(2 * strlen(str)*sizeof(char));
+		char * new_str = (char*) malloc( (2 * strlen(str)*sizeof(char) ) + 10 );
 		new_str[0] = '\0';
 
 
