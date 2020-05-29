@@ -55,11 +55,12 @@ void generation_metodos(is_metodos* metodos){
 	}
 
 
+
 	//print das strings 
 	while(tabela_global != NULL){
 
 		tabela_global->pos = stringcounter;
-		printf("@.str.%d = constant [%d x i8] c\"%s\\00\"\n",tabela_global->pos,tabela_global->tamanho,tabela_global->string);
+		printf("@.str.%d = constant [%d x i8] c\"%s\\00\"\n",tabela_global->pos,tabela_global->tamanho, (char*)strdup(tabela_global->string));
 		stringcounter++;
 		tabela_global = tabela_global->next; 
 	}
@@ -1135,6 +1136,7 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		if(strcmp(lowerType(expr->tipo),"double") == 0){
 			aux = generationOperation( expr->value, lowerType(expr->tipo));
 		}
+
 
 		if(strcmp(lowerType(expr->tipo),"int") == 0 ){
 			aux = generationOperation( expr->value,lowerType(expr->tipo));

@@ -110,7 +110,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 
 		string_element *aux_sel = (string_element*) malloc(sizeof(string_element));
 
-		char * str = expr->value;
+		char * str = (char*)strdup(expr->value);
 		int i,k=0;
 
 
@@ -164,7 +164,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		new_str[k] = '\0';
 		//printf("%s\n",new_str);
 		//as aspas nao sao adicionadas
-		aux_sel->string = new_str;
+		aux_sel->string = (char*)strdup(new_str);
 		aux_sel->tamanho += 1;
 		aux_sel->printed = 0;
 		aux_sel->next = NULL;
