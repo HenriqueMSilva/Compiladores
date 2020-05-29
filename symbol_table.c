@@ -118,7 +118,7 @@ char * recursao_expr(is_expression_list* expr, method_var* lista_do_metodo ){
 		new_str[0] = '\0';
 
 
-		for(i=0;i<strlen(str);i++){
+		for(i=0; i<strlen(str); i++){
 			//se for \n substitui para \0A
 
 			if(str[i] == '\\'){
