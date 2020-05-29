@@ -1,38 +1,105 @@
-class fluxControl1 {
-    //Insert '15' as a param
-    public static int a (int input){
-		int i; i = 0;
-		while( i < 10){
-			input = input + 2;
-			i = i+1;
-		}
-		return input;
-    }
-    
-    public static int b(int input){
-		int k; k = 0;
-        while( k < 5){
-			input = input *3;
-			k = k + 1;
-		}
-		return input;
-    }
+/*class fluxControl1 {
+
+
     public static void main(String[] args) {
-        
-        int input;
-		int aux;
-		int aux1;
-		aux = 0; aux1 = 0;
-		input = Integer.parseInt(args[0]);
-		if(input < 10) {
-			aux = a(input);
-		} else {
-			aux1 = b(input);
-		}
-		System.out.print(aux);
+        int t;
+		double e;
+
+
+
+		t = Integer.parseInt(args[0]); 
+		e = Integer.parseInt(args[0]);
+
+		//System.out.print(		args   );
+		//System.out.print("\\n1234567890,.+*«´~-|\"rç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vyb\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ\\n1234567890,.+*«´~-ç*-_ºª mnhvhcfdzaw	zqzdesxre<>x\n\t\n\t \f \r \r\n   		 \n\n !! $$ %%&&//(())==??»»``**ªª^^ÇÇ::;;__--..,,ºº~~´´++çç''«« drt!\"$%&/())=?»vybguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQguyhoimj+plçl,l,lMLÇPIKIJNUYHBYTGVTFCRSXEAZQ");
+	
+		//@.str.0 = constant [2 x i8] c" \00"
+
+		System.out.print(  "%f"  );
+		System.out.print(  " System.o@☺☻♥ut.print(STRLIT )"  );
+		System.out.print(  " System.out.print(STRLIT )\r\n"  );
+		
+		System.out.print(  " System.<x010>out.10"  );
+		System.out.print("\n ←♂♀@○◘♪");
+		
+		System.out.print(  "@.str.0 = constant [5682 x i8] c\"\\0A\\00\""  );
+		//System.out.print("\nTE~STE\n");
+		
+
+
+System.out.print(" Teste	de string");
+//		2
+
+		System.out.print("");
 		System.out.print("\n");
-		System.out.print(aux1);
+
+		//System.out.print("\\n1234Ç::;;__ @@££§§€€{{[[]]}}EAZQ");
+
+		//System.out.print(		Integer.parseInt(args[ Integer.parseInt(args[0]) ])  );
+
 		System.out.print("\n");
+
+
+		
 		
     }
+}*/
+
+
+
+class er{
+
+/*
+    public static void main(String[] args) {
+
+
+{{
+    System.out.print( "@.crl= private unnamed_addr constant [");
+		
+}
+}
+	if(true){
+		main2(args);
+	}
+
+}
+
+
+    public static void main2(String[] args) {
+        int t;
+		double e;
+		int i;
+		i = 0;
+	    System.out.print( "\n");
+
+	    System.out.print( 	true || false );
+
+	    System.out.print( Integer.parseInt(args[2])  );
+
+	    System.out.print( "\n");
+	
+
+
+	}*/
+
+
+
+
+    public static int factorial(int n) {
+        if (n == 0)
+            return 1;
+        return n * factorial(n-1);
+    }
+
+    public static void main(String[] args) {
+        int argument;
+	    argument = Integer.parseInt(args[0]);
+        //argument = 7;
+        System.out.print(factorial(argument));
+        System.out.print("\n");
+        System.out.print("qweyqwtfeiu");
+        System.out.print("\n");
+    
+}
+
 }
