@@ -8,6 +8,7 @@ extern	table_element_local 	*symtab_local;
 
 
 int registocounter = 1;
+	int stringcounter = 0;
 int whilecounter = 1;
 int ifcounter = 1;
 
@@ -26,7 +27,8 @@ void generation_metodos(is_metodos* metodos){
 	char * nameFunction;
 	char * mainType;
 	char * aux;
-	int hasmain = 0, stringcounter = 0;
+	int hasmain = 0;
+
 
 
 	printf("@.argc = common global i32 0\n");
@@ -193,7 +195,6 @@ void generation_methodheader_list(is_methodheader_list* imhl){
 		//ver se e a main(String[])
 
 		if( strcmp( lowerType(imhl->impl->type), "String[]") == 0 ){
-			//printf("\n\n\n-%s--------------------\n\n\n\n",imhl->impl->type );
 			printf("%s.nossa(",imhl->name);
 		}else{ 
 			//p.e main(int)
@@ -376,26 +377,130 @@ void generation_statment_list(is_statment_list* statment,is_methodheader_list* i
 	if(strcmp(statment->name_function,"Print") == 0){
 
 		if(strcmp(lowerType(statment->expr->tipo),"String") == 0){
-			string_element 	*string_element = symtab_global->string_element;
+			
+
+			int i,k, ascii_code, size;
+			size = (int)strlen(statment->expr->value);
+
 
 
 			//%arr = alloca i32, i32 3
 			stringcounter++;
-			printf(" %%.str.%d = alloca i8, i8 %d\n", stringcounter, strlen(statment->expr->value));
+			printf(" %%.str.%d = alloca i8, i8 %d\n", stringcounter, size + 1 );
 
 
 
-			int i;
-			for(i = 0; i < strlen(statment->expr->value); i++ ){
+			for(i = 0, k = 0; i < size; i++ ){
 
-				//%ind0 = getelementptr i32, i32* %arr, i32 0
-				printf("%%.str.%d.ind.%d = getelementptr i8, i8* %%.str.%d , i8 %d\n", stringcounter, i, stringcounter, i );
+		
+				ascii_code = statment->expr->value[i];
 
 
-				//store i32 9, i32* %ind0
-				printf(" store i8    %d  , i8* %%.str.%d.ind.%d   \n", i, stringcounter, i, statment->expr->value[i] );
+				if(statment->expr->value[i] == '\\'){
+
+
+					if(statment->expr->value[i+1] == 'n'){
+
+						//%ind0 = getelementptr i32, i32* %arr, i32 0
+						printf("%%.str.%d.ind.%d = getelementptr i8, i8* %%.str.%d , i8 %d\n", stringcounter, k, stringcounter, k );
+						ascii_code = 10;
+						i++;
+						//store i32 9, i32* %ind0
+						printf(" store i8    %d  , i8* %%.str.%d.ind.%d   \n", ascii_code, stringcounter, k );
+						k++;
+						
+					}else if(statment->expr->value[i+1] == 't'){
+												//%ind0 = getelementptr i32, i32* %arr, i32 0
+						printf("%%.str.%d.ind.%d = getelementptr i8, i8* %%.str.%d , i8 %d\n", stringcounter, k, stringcounter, k );
+						ascii_code = 9;
+						i++;
+						//store i32 9, i32* %ind0
+						printf(" store i8    %d  , i8* %%.str.%d.ind.%d   \n", ascii_code, stringcounter, k );
+						k++;
+						
+					}else if(statment->expr->value[i+1] == 'r'){
+						
+						//%ind0 = getelementptr i32, i32* %arr, i32 0
+						printf("%%.str.%d.ind.%d = getelementptr i8, i8* %%.str.%d , i8 %d\n", stringcounter, k, stringcounter, k );
+						ascii_code = 13;
+						i++;
+						//store i32 9, i32* %ind0
+						printf(" store i8    %d  , i8* %%.str.%d.ind.%d   \n", ascii_code, stringcounter, k );
+						k++;
+
+					}else if(statment->expr->value[i+1] == '\\'){
+												//%ind0 = getelementptr i32, i32* %arr, i32 0
+						printf("%%.str.%d.ind.%d = getelementptr i8, i8* %%.str.%d , i8 %d\n", stringcounter, k, stringcounter, k );
+						ascii_code = 92 ;
+						i++;
+						//store i32 9, i32* %ind0
+						printf(" store i8    %d  , i8* %%.str.%d.ind.%d   \n", ascii_code, stringcounter, k );
+						k++;
+
+					}else if(statment->expr->value[i+1] == '\"'){
+						//%ind0 = getelementptr i32, i32* %arr, i32 0
+						printf("%%.str.%d.ind.%d = getelementptr i8, i8* %%.str.%d , i8 %d\n", stringcounter, k, stringcounter, k );
+						ascii_code = 34;
+						i++;
+						//store i32 9, i32* %ind0
+						printf(" store i8    %d  , i8* %%.str.%d.ind.%d   \n", ascii_code, stringcounter, k );
+						k++;
+					}else if(statment->expr->value[i+1] == 'f'){
+						
+						//%ind0 = getelementptr i32, i32* %arr, i32 0
+						printf("%%.str.%d.ind.%d = getelementptr i8, i8* %%.str.%d , i8 %d\n", stringcounter, k, stringcounter, k );
+						ascii_code = 12;
+						i++;
+						//store i32 9, i32* %ind0
+						printf(" store i8    %d  , i8* %%.str.%d.ind.%d   \n", ascii_code, stringcounter, k );
+						k++;
+
+					}
+
+
+
+
+				//aux_sel->tamanho += 1;
+				//i++;
+
+				//}else if(statment->expr->value[i] == '%' ){
+					
+					//new_str[k] = '%'; k++;
+					//new_str[k] = '%'; k++;
+					//new_str[k] = '%'; k++;
+					//new_str[k] = '%'; k++;
+					//aux_sel->tamanho += 4;
+
+
+
+
+
+				//tudo sem ser aspa
+				}else if( statment->expr->value[i] != '\"'){
+
+
+					//%ind0 = getelementptr i32, i32* %arr, i32 0
+					printf("%%.str.%d.ind.%d = getelementptr i8, i8* %%.str.%d , i8 %d\n", stringcounter, k, stringcounter, k );
+					//store i32 9, i32* %ind0
+					printf(" store i8    %d  , i8* %%.str.%d.ind.%d   \n", ascii_code, stringcounter, k );
+					k++;
+
+				}
+
+
+
 			}
 
+				// \0
+				printf("%%.str.%d.ind.%d = getelementptr i8, i8* %%.str.%d , i8 %d\n", stringcounter, k, stringcounter, k );
+				printf(" store i8  0  , i8* %%.str.%d.ind.%d   \n",  stringcounter, k );
+
+
+
+				//call i32 (i8*, ...) @printf(i8 * getelementptr inbounds ([3 x i8], [3 x i8]* @.str.argv,   i32 0, i32 0 ), i8 *  %.str.1)
+
+
+				printf("call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str.argv, i32 0, i32 0), i8* %%.str.%d  )\n", stringcounter);
 
 
 
@@ -571,67 +676,6 @@ int verifica_variavel(is_methodheader_list* imhl, is_expression_list* expr){
 
 
 
-/*
-void guarda_nome_func_llvm(char* nome_guardar, is_methodheader_list* imhl , table_element_global * metodos_da_classe){
-	//expr do call
-	// metodos_da_class e a tabela SIMB global
-	
-	param_node * simb_param;	
-	is_methodparams_list* ast_param;
-
-	char * ast_tipo;
-	char * simb_tipo;
-
-
-	while(metodos_da_classe != NULL){
-
-
-		//compara o nome das funcoes
-		if(strcmp(metodos_da_classe->name, imhl->name) == 0){
-
-
-			ast_param = imhl->impl;
-			simb_param = metodos_da_classe->param_list;
-
-
-			//percorrer os parametos de entrada das duas funcoes
-			while( simb_param != NULL &&  ast_param != NULL){
-
- 				ast_tipo =  lowerType(ast_param->type);
- 				simb_tipo =  lowerType(simb_param->type_param);
-
-
-				if(strcmp(ast_tipo, simb_tipo) != 0 ){
-					//tipos dos parametros de entrada differentes
-					break;
-				}
-
-				//eram iguais, vamos verificar o proximo parametro
-
-				ast_param = ast_param->next;
-				simb_param = simb_param->next;
-			}
-
-
-			if(simb_param == NULL &&  ast_param == NULL){
-				
-				//assinaturas iguais
-				metodos_da_classe->nome_llvm = nome_guardar;
-
-
-				//printf("\n\nGuardou: %s Na FUNC: %s\n\n\n",metodos_da_classe->nome_llvm, metodos_da_classe->name );
-				return; 
-			}
-
-
-		}
-
-		metodos_da_classe = metodos_da_classe->next;
-
-	}
-
-
-}*/
 
 table_element_global * devolve_nome_func_llvm_parecida(is_expression_list * expr, table_element_global * metodos_da_classe){
 //expr do call
@@ -1367,27 +1411,7 @@ void generation_expression(is_expression_list* expr,is_methodheader_list* imhl){
 		registocounter++;
 	}	
 
-	/*if(strcmp(expr->value,"Xor") == 0){
 
-		printf("%%.%d = alloca i1\n",registocounter);
-		printf("br i1 %%.%d, label %%then%d, label %%else%d\n",expr->expr1->registo_number,ifcounter,ifcounter);
-		printf("then%d:\n",ifcounter);
-		printf("store i1 false, i1* %%.%d\n",registocounter);
-		printf("br label %%ifCont%d\nelse%d:\n",ifcounter,ifcounter);
-		printf("store i1 true, i1* %%.%d\n",registocounter);
-		printf("br label %%ifCont%d\nifCont%d:\n",ifcounter,ifcounter);
-		registocounter++;
-		printf("%%.%d = load i1, i1* %%.%d\n",registocounter,registocounter-1);
-		registocounter++;
-		printf("%%.%d = xor i1 %%.%d, %%.%d\n",registocounter,registocounter-1,expr->expr2->registo_number);
-
-		expr->expr1->registo_number = registocounter; 
-		expr->generation_type =  generation_tipo(lowerType(expr->tipo));
-		expr->registo_number = expr->expr1->registo_number;
-		ifcounter++;
-		registocounter++;
-
-	}*/
 }
 
 

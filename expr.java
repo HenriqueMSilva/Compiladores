@@ -84,22 +84,35 @@ class er{
 
 
 
-
+/*
     public static int factorial(int n) {
         if (n == 0)
             return 1;
         return n * factorial(n-1);
-    }
+    }*/
 
     public static void main(String[] args) {
-        int argument;
-	    argument = Integer.parseInt(args[0]);
+        //int argument;
+	    //argument = Integer.parseInt(args[0]);
         //argument = 7;
-        System.out.print(factorial(argument));
+
+
+        Integer.parseInt(args[1_0]);
+        //Integer.parseInt(args[1_0_0]);
+        Integer.parseInt(args[1 + 5]);
+        Integer.parseInt(args[2 / 2]);
+
+        b = Integer.parseInt(args[1 * 5]);
         System.out.print("\n");
-        System.out.print("qweyqwtfeiu");
+        System.out.print(a + 56);
         System.out.print("\n");
+        System.out.print(b);
+        
+        System.out.print("\n");
+      
     
-}
+	}
+    public static double a;
+    public static int b;
 
 }
