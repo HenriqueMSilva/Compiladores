@@ -183,10 +183,6 @@ int main(int argc, char *argv[]){
 
 		    	errors=check_program(myprogram);
 
-			    if(errors == 0){
-			    	show_table();
-			    	print_tree(myprogram);
-			    }
 			}
 
 		free_tree(myprogram);
